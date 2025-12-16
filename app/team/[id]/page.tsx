@@ -200,20 +200,21 @@ export default function TeamMemberPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {member.projects.map((project) => (
-              <div
+              <Link
+                href={`/team/${member.id}/project/${project.id}`}
                 key={project.id}
-                className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all"
+                className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-black hover:shadow-lg transition-all group cursor-pointer"
               >
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:from-gray-200 group-hover:to-gray-300 transition-colors">
                   <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div className="p-6">
                   <span className="text-sm text-gray-500 font-medium">{project.type}</span>
-                  <h3 className="text-xl font-bold text-black mt-1">{project.title}</h3>
+                  <h3 className="text-xl font-bold text-black mt-1 group-hover:text-gray-700 transition-colors">{project.title}</h3>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 

@@ -1,6 +1,5 @@
 export default function SocialProof() {
   const clients = [
-    { name: "Adidas" },
     { name: "Under Armour" },
     { name: "Armani" },
     { name: "Nike" },
