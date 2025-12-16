@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -27,49 +28,79 @@ export default function TeamPage() {
     }
   }, []);
 
-  // Mock team members data
+  // Mock team members data with projects
   const teamMembers = [
     {
       id: 1,
       name: 'Sarah Chen',
       role: '3D Fashion Designer',
       skills: ['CLO3D', '3D Simulation', 'Texturing'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p1', title: 'Summer Collection 2024', type: '3D Simulation', image: '/placeholder.jpg' },
+        { id: 'p2', title: 'Athleisure Line', type: 'Texturing', image: '/placeholder.jpg' },
+        { id: 'p3', title: 'Denim Essentials', type: '3D Modeling', image: '/placeholder.jpg' }
+      ]
     },
     {
       id: 2,
       name: 'Marco Rossi',
       role: 'Technical Designer',
       skills: ['2D Flats', 'Tech Packs', 'Patternmaking'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p4', title: 'Outerwear Tech Packs', type: 'Tech Pack', image: '/placeholder.jpg' },
+        { id: 'p5', title: 'Streetwear Flats', type: '2D Flats', image: '/placeholder.jpg' },
+        { id: 'p6', title: 'Formal Wear Patterns', type: 'Patternmaking', image: '/placeholder.jpg' }
+      ]
     },
     {
       id: 3,
       name: 'Aisha Kumar',
       role: '3D Visualization Specialist',
       skills: ['Browzwear', 'Rendering', 'Material Design'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p7', title: 'Luxury Brand Renders', type: 'Rendering', image: '/placeholder.jpg' },
+        { id: 'p8', title: 'Fabric Visualization', type: 'Material Design', image: '/placeholder.jpg' },
+        { id: 'p9', title: 'Virtual Showroom', type: '3D Visualization', image: '/placeholder.jpg' }
+      ]
     },
     {
       id: 4,
       name: 'Lucas Silva',
       role: 'Collection Developer',
       skills: ['Collection Planning', 'Line Sheets', 'Concept Design'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p10', title: 'Fall/Winter 2024', type: 'Collection Planning', image: '/placeholder.jpg' },
+        { id: 'p11', title: 'Resort Collection', type: 'Concept Design', image: '/placeholder.jpg' },
+        { id: 'p12', title: 'Capsule Wardrobe', type: 'Line Sheets', image: '/placeholder.jpg' }
+      ]
     },
     {
       id: 5,
       name: 'Emma Thompson',
       role: 'Senior Technical Designer',
       skills: ['3D Simulation', '2D Flats', 'Quality Control'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p13', title: 'Premium Knitwear', type: '3D Simulation', image: '/placeholder.jpg' },
+        { id: 'p14', title: 'Swimwear Line', type: '2D Flats', image: '/placeholder.jpg' },
+        { id: 'p15', title: 'Quality Standards Guide', type: 'Quality Control', image: '/placeholder.jpg' }
+      ]
     },
     {
       id: 6,
       name: 'Hiroshi Tanaka',
       role: 'Digital Fashion Artist',
       skills: ['CLO3D', 'Marvelous Designer', 'Virtual Prototyping'],
-      image: '/placeholder.jpg'
+      image: '/placeholder.jpg',
+      projects: [
+        { id: 'p16', title: 'Avant-Garde Collection', type: 'CLO3D', image: '/placeholder.jpg' },
+        { id: 'p17', title: 'Digital Fashion Week', type: 'Virtual Prototyping', image: '/placeholder.jpg' },
+        { id: 'p18', title: 'NFT Fashion Series', type: 'Digital Art', image: '/placeholder.jpg' }
+      ]
     }
   ];
 
@@ -193,7 +224,7 @@ export default function TeamPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                       errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                     } outline-none`}
                     placeholder="Your Name"
@@ -209,7 +240,7 @@ export default function TeamPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                       errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                     } outline-none`}
                     placeholder="your@email.com"
@@ -225,7 +256,7 @@ export default function TeamPage() {
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                       errors.company ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                     } outline-none`}
                     placeholder="Your Company"
@@ -240,7 +271,7 @@ export default function TeamPage() {
                     name="projectType"
                     value={formData.projectType}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                    className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                       errors.projectType ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                     } outline-none`}
                   >
@@ -263,7 +294,7 @@ export default function TeamPage() {
                     name="volume"
                     value={formData.volume}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium focus:border-black focus:bg-white outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium focus:border-black focus:bg-white outline-none transition-colors text-black"
                     placeholder="e.g., 50 designs per month"
                   />
                 </div>
@@ -276,7 +307,7 @@ export default function TeamPage() {
                     name="timeline"
                     value={formData.timeline}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium focus:border-black focus:bg-white outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium focus:border-black focus:bg-white outline-none transition-colors text-black"
                     placeholder="e.g., 2-3 months"
                   />
                 </div>
@@ -289,7 +320,7 @@ export default function TeamPage() {
                     value={formData.message}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium resize-none focus:border-black focus:bg-white outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium resize-none focus:border-black focus:bg-white outline-none transition-colors text-black"
                     placeholder="Tell us more about your project..."
                   />
                 </div>
@@ -336,8 +367,12 @@ export default function TeamPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {teamMembers.map((member) => (
-                <div key={member.id} className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-400 transition-colors">
-                  <div className="aspect-square bg-linear-to-br from-purple-50 to-blue-50 rounded-full mb-6 flex items-center justify-center">
+                <Link
+                  href={`/team/${member.id}`}
+                  key={member.id}
+                  className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-6 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-colors">
                     <span className="text-4xl">👤</span>
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-2">{member.name}</h3>
@@ -349,10 +384,10 @@ export default function TeamPage() {
                       </span>
                     ))}
                   </div>
-                  <button className="w-full px-6 py-3 border-2 border-black text-black rounded font-medium hover:bg-black hover:text-white transition-colors">
-                    View Profile
-                  </button>
-                </div>
+                  <div className="w-full px-6 py-3 border-2 border-black text-black rounded font-medium group-hover:bg-black group-hover:text-white transition-colors text-center">
+                    View Projects
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
