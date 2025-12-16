@@ -157,9 +157,9 @@ export default function TeamPage() {
 
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <h1 className="text-6xl font-bold text-black mb-6">Meet the Team</h1>
-          <p className="text-xl text-gray-700 max-w-2xl">
+        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 animate-fade-in-up">Meet the Team</h1>
+          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200" style={{ animationFillMode: 'both' }}>
             {hasAccess
               ? 'Our vetted Fashion Technical Designers ready to bring your vision to life.'
               : 'Unlock access to our marketplace of vetted Fashion Technical Designers.'}
@@ -357,34 +357,35 @@ export default function TeamPage() {
       ) : (
         /* Full Team Grid (After Unlock) */
         <div className="bg-gray-50">
-          <div className="max-w-6xl mx-auto px-6 py-20">
+          <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
             {submitted && (
-              <div className="mb-12 text-center py-8 bg-white rounded-2xl border-2 border-black">
-                <h2 className="text-2xl font-bold text-black mb-2">Access Granted!</h2>
-                <p className="text-gray-700">You can now view and contact our team members.</p>
+              <div className="mb-16 text-center py-10 bg-white rounded-3xl border-2 border-black animate-scale-in shadow-lg">
+                <h2 className="text-3xl font-bold text-black mb-3">Access Granted!</h2>
+                <p className="text-gray-700 text-lg">You can now view and contact our team members.</p>
               </div>
             )}
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamMembers.map((member) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+              {teamMembers.map((member, index) => (
                 <Link
                   href={`/team/${member.id}`}
                   key={member.id}
-                  className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all cursor-pointer group"
+                  className="bg-white rounded-3xl p-8 md:p-10 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 cursor-pointer group hover:-translate-y-2 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-6 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-colors">
-                    <span className="text-4xl">👤</span>
+                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-8 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-all duration-500 group-hover:scale-105">
+                    <span className="text-5xl">👤</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-black mb-2">{member.name}</h3>
-                  <p className="text-gray-600 mb-4">{member.role}</p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {member.skills.map((skill, index) => (
-                      <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded font-medium">
+                  <h3 className="text-2xl md:text-3xl font-bold text-black mb-3">{member.name}</h3>
+                  <p className="text-gray-600 text-lg mb-5">{member.role}</p>
+                  <div className="flex flex-wrap gap-2 mb-8">
+                    {member.skills.map((skill, idx) => (
+                      <span key={idx} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium">
                         {skill}
                       </span>
                     ))}
                   </div>
-                  <div className="w-full px-6 py-3 border-2 border-black text-black rounded font-medium group-hover:bg-black group-hover:text-white transition-colors text-center">
+                  <div className="w-full px-6 py-4 border-2 border-black text-black rounded-xl font-semibold group-hover:bg-black group-hover:text-white transition-all duration-300 text-center text-lg">
                     View Projects
                   </div>
                 </Link>
