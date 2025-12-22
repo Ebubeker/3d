@@ -1,3 +1,5 @@
+import { Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -17,16 +19,16 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex gap-4">
               <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                <span className="text-xl">𝕏</span>
+                <Twitter className="w-5 h-5" />
               </a>
               <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                <span className="text-xl">f</span>
+                <Facebook className="w-5 h-5" />
               </a>
               <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                <span className="text-xl">in</span>
+                <Linkedin className="w-5 h-5" />
               </a>
               <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                <span className="text-xl">📷</span>
+                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>

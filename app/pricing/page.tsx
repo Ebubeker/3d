@@ -57,7 +57,7 @@ export default function PricingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="text-4xl mb-4">1️⃣</div>
+              <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">1</div>
               <h3 className="text-2xl font-bold text-black mb-3">Choose Your Designer</h3>
               <p className="text-gray-700">
                 Browse our team marketplace and select the designer that best matches your project needs and budget.
@@ -65,7 +65,7 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="text-4xl mb-4">2️⃣</div>
+              <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">2</div>
               <h3 className="text-2xl font-bold text-black mb-3">Hourly Billing</h3>
               <p className="text-gray-700">
                 Work is billed hourly based on the rates below. You'll receive detailed time tracking and progress updates.
@@ -73,7 +73,7 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="text-4xl mb-4">3️⃣</div>
+              <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">3</div>
               <h3 className="text-2xl font-bold text-black mb-3">Simple Commission</h3>
               <p className="text-gray-700">
                 virtuality.fashion takes a small commission to maintain the platform and ensure quality standards.

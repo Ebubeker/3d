@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Palette, Gem, ShoppingBag, Ruler, Globe, Factory, Settings } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "3D Fashion Design Solutions | virtuality.fashion",
@@ -15,37 +16,37 @@ export default function SolutionsPage() {
       id: 1,
       title: "3D Design",
       description: "CLO3D & Browzwear integration",
-      icon: "🎨"
+      icon: Palette
     },
     {
       id: 2,
       title: "Virtual Prototyping",
       description: "Digital samples, 60% cost savings",
-      icon: "💎"
+      icon: Gem
     },
     {
       id: 3,
       title: "Ecommerce Visualization",
       description: "Virtual try-on & configurators",
-      icon: "🛍️"
+      icon: ShoppingBag
     },
     {
       id: 4,
       title: "CAD Tools",
       description: "Technical flats & pattern making",
-      icon: "📐"
+      icon: Ruler
     },
     {
       id: 5,
       title: "Cloud Platform",
       description: "Real-time collaboration",
-      icon: "🌐"
+      icon: Globe
     },
     {
       id: 6,
       title: "Manufacturing",
       description: "Production-ready workflows",
-      icon: "🏭"
+      icon: Factory
     }
   ];
 
@@ -85,20 +86,25 @@ export default function SolutionsPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {solutions.map((solution) => (
-              <div
-                key={solution.id}
-                className="bg-white rounded-xl p-6 border border-gray-200 hover:border-gray-400 transition-colors"
-              >
-                <div className="text-4xl mb-3">{solution.icon}</div>
-                <h3 className="text-xl font-bold text-black mb-2">
-                  {solution.title}
-                </h3>
-                <p className="text-gray-700">
-                  {solution.description}
-                </p>
-              </div>
-            ))}
+            {solutions.map((solution) => {
+              const Icon = solution.icon;
+              return (
+                <div
+                  key={solution.id}
+                  className="bg-white rounded-xl p-6 border border-gray-200 hover:border-gray-400 transition-colors"
+                >
+                  <div className="mb-3">
+                    <Icon className="w-10 h-10 text-black" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-bold text-black mb-2">
+                    {solution.title}
+                  </h3>
+                  <p className="text-gray-700">
+                    {solution.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -144,8 +150,8 @@ export default function SolutionsPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {['CLO3D', 'Browzwear', 'Marvelous Designer', 'Adobe Illustrator'].map((tool, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-4 text-center border border-gray-200">
-                <div className="text-2xl mb-2">⚙️</div>
+              <div key={idx} className="bg-white rounded-lg p-4 text-center border border-gray-200 flex flex-col items-center justify-center gap-2">
+                <Settings className="w-8 h-8 text-black" strokeWidth={1.5} />
                 <h3 className="text-sm font-bold text-black">{tool}</h3>
               </div>
             ))}

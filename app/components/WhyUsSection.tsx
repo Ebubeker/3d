@@ -1,3 +1,5 @@
+import { Sparkles, Zap, Crown, RefreshCw } from 'lucide-react';
+
 export default function WhyUsSection() {
   return (
     <section className="bg-white py-20 px-6 relative overflow-hidden">
@@ -34,8 +36,8 @@ export default function WhyUsSection() {
               </div>
             </div>
             <div className="bg-linear-to-br from-purple-100 to-blue-100 rounded-2xl h-64 flex items-center justify-center border border-gray-200 hover:shadow-xl transition-shadow">
-              <div className="text-center">
-                <div className="text-6xl mb-2">✨</div>
+              <div className="text-center flex flex-col items-center">
+                <Sparkles className="w-16 h-16 text-purple-600 mb-4" />
                 <p className="text-gray-600">Premium Design</p>
               </div>
             </div>
@@ -44,8 +46,8 @@ export default function WhyUsSection() {
           {/* Reason 2 */}
           <div className="grid md:grid-cols-2 gap-8 items-center md:flex-row-reverse">
             <div className="bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl h-64 flex items-center justify-center border border-gray-200 md:order-2 hover:shadow-xl transition-shadow">
-              <div className="text-center">
-                <div className="text-6xl mb-2">⚡</div>
+              <div className="text-center flex flex-col items-center">
+                <Zap className="w-16 h-16 text-blue-600 mb-4" />
                 <p className="text-gray-600">Lightning Performance</p>
               </div>
             </div>
@@ -80,8 +82,8 @@ export default function WhyUsSection() {
               </div>
             </div>
             <div className="bg-linear-to-br from-purple-100 to-blue-100 rounded-2xl h-64 flex items-center justify-center border border-gray-200 hover:shadow-xl transition-shadow">
-              <div className="text-center">
-                <div className="text-6xl mb-2">👑</div>
+              <div className="text-center flex flex-col items-center">
+                <Crown className="w-16 h-16 text-purple-600 mb-4" />
                 <p className="text-gray-600">Premium Partners</p>
               </div>
             </div>
@@ -90,8 +92,8 @@ export default function WhyUsSection() {
           {/* Reason 4 */}
           <div className="grid md:grid-cols-2 gap-8 items-center md:flex-row-reverse">
             <div className="bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl h-64 flex items-center justify-center border border-gray-200 md:order-2 hover:shadow-xl transition-shadow">
-              <div className="text-center">
-                <div className="text-6xl mb-2">🔄</div>
+              <div className="text-center flex flex-col items-center">
+                <RefreshCw className="w-16 h-16 text-blue-600 mb-4" />
                 <p className="text-gray-600">Innovation Focused</p>
               </div>
             </div>

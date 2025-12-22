@@ -1,3 +1,5 @@
+import { Shirt, Layers, ShoppingBag, MoveHorizontal, ZoomIn, Scissors } from 'lucide-react';
+
 export default function ProductShowcase() {
   const products = [
     {
@@ -5,7 +7,7 @@ export default function ProductShowcase() {
       name: 'Premium Classic Tee',
       category: 'T-Shirts',
       colors: 3,
-      emoji: '👕',
+      icon: Shirt,
       price: '$29.99',
       colors_available: ['purple', 'blue', 'white'],
     },
@@ -14,7 +16,7 @@ export default function ProductShowcase() {
       name: 'Oversized Hoodie',
       category: 'Hoodies',
       colors: 4,
-      emoji: '🧥',
+      icon: Layers,
       price: '$59.99',
       colors_available: ['purple', 'black', 'gray', 'blue'],
     },
@@ -23,7 +25,7 @@ export default function ProductShowcase() {
       name: 'Fitted Polo Shirt',
       category: 'Polos',
       colors: 3,
-      emoji: '🎽',
+      icon: Scissors,
       price: '$39.99',
       colors_available: ['blue', 'white', 'navy'],
     },
@@ -32,7 +34,7 @@ export default function ProductShowcase() {
       name: 'Jogger Pants',
       category: 'Pants',
       colors: 2,
-      emoji: '👖',
+      icon: ShoppingBag,
       price: '$49.99',
       colors_available: ['gray', 'black'],
     },
@@ -57,63 +59,66 @@ export default function ProductShowcase() {
 
         {/* Products Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
-            >
-              {/* Product Visualization */}
-              <div className="relative bg-linear-to-br from-gray-50 to-gray-100 aspect-square flex flex-col items-center justify-center overflow-hidden group-hover:from-purple-50 group-hover:to-blue-50 transition-colors">
-                {/* 3D Product Emoji */}
-                <div className="text-7xl animate-bounce group-hover:scale-110 transition-transform" style={{animationDuration: '2.5s'}}>
-                  {product.emoji}
-                </div>
+          {products.map((product) => {
+            const Icon = product.icon;
+            return (
+              <div
+                key={product.id}
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
+              >
+                {/* Product Visualization */}
+                <div className="relative bg-linear-to-br from-gray-50 to-gray-100 aspect-square flex flex-col items-center justify-center overflow-hidden group-hover:from-purple-50 group-hover:to-blue-50 transition-colors">
+                  {/* 3D Product Icon */}
+                  <div className="animate-bounce group-hover:scale-110 transition-transform" style={{animationDuration: '2.5s'}}>
+                    <Icon className="w-24 h-24 text-gray-700" strokeWidth={1} />
+                  </div>
 
-                {/* Color indicators */}
-                <div className="absolute bottom-4 left-0 right-0 flex gap-2 justify-center">
-                  {product.colors_available.map((color, idx) => (
-                    <div
-                      key={idx}
-                      className={`w-3 h-3 rounded-full border-2 border-white transition-all ${
-                        color === 'purple'
-                          ? 'bg-purple-600'
-                          : color === 'blue'
-                          ? 'bg-blue-600'
-                          : color === 'black'
-                          ? 'bg-black'
-                          : color === 'white'
-                          ? 'bg-white'
-                          : color === 'gray'
-                          ? 'bg-gray-400'
-                          : 'bg-blue-900'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{product.name}</h3>
-                <p className="text-sm text-purple-600 font-semibold mb-3">{product.category}</p>
-
-                {/* Price and specs */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-gray-900">{product.price}</span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
-                      {product.colors} colors
-                    </span>
+                  {/* Color indicators */}
+                  <div className="absolute bottom-4 left-0 right-0 flex gap-2 justify-center">
+                    {product.colors_available.map((color, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-3 h-3 rounded-full border-2 border-white transition-all ${
+                          color === 'purple'
+                            ? 'bg-purple-600'
+                            : color === 'blue'
+                            ? 'bg-blue-600'
+                            : color === 'black'
+                            ? 'bg-black'
+                            : color === 'white'
+                            ? 'bg-white'
+                            : color === 'gray'
+                            ? 'bg-gray-400'
+                            : 'bg-blue-900'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                {/* CTA Button */}
-                <button className="w-full px-4 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-105">
-                  View in 3D
-                </button>
+                {/* Product Info */}
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">{product.name}</h3>
+                  <p className="text-sm text-purple-600 font-semibold mb-3">{product.category}</p>
+
+                  {/* Price and specs */}
+                  <div className="space-y-3 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold text-gray-900">{product.price}</span>
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
+                        {product.colors} colors
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <button className="w-full px-4 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-105">
+                    View in 3D
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Featured Feature Section */}
@@ -175,8 +180,8 @@ export default function ProductShowcase() {
                 {/* Main demo container */}
                 <div className="relative bg-white rounded-3xl shadow-2xl p-6 border border-gray-200">
                   <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="text-6xl animate-bounce">
-                      👕
+                    <div className="animate-bounce">
+                      <Shirt className="w-24 h-24 text-purple-600" strokeWidth={1} />
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-gray-500 uppercase tracking-wide font-semibold">Interactive 3D Model</p>
@@ -187,8 +192,10 @@ export default function ProductShowcase() {
                         <div className="w-4 h-4 bg-white rounded-full border-2 border-gray-300"></div>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 text-center mt-4">
-                      ↔️ Drag to rotate • 🔍 Scroll to zoom
+                    <div className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-2">
+                      <span className="flex items-center gap-1"><MoveHorizontal className="w-3 h-3" /> Drag to rotate</span>
+                      <span className="text-gray-300">•</span>
+                      <span className="flex items-center gap-1"><ZoomIn className="w-3 h-3" /> Scroll to zoom</span>
                     </div>
                   </div>
                 </div>

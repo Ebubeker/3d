@@ -1,3 +1,5 @@
+import { User, Briefcase, Palette, Laptop, Star } from 'lucide-react';
+
 export default function TestimonialsSection() {
   const testimonials = [
     {
@@ -5,7 +7,7 @@ export default function TestimonialsSection() {
       name: "Alex Johnson",
       role: "Fashion Director",
       company: "Premium Brands Co.",
-      image: "👨‍💼",
+      icon: User,
       rating: 5,
       text: "Virtuality.Fashion has completely transformed how we showcase our collections. The 3D rendering quality is exceptional, and our customers love the virtual try-on experience.",
     },
@@ -14,7 +16,7 @@ export default function TestimonialsSection() {
       name: "Sarah Chen",
       role: "E-commerce Manager",
       company: "Luxury Apparel Inc.",
-      image: "👩‍💼",
+      icon: Briefcase,
       rating: 5,
       text: "The platform is incredibly fast and intuitive. Our conversion rates increased by 40% after implementing Virtuality.Fashion. Highly recommended for any fashion brand.",
     },
@@ -23,7 +25,7 @@ export default function TestimonialsSection() {
       name: "Marcus Williams",
       role: "Creative Director",
       company: "Fashion Innovation Labs",
-      image: "👨‍🎨",
+      icon: Palette,
       rating: 5,
       text: "Finally, a 3D fashion platform that delivers on quality and performance. The team's commitment to rebuilding with excellence is evident in every detail.",
     },
@@ -32,7 +34,7 @@ export default function TestimonialsSection() {
       name: "Emma Rodriguez",
       role: "Brand Manager",
       company: "Trend Forward Collective",
-      image: "👩‍💻",
+      icon: Laptop,
       rating: 5,
       text: "The immersive environments and realistic fabric rendering are mind-blowing. Our customers spend 3x longer on product pages now. This is the future of fashion retail.",
     },
@@ -41,7 +43,7 @@ export default function TestimonialsSection() {
   const StarRating = ({ rating }: { rating: number }) => (
     <div className="flex gap-1">
       {Array.from({ length: rating }).map((_, i) => (
-        <span key={i} className="text-yellow-400">⭐</span>
+        <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
       ))}
     </div>
   );
@@ -65,34 +67,37 @@ export default function TestimonialsSection() {
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-2 gap-8">
-          {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all duration-300"
-            >
-              {/* Rating */}
-              <div className="mb-4">
-                <StarRating rating={testimonial.rating} />
-              </div>
-
-              {/* Testimonial Text */}
-              <p className="text-gray-700 text-lg leading-relaxed mb-6 italic">
-                &ldquo;{testimonial.text}&rdquo;
-              </p>
-
-              {/* Author Info */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-linear-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-3xl">
-                  {testimonial.image}
+          {testimonials.map((testimonial) => {
+            const Icon = testimonial.icon;
+            return (
+              <div
+                key={testimonial.id}
+                className="bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all duration-300"
+              >
+                {/* Rating */}
+                <div className="mb-4">
+                  <StarRating rating={testimonial.rating} />
                 </div>
-                <div>
-                  <h4 className="text-gray-900 font-semibold text-lg">{testimonial.name}</h4>
-                  <p className="text-gray-600 text-sm">{testimonial.role}</p>
-                  <p className="text-purple-600 text-xs font-medium">{testimonial.company}</p>
+
+                {/* Testimonial Text */}
+                <p className="text-gray-700 text-lg leading-relaxed mb-6 italic">
+                  &ldquo;{testimonial.text}&rdquo;
+                </p>
+
+                {/* Author Info */}
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-linear-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-gray-900 font-semibold text-lg">{testimonial.name}</h4>
+                    <p className="text-gray-600 text-sm">{testimonial.role}</p>
+                    <p className="text-purple-600 text-xs font-medium">{testimonial.company}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Trust Stats */}
