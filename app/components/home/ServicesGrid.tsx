@@ -1,6 +1,29 @@
+'use client';
+
 import { Ruler, Palette, Gem, Image, Users, Cloud } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ServicesGrid() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const services = [
     {
       id: 1,
@@ -77,41 +100,45 @@ export default function ServicesGrid() {
   ];
 
   return (
-    <section className="bg-white py-32">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl md:text-6xl font-bold text-black mb-6">
+    <section ref={sectionRef} className="bg-white py-32 md:py-40">
+      <div className="max-w-7xl mx-auto px-8 md:px-12">
+        <div className={`text-center mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8">
             Our Services
           </h2>
-          <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             End-to-end digital fashion solutions to transform your design workflow
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {services.map((service) => {
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+          {services.map((service, index) => {
             const Icon = service.icon;
             return (
               <div
                 key={service.id}
-                className="group bg-white rounded-2xl p-10 border-2 border-gray-100 hover:border-gray-300 transition-all duration-300 hover:shadow-xl"
+                className={`group bg-white rounded-3xl p-10 md:p-12 border-2 border-gray-100 hover:border-gray-300 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{
+                  transitionDelay: `${index * 100}ms`,
+                  transitionProperty: 'all'
+                }}
               >
-                <div className={`w-16 h-16 rounded-xl bg-linear-to-br ${service.color} flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="w-8 h-8 text-white" strokeWidth={2} />
+                <div className={`w-18 h-18 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-10 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
+                  <Icon className="w-9 h-9 md:w-10 md:h-10 text-white" strokeWidth={2} />
                 </div>
 
-                <h3 className="text-2xl md:text-3xl font-bold text-black mb-4">
+                <h3 className="text-2xl md:text-3xl font-bold text-black mb-5">
                   {service.title}
                 </h3>
 
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                   {service.description}
                 </p>
 
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {service.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start text-base text-gray-700">
-                      <span className="text-gray-400 mr-3 text-lg">•</span>
+                      <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${service.color} mr-4 mt-2 flex-shrink-0`}></span>
                       <span>{feature}</span>
                     </li>
                   ))}
