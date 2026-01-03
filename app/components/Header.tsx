@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Home, 
-  Box, 
-  Users, 
-  CreditCard, 
-  Building2, 
-  Mail, 
-  Menu, 
-  X 
+import {
+  Home,
+  Box,
+  Users,
+  Mail,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Header() {
@@ -29,8 +27,6 @@ export default function Header() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Solutions', href: '/solutions', icon: Box },
     { name: 'Team', href: '/team', icon: Users },
-    { name: 'Pricing', href: '/pricing', icon: CreditCard },
-    { name: 'Enterprise', href: '/enterprise', icon: Building2 },
     { name: 'Contact', href: '/contact', icon: Mail },
   ];
 

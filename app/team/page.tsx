@@ -34,6 +34,7 @@ export default function TeamPage() {
       id: 1,
       name: 'Sarah Chen',
       role: '3D Fashion Designer',
+      experience: 5,
       skills: ['CLO3D', '3D Simulation', 'Texturing'],
       image: '/placeholder.jpg',
       projects: [
@@ -46,6 +47,7 @@ export default function TeamPage() {
       id: 2,
       name: 'Marco Rossi',
       role: 'Technical Designer',
+      experience: 2,
       skills: ['2D Flats', 'Tech Packs', 'Patternmaking'],
       image: '/placeholder.jpg',
       projects: [
@@ -58,6 +60,7 @@ export default function TeamPage() {
       id: 3,
       name: 'Aisha Kumar',
       role: '3D Visualization Specialist',
+      experience: 4,
       skills: ['Browzwear', 'Rendering', 'Material Design'],
       image: '/placeholder.jpg',
       projects: [
@@ -70,6 +73,7 @@ export default function TeamPage() {
       id: 4,
       name: 'Lucas Silva',
       role: 'Collection Developer',
+      experience: 3,
       skills: ['Collection Planning', 'Line Sheets', 'Concept Design'],
       image: '/placeholder.jpg',
       projects: [
@@ -82,6 +86,7 @@ export default function TeamPage() {
       id: 5,
       name: 'Emma Thompson',
       role: 'Senior Technical Designer',
+      experience: 8,
       skills: ['3D Simulation', '2D Flats', 'Quality Control'],
       image: '/placeholder.jpg',
       projects: [
@@ -94,6 +99,7 @@ export default function TeamPage() {
       id: 6,
       name: 'Hiroshi Tanaka',
       role: 'Digital Fashion Artist',
+      experience: 6,
       skills: ['CLO3D', 'Marvelous Designer', 'Virtual Prototyping'],
       image: '/placeholder.jpg',
       projects: [
@@ -172,12 +178,13 @@ export default function TeamPage() {
           {/* Blurred Team Grid */}
           <div className="bg-gray-50 border-b border-gray-200 relative">
             <div className="max-w-6xl mx-auto px-6 py-20">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 blur-md pointer-events-none select-none">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 blur-md pointer-events-none select-none">
                 {teamMembers.map((member) => (
                   <div key={member.id} className="bg-white rounded-2xl p-8 border border-gray-200">
                     <div className="aspect-square bg-gray-200 rounded-full mb-6"></div>
-                    <h3 className="text-2xl font-bold text-black mb-2">{member.name}</h3>
-                    <p className="text-gray-600 mb-4">{member.role}</p>
+                    <h3 className="text-2xl font-bold text-black mb-1">{member.name}</h3>
+                    <p className="text-gray-600 mb-1">{member.role}</p>
+                    <p className="text-gray-500 text-sm mb-4">{member.experience} years of experience</p>
                     <div className="flex flex-wrap gap-2">
                       {member.skills.map((skill, index) => (
                         <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded">
@@ -365,27 +372,28 @@ export default function TeamPage() {
               </div>
             )}
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {teamMembers.map((member, index) => (
                 <Link
                   href={`/team/${member.id}`}
                   key={member.id}
-                  className="bg-white rounded-3xl p-8 md:p-10 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 cursor-pointer group hover:-translate-y-2 animate-fade-in-up"
+                  className="bg-white rounded-3xl p-8 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 cursor-pointer group hover:-translate-y-2 animate-fade-in-up"
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-8 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-all duration-500 group-hover:scale-105">
+                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-6 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-all duration-500 group-hover:scale-105">
                     <span className="text-5xl">👤</span>
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-black mb-3">{member.name}</h3>
-                  <p className="text-gray-600 text-lg mb-5">{member.role}</p>
-                  <div className="flex flex-wrap gap-2 mb-8">
+                  <h3 className="text-2xl font-bold text-black mb-1">{member.name}</h3>
+                  <p className="text-gray-600 text-base mb-1">{member.role}</p>
+                  <p className="text-gray-500 text-sm mb-4">{member.experience} {member.experience === 1 ? 'year' : 'years'} of experience</p>
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {member.skills.map((skill, idx) => (
-                      <span key={idx} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium">
+                      <span key={idx} className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium">
                         {skill}
                       </span>
                     ))}
                   </div>
-                  <div className="w-full px-6 py-4 border-2 border-black text-black rounded-xl font-semibold group-hover:bg-black group-hover:text-white transition-all duration-300 text-center text-lg">
+                  <div className="w-full px-6 py-3 border-2 border-black text-black rounded-xl font-semibold group-hover:bg-black group-hover:text-white transition-all duration-300 text-center">
                     View Projects
                   </div>
                 </Link>

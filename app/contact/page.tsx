@@ -62,9 +62,12 @@ export default function ContactPage() {
 
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <h1 className="text-6xl font-bold text-black mb-6">Get in Touch</h1>
-          <p className="text-xl text-gray-700 max-w-2xl">
+        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">
+            Contact Us
+          </p>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8">Get in Touch</h1>
+          <p className="text-xl md:text-2xl text-gray-600 max-w-2xl leading-relaxed">
             Have a project in mind? Let&apos;s discuss how we can help bring your vision to life.
           </p>
         </div>
@@ -90,7 +93,7 @@ export default function ContactPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                     errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                   } outline-none`}
                   placeholder="Your Name"
@@ -106,7 +109,7 @@ export default function ContactPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                     errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                   } outline-none`}
                   placeholder="your@email.com"
@@ -122,7 +125,7 @@ export default function ContactPage() {
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors ${
+                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors text-black ${
                     errors.company ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                   } outline-none`}
                   placeholder="Your Company"
@@ -138,7 +141,7 @@ export default function ContactPage() {
                   value={formData.message}
                   onChange={handleChange}
                   rows={6}
-                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors resize-none ${
+                  className={`w-full px-4 py-3 border-2 rounded font-medium transition-colors resize-none text-black ${
                     errors.message ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
                   } outline-none`}
                   placeholder="Tell us about your project..."

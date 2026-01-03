@@ -11,7 +11,7 @@ export default function HeroSection() {
         <div className="w-full md:w-1/2 flex items-center z-10">
           <div className="max-w-2xl mx-auto px-8 md:px-16 py-16 md:py-20">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 leading-tight animate-fade-in-up">
-              The digitization fashion, the good ole fashion way
+              The digitization fashion, the good old fashion way
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-700 mb-10 animate-fade-in-up delay-200" style={{ animationFillMode: 'both' }}>

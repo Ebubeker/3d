@@ -34,8 +34,7 @@ export default function ServicesGrid() {
         "Construction details and specifications",
         "Multiple views and variations"
       ],
-      icon: Ruler,
-      color: "from-blue-500 to-cyan-500"
+      icon: Ruler
     },
     {
       id: 2,
@@ -46,8 +45,7 @@ export default function ServicesGrid() {
         "Pattern making and grading",
         "Animation and fit testing"
       ],
-      icon: Palette,
-      color: "from-purple-500 to-pink-500"
+      icon: Palette
     },
     {
       id: 3,
@@ -58,8 +56,7 @@ export default function ServicesGrid() {
         "Faster iteration and approvals",
         "Sustainable design process"
       ],
-      icon: Gem,
-      color: "from-emerald-500 to-teal-500"
+      icon: Gem
     },
     {
       id: 4,
@@ -70,8 +67,7 @@ export default function ServicesGrid() {
         "Multiple angles and lighting",
         "Lifestyle and e-commerce ready"
       ],
-      icon: Image,
-      color: "from-orange-500 to-red-500"
+      icon: Image
     },
     {
       id: 5,
@@ -82,8 +78,7 @@ export default function ServicesGrid() {
         "Size recommendation engine",
         "Reduced return rates"
       ],
-      icon: Users,
-      color: "from-indigo-500 to-purple-500"
+      icon: Users
     },
     {
       id: 6,
@@ -94,14 +89,13 @@ export default function ServicesGrid() {
         "Real-time collaboration tools",
         "Project management dashboard"
       ],
-      icon: Cloud,
-      color: "from-cyan-500 to-blue-500"
+      icon: Cloud
     }
   ];
 
   return (
     <section ref={sectionRef} className="bg-white py-32 md:py-40">
-      <div className="max-w-7xl mx-auto px-8 md:px-12">
+      <div className="max-w-7xl mx-auto px-6">
         <div className={`text-center mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8">
             Our Services
@@ -111,34 +105,34 @@ export default function ServicesGrid() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
               <div
                 key={service.id}
-                className={`group bg-white rounded-3xl p-10 md:p-12 border-2 border-gray-100 hover:border-gray-300 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-black transition-all duration-500 hover:shadow-xl aspect-square flex flex-col ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{
                   transitionDelay: `${index * 100}ms`,
                   transitionProperty: 'all'
                 }}
               >
-                <div className={`w-18 h-18 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-10 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
-                  <Icon className="w-9 h-9 md:w-10 md:h-10 text-white" strokeWidth={2} />
+                <div className="w-14 h-14 rounded-xl bg-white border-2 border-black flex items-center justify-center mb-6 group-hover:bg-black transition-all duration-300">
+                  <Icon className="w-7 h-7 text-black group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </div>
 
-                <h3 className="text-2xl md:text-3xl font-bold text-black mb-5">
+                <h3 className="text-xl font-bold text-black mb-3">
                   {service.title}
                 </h3>
 
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-grow">
                   {service.description}
                 </p>
 
-                <ul className="space-y-4">
+                <ul className="space-y-2 mt-auto">
                   {service.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start text-base text-gray-700">
-                      <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${service.color} mr-4 mt-2 flex-shrink-0`}></span>
+                    <li key={idx} className="flex items-start text-sm text-gray-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-black mr-3 mt-1.5 flex-shrink-0"></span>
                       <span>{feature}</span>
                     </li>
                   ))}
