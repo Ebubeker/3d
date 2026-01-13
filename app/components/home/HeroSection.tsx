@@ -15,17 +15,17 @@ export default function HeroSection() {
           style={{ opacity: 0.05 }}
         />
       </div>
-      <div className="flex flex-col md:flex-row min-h-screen pt-20 md:pt-16">
+      <div className="flex flex-col md:flex-row min-h-screen pt-20 md:pt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Left: Content - Half width */}
         <div className="w-full md:w-1/2 flex items-center z-10">
-          <div className="max-w-2xl mx-auto px-6 sm:px-8 md:px-16 py-12 md:py-20">
+          <div className="pr-6 sm:pr-8 md:pr-16 py-12 md:py-20">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 sm:mb-6 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 sm:mb-6 leading-tight font-copperplate"
             >
-              The digitization fashion, the good old fashion way
+              Digitizing fashion, the good old-fashioned way
             </motion.h1>
 
             <motion.p
@@ -34,7 +34,7 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-lg sm:text-xl md:text-2xl text-gray-700 mb-8 sm:mb-10"
             >
-              Professional virtual clothing design. Faster production, lower costs.
+              Traditional fashion execution, supported by digital tools and on-demand talent.
             </motion.p>
 
             <motion.div

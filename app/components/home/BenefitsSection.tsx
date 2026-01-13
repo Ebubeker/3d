@@ -13,28 +13,28 @@ export default function BenefitsSection() {
     {
       id: 1,
       title: "Faster Production",
-      description: "Eliminate weeks of waiting for physical samples. Our digital-first approach delivers production-ready designs in days, accelerating your entire product development cycle.",
+      description: "Accelerate your apparel product development with virtual sampling and faster approvals. Shorten lead times from concept to production ready, with fewer physical samples.",
       type: "image",
       image: "/images/portfolio/f2.jpg"
     },
     {
       id: 2,
-      title: "60% Cost Savings",
-      description: "Dramatically reduce sampling costs with virtual prototyping. No more expensive fabric waste, shipping fees, or multiple revision rounds eating into your margins.",
+      title: "Cost Savings",
+      description: "Reduce sampling iterations and lower development cost per style by cutting rework and physical sample shipments. Digital prototypes support clearer decisions earlier in the process.",
       type: "video",
       video: "https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4"
     },
     {
       id: 3,
       title: "Expert Team",
-      description: "Access a curated network of vetted fashion technical designers. Each professional is thoroughly screened for expertise in CLO3D, Browzwear, and industry best practices.",
+      description: "Access a vetted network of fashion specialists for tech pack services, apparel technical design, and 3D garment visualization. The team follows industry best practices and proven delivery workflows.",
       type: "image",
       image: "/images/portfolio/f3.jpg"
     },
     {
       id: 4,
       title: "Top Technology",
-      description: "Leverage industry-leading 3D design software including CLO3D, Browzwear, and Marvelous Designer. Photorealistic renders that match physical samples.",
+      description: "Advanced 3D virtualization and patternmaking workflows support 3D garment prototyping, fit simulation, and production-ready outputs. AI-based tools are used to create e-commerce visuals, presenting collections on virtual models for consistent product pages and listings. Our specialists work with Optitex, CLO3D, Browzwear, Style3D, Shima Seiki, and other leading 3D virtualization and patternmaking solutions.",
       type: "video",
       video: "https://videos.pexels.com/video-files/5532765/5532765-uhd_2560_1440_25fps.mp4"
     }
@@ -95,10 +95,10 @@ export default function BenefitsSection() {
         className="sticky top-0 h-screen w-full overflow-hidden flex flex-col pt-20"
       >
         {/* Header with Title and Progress */}
-        <div className="bg-gray-50 pt-4 sm:pt-6 md:pt-8 pb-4 sm:pb-6 md:pb-8 px-4 sm:px-6 md:px-12">
+        <div className="bg-gray-50 pt-4 sm:pt-6 md:pt-8 pb-4 sm:pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black font-copperplate">
                 Benefits
               </h2>
 
@@ -139,7 +139,7 @@ export default function BenefitsSection() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 px-4 sm:px-6 md:px-12 pb-8 sm:pb-12 md:pb-16 overflow-hidden">
+        <div className="flex-1 px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 md:pb-16 overflow-hidden">
           <div className="max-w-7xl mx-auto h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 h-full items-center">
               {/* Text Content */}
@@ -164,7 +164,7 @@ export default function BenefitsSection() {
                       </span>
                       <div className="h-px flex-1 bg-gray-300" />
                     </div>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-3 sm:mb-6 leading-tight">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-3 sm:mb-6 leading-tight font-copperplate">
                       {benefit.title}
                     </h3>
                     <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed">

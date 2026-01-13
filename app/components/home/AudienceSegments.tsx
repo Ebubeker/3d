@@ -7,42 +7,36 @@ export default function AudienceSegments() {
   const segments = [
     {
       id: 1,
-      headline: "Small & Medium Business",
-      subtitle: "Perfect for growing fashion businesses",
-      description: "Access professional 3D design services without the overhead of a full-time team. Scale your design capabilities on demand.",
+      headline: "Fashion Brands and Product Teams",
+      description: "End-to-end support from tech pack to sampling to e-commerce visuals.",
       features: [
-        "Pay-per-project flexibility",
-        "48-hour turnaround available",
-        "Dedicated project manager",
-        "Unlimited revisions"
+        "Tech pack services and apparel technical design",
+        "Faster approvals with 3D garment prototyping and virtual sampling",
+        "Visual assets for product pages and e-commerce listings"
       ],
       cta: "Get Started",
       ctaLink: "/contact"
     },
     {
       id: 2,
-      headline: "Fashion Brands",
-      subtitle: "Streamline your product development",
-      description: "Accelerate your design-to-market pipeline with our comprehensive digital prototyping and visualization solutions.",
+      headline: "Designers and Studios",
+      description: "Extra capacity when you need it, without changing your workflow.",
       features: [
-        "60% faster time-to-market",
-        "Reduce sampling costs by 70%",
-        "Seamless PLM integration",
-        "Priority support & SLA"
+        "On-demand support for tech packs, specs, and construction details",
+        "3D garment visualization for fit checks, materials, and colorways",
+        "Consistent outputs ready for vendors and brand teams"
       ],
       cta: "View Solutions",
       ctaLink: "/solutions"
     },
     {
       id: 3,
-      headline: "Enterprise",
-      subtitle: "Custom solutions at scale",
-      description: "Full-service digital transformation for large organizations. Dedicated teams, custom workflows, and enterprise-grade security.",
+      headline: "Manufacturers and Vendors",
+      description: "Clear, vendor-ready deliverables that minimize revisions and expedite sampling.",
       features: [
-        "Dedicated design team",
-        "Custom API integrations",
-        "On-premise deployment options",
-        "24/7 premium support"
+        "Production-ready tech packs and spec sheets that vendors can execute",
+        "Clear construction details and measurement consistency",
+        "3D garment prototyping to reduce sampling iterations"
       ],
       cta: "Contact Sales",
       ctaLink: "/contact"
@@ -74,7 +68,7 @@ export default function AudienceSegments() {
 
   return (
     <section className="bg-gray-50 py-20 sm:py-32 md:py-40 lg:py-52">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -82,11 +76,11 @@ export default function AudienceSegments() {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-4 sm:mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-4 sm:mb-6 font-copperplate">
             For Teams of All Sizes
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-            Whether you're a startup or a global brand, we have the right solution for your needs
+            Built for fashion execution across brands, studios, and vendors.
           </p>
         </motion.div>
 
@@ -104,12 +98,9 @@ export default function AudienceSegments() {
               className="bg-white border-2 border-gray-200 rounded-2xl p-6 sm:p-8 hover:border-black hover:shadow-xl transition-all duration-300 flex flex-col"
             >
               <div className="mb-4 sm:mb-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-2">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-2 font-copperplate">
                   {segment.headline}
                 </h3>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wide">
-                  {segment.subtitle}
-                </p>
               </div>
 
               <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 leading-relaxed">

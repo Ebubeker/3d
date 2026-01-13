@@ -4,7 +4,10 @@
       "Bash(npm run lint)",
       "Bash(npx tsc --noEmit)",
       "Bash(copy:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Read(//c/Users/Zbook/OneDrive/Desktop/**)",
+      "Bash(cd:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

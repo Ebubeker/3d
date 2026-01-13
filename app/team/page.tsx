@@ -2,11 +2,35 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import EnterpriseForm from '../components/EnterpriseForm';
+import JoinTeamModal from '../components/JoinTeamModal';
+import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+
+interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  location: string;
+  languages: string[];
+  specialties: string[];
+  tools: string[];
+  bio: string;
+  portrait: string;
+  portfolio: {
+    id: string;
+    thumbnail: string;
+    title: string;
+  }[];
+}
 
 export default function TeamPage() {
   const [hasAccess, setHasAccess] = useState(false);
+  const [showEnterpriseForm, setShowEnterpriseForm] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [expandedBio, setExpandedBio] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,84 +52,102 @@ export default function TeamPage() {
     }
   }, []);
 
-  // Mock team members data with projects
-  const teamMembers = [
+  // Team members data with new structure
+  const teamMembers: TeamMember[] = [
     {
       id: 1,
       name: 'Sarah Chen',
       role: '3D Fashion Designer',
-      experience: 5,
-      skills: ['CLO3D', '3D Simulation', 'Texturing'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p1', title: 'Summer Collection 2024', type: '3D Simulation', image: '/placeholder.jpg' },
-        { id: 'p2', title: 'Athleisure Line', type: 'Texturing', image: '/placeholder.jpg' },
-        { id: 'p3', title: 'Denim Essentials', type: '3D Modeling', image: '/placeholder.jpg' }
+      location: 'United States',
+      languages: ['English', 'Mandarin'],
+      specialties: ['Womenswear', 'Sportswear', 'Activewear'],
+      tools: ['CLO3D', 'Browzwear', 'Adobe Illustrator'],
+      bio: 'Senior 3D fashion designer with 5+ years of experience in virtual prototyping and digital sampling. Specialized in sportswear and activewear categories with expertise in fit simulation and materials visualization.',
+      portrait: '/images/team/sarah-chen.jpg',
+      portfolio: [
+        { id: 'p1', title: 'Summer Collection 2024', thumbnail: '/placeholder.jpg' },
+        { id: 'p2', title: 'Athleisure Line', thumbnail: '/placeholder.jpg' },
+        { id: 'p3', title: 'Activewear Range', thumbnail: '/placeholder.jpg' }
       ]
     },
     {
       id: 2,
       name: 'Marco Rossi',
       role: 'Technical Designer',
-      experience: 2,
-      skills: ['2D Flats', 'Tech Packs', 'Patternmaking'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p4', title: 'Outerwear Tech Packs', type: 'Tech Pack', image: '/placeholder.jpg' },
-        { id: 'p5', title: 'Streetwear Flats', type: '2D Flats', image: '/placeholder.jpg' },
-        { id: 'p6', title: 'Formal Wear Patterns', type: 'Patternmaking', image: '/placeholder.jpg' }
+      location: 'Italy',
+      languages: ['English', 'Italian'],
+      specialties: ['Menswear', 'Tailoring', 'Outerwear'],
+      tools: ['Optitex', 'Adobe Illustrator', 'Gerber'],
+      bio: 'Technical designer specialized in menswear and tailoring. Expert in creating production-ready tech packs with precise measurements and construction details for high-end fashion brands.',
+      portrait: '/images/team/marco-rossi.jpg',
+      portfolio: [
+        { id: 'p4', title: 'Outerwear Tech Packs', thumbnail: '/placeholder.jpg' },
+        { id: 'p5', title: 'Tailored Suiting Line', thumbnail: '/placeholder.jpg' },
+        { id: 'p6', title: 'Formal Wear Patterns', thumbnail: '/placeholder.jpg' }
       ]
     },
     {
       id: 3,
       name: 'Aisha Kumar',
       role: '3D Visualization Specialist',
-      experience: 4,
-      skills: ['Browzwear', 'Rendering', 'Material Design'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p7', title: 'Luxury Brand Renders', type: 'Rendering', image: '/placeholder.jpg' },
-        { id: 'p8', title: 'Fabric Visualization', type: 'Material Design', image: '/placeholder.jpg' },
-        { id: 'p9', title: 'Virtual Showroom', type: '3D Visualization', image: '/placeholder.jpg' }
+      location: 'India',
+      languages: ['English', 'Hindi'],
+      specialties: ['Womenswear', 'Lingerie', 'Swimwear'],
+      tools: ['Browzwear', 'Style3D', 'Adobe Photoshop'],
+      bio: 'Visualization specialist focused on creating photorealistic renders and e-commerce visuals. Expertise in materials simulation and virtual model imagery for product pages.',
+      portrait: '/images/team/aisha-kumar.jpg',
+      portfolio: [
+        { id: 'p7', title: 'Luxury Brand Renders', thumbnail: '/placeholder.jpg' },
+        { id: 'p8', title: 'Swimwear Visualization', thumbnail: '/placeholder.jpg' },
+        { id: 'p9', title: 'Virtual Showroom', thumbnail: '/placeholder.jpg' }
       ]
     },
     {
       id: 4,
       name: 'Lucas Silva',
       role: 'Collection Developer',
-      experience: 3,
-      skills: ['Collection Planning', 'Line Sheets', 'Concept Design'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p10', title: 'Fall/Winter 2024', type: 'Collection Planning', image: '/placeholder.jpg' },
-        { id: 'p11', title: 'Resort Collection', type: 'Concept Design', image: '/placeholder.jpg' },
-        { id: 'p12', title: 'Capsule Wardrobe', type: 'Line Sheets', image: '/placeholder.jpg' }
+      location: 'Brazil',
+      languages: ['English', 'Portuguese', 'Spanish'],
+      specialties: ['Streetwear', 'Denim', 'Kidswear'],
+      tools: ['CLO3D', 'Marvelous Designer', 'Adobe Illustrator'],
+      bio: 'Collection developer with a strong background in streetwear and denim categories. Helps brands plan and execute collections from concept to production-ready deliverables.',
+      portrait: '/images/team/lucas-silva.jpg',
+      portfolio: [
+        { id: 'p10', title: 'Fall/Winter 2024', thumbnail: '/placeholder.jpg' },
+        { id: 'p11', title: 'Streetwear Capsule', thumbnail: '/placeholder.jpg' },
+        { id: 'p12', title: 'Denim Collection', thumbnail: '/placeholder.jpg' }
       ]
     },
     {
       id: 5,
       name: 'Emma Thompson',
-      role: 'Senior Technical Designer',
-      experience: 8,
-      skills: ['3D Simulation', '2D Flats', 'Quality Control'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p13', title: 'Premium Knitwear', type: '3D Simulation', image: '/placeholder.jpg' },
-        { id: 'p14', title: 'Swimwear Line', type: '2D Flats', image: '/placeholder.jpg' },
-        { id: 'p15', title: 'Quality Standards Guide', type: 'Quality Control', image: '/placeholder.jpg' }
+      role: 'Patternmaker',
+      location: 'United Kingdom',
+      languages: ['English', 'French'],
+      specialties: ['Womenswear', 'Knitwear', 'Outdoor'],
+      tools: ['Optitex', 'Lectra', 'Shima Seiki'],
+      bio: 'Senior patternmaker with 8+ years of experience in digital pattern development. Specialized in knitwear and outdoor categories with expertise in grading and fit optimization.',
+      portrait: '/images/team/emma-thompson.jpg',
+      portfolio: [
+        { id: 'p13', title: 'Premium Knitwear', thumbnail: '/placeholder.jpg' },
+        { id: 'p14', title: 'Outdoor Jackets', thumbnail: '/placeholder.jpg' },
+        { id: 'p15', title: 'Technical Outerwear', thumbnail: '/placeholder.jpg' }
       ]
     },
     {
       id: 6,
       name: 'Hiroshi Tanaka',
-      role: 'Digital Fashion Artist',
-      experience: 6,
-      skills: ['CLO3D', 'Marvelous Designer', 'Virtual Prototyping'],
-      image: '/placeholder.jpg',
-      projects: [
-        { id: 'p16', title: 'Avant-Garde Collection', type: 'CLO3D', image: '/placeholder.jpg' },
-        { id: 'p17', title: 'Digital Fashion Week', type: 'Virtual Prototyping', image: '/placeholder.jpg' },
-        { id: 'p18', title: 'NFT Fashion Series', type: 'Digital Art', image: '/placeholder.jpg' }
+      role: '3D Fashion Designer',
+      location: 'Japan',
+      languages: ['English', 'Japanese'],
+      specialties: ['Menswear', 'Sportswear', 'Footwear'],
+      tools: ['CLO3D', 'Marvelous Designer', 'Style3D'],
+      bio: 'Digital fashion artist pushing the boundaries of 3D design. Creates innovative virtual prototypes and concept visualizations for avant-garde and sportswear brands.',
+      portrait: '/images/team/hiroshi-tanaka.jpg',
+      portfolio: [
+        { id: 'p16', title: 'Avant-Garde Collection', thumbnail: '/placeholder.jpg' },
+        { id: 'p17', title: 'Digital Fashion Week', thumbnail: '/placeholder.jpg' },
+        { id: 'p18', title: 'Concept Footwear', thumbnail: '/placeholder.jpg' }
       ]
     }
   ];
@@ -147,7 +189,6 @@ export default function TeamPage() {
     if (!formData.consent) newErrors.consent = 'You must agree to the privacy policy';
 
     if (Object.keys(newErrors).length === 0) {
-      // Store form data in localStorage (in production, this would be sent to a backend)
       localStorage.setItem('teamAccess', 'granted');
       localStorage.setItem('clientData', JSON.stringify(formData));
       setHasAccess(true);
@@ -157,6 +198,10 @@ export default function TeamPage() {
     }
   };
 
+  const toggleBio = (id: number) => {
+    setExpandedBio(expandedBio === id ? null : id);
+  };
+
   return (
     <>
       <Header />
@@ -164,12 +209,33 @@ export default function TeamPage() {
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 animate-fade-in-up">Meet the Team</h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200" style={{ animationFillMode: 'both' }}>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 animate-fade-in-up font-copperplate">Meet the Team</h1>
+          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200 mb-8" style={{ animationFillMode: 'both' }}>
             {hasAccess
               ? 'Our vetted Fashion Technical Designers ready to bring your vision to life.'
               : 'Unlock access to our marketplace of vetted Fashion Technical Designers.'}
           </p>
+
+          {/* CTAs - Only show when has access */}
+          {hasAccess && (
+            <div className="flex flex-wrap gap-4 animate-fade-in-up delay-300" style={{ animationFillMode: 'both' }}>
+              <button
+                onClick={() => setShowEnterpriseForm(true)}
+                className="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+              >
+                Enterprise
+              </button>
+              <button
+                onClick={() => setShowJoinModal(true)}
+                className="px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors"
+              >
+                Join the Team
+              </button>
+              <p className="w-full text-sm text-gray-500 mt-2">
+                Get a tailored quote and a curated team for your project.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -184,11 +250,11 @@ export default function TeamPage() {
                     <div className="aspect-square bg-gray-200 rounded-full mb-6"></div>
                     <h3 className="text-2xl font-bold text-black mb-1">{member.name}</h3>
                     <p className="text-gray-600 mb-1">{member.role}</p>
-                    <p className="text-gray-500 text-sm mb-4">{member.experience} years of experience</p>
+                    <p className="text-gray-500 text-sm mb-4">{member.location}</p>
                     <div className="flex flex-wrap gap-2">
-                      {member.skills.map((skill, index) => (
+                      {member.tools.slice(0, 3).map((tool, index) => (
                         <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded">
-                          {skill}
+                          {tool}
                         </span>
                       ))}
                     </div>
@@ -218,7 +284,7 @@ export default function TeamPage() {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-black mb-4">Get Access to Our Team</h2>
                 <p className="text-lg text-gray-700">
-                  Tell us about your project and we'll unlock the full team marketplace for you.
+                  Tell us about your project and we&apos;ll unlock the full team marketplace for you.
                 </p>
               </div>
 
@@ -374,36 +440,150 @@ export default function TeamPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {teamMembers.map((member, index) => (
-                <Link
-                  href={`/team/${member.id}`}
+                <div
                   key={member.id}
-                  className="bg-white rounded-3xl p-8 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 cursor-pointer group hover:-translate-y-2 animate-fade-in-up"
+                  className="bg-white rounded-3xl p-6 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 animate-fade-in-up flex flex-col"
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="aspect-square bg-gradient-to-br from-purple-50 to-blue-50 rounded-full mb-6 flex items-center justify-center group-hover:from-purple-100 group-hover:to-blue-100 transition-all duration-500 group-hover:scale-105">
-                    <span className="text-5xl">👤</span>
+                  {/* Portrait */}
+                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-5 flex items-center justify-center overflow-hidden">
+                    {member.portrait && member.portrait !== '/placeholder.jpg' ? (
+                      <Image
+                        src={member.portrait}
+                        alt={member.name}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover grayscale"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span className="text-4xl font-bold text-gray-500">
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <h3 className="text-2xl font-bold text-black mb-1">{member.name}</h3>
-                  <p className="text-gray-600 text-base mb-1">{member.role}</p>
-                  <p className="text-gray-500 text-sm mb-4">{member.experience} {member.experience === 1 ? 'year' : 'years'} of experience</p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {member.skills.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium">
-                        {skill}
-                      </span>
-                    ))}
+
+                  {/* Name and Role */}
+                  <h3 className="text-xl font-bold text-black mb-1">{member.name}</h3>
+                  <p className="text-gray-600 text-sm mb-3">{member.role}</p>
+
+                  {/* Location */}
+                  <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+                    <MapPin className="w-4 h-4" />
+                    <span>{member.location}</span>
                   </div>
-                  <div className="w-full px-6 py-3 border-2 border-black text-black rounded-xl font-semibold group-hover:bg-black group-hover:text-white transition-all duration-300 text-center">
-                    View Projects
+
+                  {/* Languages */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <Globe className="w-4 h-4 text-gray-400" />
+                    <div className="flex flex-wrap gap-1">
+                      {member.languages.map((lang, idx) => (
+                        <span key={idx} className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </Link>
+
+                  {/* Specialties */}
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500 mb-2">Specialties</p>
+                    <div className="flex flex-wrap gap-1">
+                      {member.specialties.map((specialty, idx) => (
+                        <span key={idx} className="text-xs text-black bg-gray-100 px-2 py-1 rounded-lg font-medium">
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tools */}
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500 mb-2">Tools</p>
+                    <div className="flex flex-wrap gap-1">
+                      {member.tools.map((tool, idx) => (
+                        <span key={idx} className="text-xs text-gray-700 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bio */}
+                  <div className="mb-4 flex-grow">
+                    <p className={`text-sm text-gray-600 leading-relaxed ${expandedBio !== member.id ? 'line-clamp-3' : ''}`}>
+                      {member.bio}
+                    </p>
+                    {member.bio.length > 120 && (
+                      <button
+                        onClick={() => toggleBio(member.id)}
+                        className="text-xs text-gray-500 hover:text-black mt-1 flex items-center gap-1"
+                      >
+                        {expandedBio === member.id ? (
+                          <>Show less <ChevronUp className="w-3 h-3" /></>
+                        ) : (
+                          <>Read more <ChevronDown className="w-3 h-3" /></>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Portfolio Preview */}
+                  <div className="mb-5">
+                    <p className="text-xs text-gray-500 mb-2">Portfolio</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {member.portfolio.slice(0, 3).map((item) => (
+                        <div key={item.id} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-3 mt-auto">
+                    <Link
+                      href="/contact"
+                      className="flex-1 px-4 py-3 bg-black text-white rounded-xl font-semibold text-center text-sm hover:bg-gray-800 transition-colors"
+                    >
+                      Contact
+                    </Link>
+                    <Link
+                      href={`/team/${member.id}`}
+                      className="flex-1 px-4 py-3 border-2 border-black text-black rounded-xl font-semibold text-center text-sm hover:bg-black hover:text-white transition-colors"
+                    >
+                      View Portfolio
+                    </Link>
+                  </div>
+                </div>
               ))}
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="mt-16 text-center">
+              <button
+                onClick={() => setShowJoinModal(true)}
+                className="px-8 py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors"
+              >
+                Join the Team
+              </button>
             </div>
           </div>
         </div>
       )}
 
       <Footer />
+
+      {/* Modals */}
+      <EnterpriseForm
+        isOpen={showEnterpriseForm}
+        onClose={() => setShowEnterpriseForm(false)}
+      />
+      <JoinTeamModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+      />
     </>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Ruler, Palette, Gem, Image, Users, Cloud, ArrowRight, Check } from 'lucide-react';
+import { Ruler, Box, Image, ArrowRight, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -8,74 +8,38 @@ export default function ServicesGrid() {
   const services = [
     {
       id: 1,
-      title: "2D Technical Drawings",
-      description: "Professional flat sketches and technical specifications for production-ready garments.",
+      title: "2D Technical Design and Tech Packs",
+      description: "Apparel technical design that reduces delays and rework.",
       features: [
-        "Detailed tech packs with measurements",
-        "Construction details and specifications",
-        "Multiple views and variations"
+        "Production-ready tech packs, measurements, and spec sheets vendors can execute.",
+        "Clear construction details that reduce iterations with vendors.",
+        "Vendor-ready deliverables that lower development cost per style."
       ],
       icon: Ruler,
       link: "/solutions"
     },
     {
       id: 2,
-      title: "3D Fashion Design",
-      description: "Create realistic digital garments using industry-leading CLO3D and Browzwear software.",
+      title: "Virtual Sampling and 3D Prototyping",
+      description: "Shorten lead times, reduce physical samples, and speed up approvals.",
       features: [
-        "Realistic fabric simulation",
-        "Pattern making and grading",
-        "Animation and fit testing"
+        "3D fit simulation and validation using advanced 3D visualization tools.",
+        "Faster approvals with fewer physical samples and less rework.",
+        "Colorways and materials visualization for clearer decisions."
       ],
-      icon: Palette,
+      icon: Box,
       link: "/solutions"
     },
     {
       id: 3,
-      title: "Virtual Prototyping",
-      description: "Eliminate physical sampling costs with photorealistic digital prototypes.",
+      title: "E-commerce Ready Visuals",
+      description: "Visual assets for product pages and listings, created from digital prototypes and virtual models.",
       features: [
-        "60% reduction in sampling costs",
-        "Faster iteration and approvals",
-        "Sustainable design process"
-      ],
-      icon: Gem,
-      link: "/solutions"
-    },
-    {
-      id: 4,
-      title: "Product Rendering",
-      description: "Studio-quality product images and marketing visuals without photoshoots.",
-      features: [
-        "Photorealistic product shots",
-        "Multiple angles and lighting",
-        "Lifestyle and e-commerce ready"
+        "On-model imagery with virtual models across styles and colorways.",
+        "Multi-angle product visuals without photoshoots.",
+        "Assets optimized for e-commerce listings and product pages."
       ],
       icon: Image,
-      link: "/solutions"
-    },
-    {
-      id: 5,
-      title: "Virtual Try-On",
-      description: "Interactive digital fitting solutions for e-commerce and retail experiences.",
-      features: [
-        "AR try-on integration",
-        "Size recommendation engine",
-        "Reduced return rates"
-      ],
-      icon: Users,
-      link: "/solutions"
-    },
-    {
-      id: 6,
-      title: "Collaborative Platform",
-      description: "Cloud-based workspace connecting you with expert fashion designers worldwide.",
-      features: [
-        "On-demand expert designers",
-        "Real-time collaboration tools",
-        "Project management dashboard"
-      ],
-      icon: Cloud,
       link: "/solutions"
     }
   ];
@@ -105,7 +69,7 @@ export default function ServicesGrid() {
 
   return (
     <section className="bg-gray-100 py-20 sm:py-32 md:py-40 lg:py-52">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -113,11 +77,11 @@ export default function ServicesGrid() {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-12 sm:mb-16 md:mb-24"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 font-copperplate">
             Our Services
           </h2>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-            End-to-end digital fashion solutions to transform your design workflow
+            Traditional fashion execution, supported by digital tools and vetted talent.
           </p>
         </motion.div>
 
@@ -126,7 +90,7 @@ export default function ServicesGrid() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"
         >
           {services.map((service) => {
             const Icon = service.icon;
@@ -142,7 +106,7 @@ export default function ServicesGrid() {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-2 sm:mb-3 font-copperplate">
                   {service.title}
                 </h3>
 
