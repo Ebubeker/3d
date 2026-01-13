@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Instagram, Linkedin, Twitter, Youtube } from 'lucide-react';
+import { Instagram, Linkedin, Facebook } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -18,10 +18,9 @@ export default function Footer() {
   ];
 
   const socialLinks = [
-    { name: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-    { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-    { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
-    { name: 'YouTube', href: 'https://youtube.com', icon: Youtube },
+    { name: 'Instagram', href: 'https://www.instagram.com/virtuality.fashion/', icon: Instagram },
+    { name: 'LinkedIn', href: 'https://www.linkedin.com/company/virtuality-fashion/?viewAsMember=true', icon: Linkedin },
+    { name: 'Facebook', href: 'https://www.facebook.com/virtuality.fashion', icon: Facebook },
   ];
 
   return (
@@ -96,9 +95,9 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Contact</h3>
             <div className="flex flex-col gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
-              <p>hello@virtuality.fashion</p>
-              <p>+1 (555) 123-4567</p>
-              <p>New York, NY</p>
+              <p>amnon@virtuality.fashion</p>
+              <p>+972 73-374-4885</p>
+              <p>Israel</p>
             </div>
           </div>
         </div>
