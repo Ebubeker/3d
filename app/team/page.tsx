@@ -242,9 +242,9 @@ export default function TeamPage() {
             style={{ opacity: 0.05 }}
           />
         </div>
-        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32 relative z-10">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 animate-fade-in-up font-copperplate">Meet the Team</h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200 mb-8" style={{ animationFillMode: 'both' }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 md:py-32 relative z-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 animate-fade-in-up font-copperplate">Meet the Team</h1>
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200 mb-6 sm:mb-8" style={{ animationFillMode: 'both' }}>
             {hasAccess
               ? 'Our vetted Fashion Technical Designers ready to bring your vision to life.'
               : 'Unlock access to our marketplace of vetted Fashion Technical Designers.'}
@@ -252,20 +252,20 @@ export default function TeamPage() {
 
           {/* CTAs - Only show when has access */}
           {hasAccess && (
-            <div className="flex flex-wrap gap-4 animate-fade-in-up delay-300" style={{ animationFillMode: 'both' }}>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 animate-fade-in-up delay-300" style={{ animationFillMode: 'both' }}>
               <button
                 onClick={() => setShowEnterpriseForm(true)}
-                className="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm sm:text-base"
               >
                 Enterprise
               </button>
               <button
                 onClick={() => setShowJoinModal(true)}
-                className="px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors"
+                className="w-full sm:w-auto px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors text-sm sm:text-base"
               >
                 Join the Team
               </button>
-              <p className="w-full text-sm text-gray-500 mt-2">
+              <p className="w-full text-xs sm:text-sm text-gray-500 mt-2">
                 Get a tailored quote and a curated team for your project.
               </p>
             </div>
@@ -277,17 +277,17 @@ export default function TeamPage() {
         <>
           {/* Blurred Team Grid */}
           <div className="bg-gray-50 border-b border-gray-200 relative">
-            <div className="max-w-6xl mx-auto px-6 py-20">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 blur-md pointer-events-none select-none">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 blur-md pointer-events-none select-none">
                 {teamMembers.map((member) => (
-                  <div key={member.id} className="bg-white rounded-2xl p-8 border border-gray-200">
-                    <div className="aspect-square bg-gray-200 rounded-full mb-6"></div>
-                    <h3 className="text-2xl font-bold text-black mb-1">{member.name}</h3>
-                    <p className="text-gray-600 mb-1">{member.role}</p>
-                    <p className="text-gray-500 text-sm mb-4">{member.location}</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div key={member.id} className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200">
+                    <div className="aspect-square bg-gray-200 rounded-full mb-4 sm:mb-6"></div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-1">{member.name}</h3>
+                    <p className="text-gray-600 text-sm sm:text-base mb-1">{member.role}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">{member.location}</p>
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
                       {member.tools.slice(0, 3).map((tool, index) => (
-                        <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded">
+                        <span key={index} className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded">
                           {tool}
                         </span>
                       ))}
@@ -298,14 +298,14 @@ export default function TeamPage() {
             </div>
 
             {/* Overlay with unlock message */}
-            <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm">
-              <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md text-center border-2 border-black">
-                <div className="text-4xl mb-4">🔒</div>
-                <h2 className="text-3xl font-bold text-black mb-4">Access Required</h2>
-                <p className="text-gray-700 mb-6">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm p-4">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl max-w-md text-center border-2 border-black mx-4">
+                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🔒</div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-black mb-3 sm:mb-4">Access Required</h2>
+                <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6">
                   Submit your project details below to unlock full access to our team of designers.
                 </p>
-                <a href="#unlock-form" className="px-8 py-4 bg-black text-white rounded font-medium hover:bg-gray-900 transition-colors inline-block">
+                <a href="#unlock-form" className="px-6 sm:px-8 py-3 sm:py-4 bg-black text-white rounded font-medium hover:bg-gray-900 transition-colors inline-block text-sm sm:text-base">
                   Unlock Access
                 </a>
               </div>
@@ -314,18 +314,18 @@ export default function TeamPage() {
 
           {/* Unlock Form */}
           <div id="unlock-form" className="bg-white">
-            <div className="max-w-2xl mx-auto px-6 py-20">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-black mb-4">Get Access to Our Team</h2>
-                <p className="text-lg text-gray-700">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-3 sm:mb-4">Get Access to Our Team</h2>
+                <p className="text-base sm:text-lg text-gray-700">
                   Tell us about your project and we&apos;ll unlock the full team marketplace for you.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* Name */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Name *</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -341,7 +341,7 @@ export default function TeamPage() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Email *</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Email *</label>
                   <input
                     type="email"
                     name="email"
@@ -357,7 +357,7 @@ export default function TeamPage() {
 
                 {/* Company */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Company *</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Company *</label>
                   <input
                     type="text"
                     name="company"
@@ -373,7 +373,7 @@ export default function TeamPage() {
 
                 {/* Project Type */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Type of Project *</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Type of Project *</label>
                   <select
                     name="projectType"
                     value={formData.projectType}
@@ -395,7 +395,7 @@ export default function TeamPage() {
 
                 {/* Estimated Volume */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Estimated Volume</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Estimated Volume</label>
                   <input
                     type="text"
                     name="volume"
@@ -408,7 +408,7 @@ export default function TeamPage() {
 
                 {/* Timeline */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Timeline</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Timeline</label>
                   <input
                     type="text"
                     name="timeline"
@@ -421,7 +421,7 @@ export default function TeamPage() {
 
                 {/* Additional Details */}
                 <div>
-                  <label className="block text-black font-semibold mb-3">Additional Details</label>
+                  <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Additional Details</label>
                   <textarea
                     name="message"
                     value={formData.message}
@@ -464,23 +464,23 @@ export default function TeamPage() {
       ) : (
         /* Full Team Grid (After Unlock) */
         <div className="bg-gray-50">
-          <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-12 sm:py-16 md:py-24 lg:py-32">
             {submitted && (
-              <div className="mb-16 text-center py-10 bg-white rounded-3xl border-2 border-black animate-scale-in shadow-lg">
-                <h2 className="text-3xl font-bold text-black mb-3">Access Granted!</h2>
-                <p className="text-gray-700 text-lg">You can now view and contact our team members.</p>
+              <div className="mb-8 sm:mb-12 md:mb-16 text-center py-6 sm:py-8 md:py-10 px-4 bg-white rounded-2xl sm:rounded-3xl border-2 border-black animate-scale-in shadow-lg">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-2 sm:mb-3">Access Granted!</h2>
+                <p className="text-gray-700 text-sm sm:text-base md:text-lg">You can now view and contact our team members.</p>
               </div>
             )}
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {teamMembers.map((member, index) => (
                 <div
                   key={member.id}
-                  className="bg-white rounded-3xl p-6 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 animate-fade-in-up flex flex-col"
+                  className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 animate-fade-in-up flex flex-col"
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
                   {/* Portrait */}
-                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-5 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 flex items-center justify-center overflow-hidden">
                     {member.portrait && member.portrait !== '/placeholder.jpg' ? (
                       <Image
                         src={member.portrait}
@@ -499,21 +499,21 @@ export default function TeamPage() {
                   </div>
 
                   {/* Name and Role */}
-                  <h3 className="text-xl font-bold text-black mb-1">{member.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{member.role}</p>
+                  <h3 className="text-lg sm:text-xl font-bold text-black mb-1">{member.name}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">{member.role}</p>
 
                   {/* Location */}
-                  <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
-                    <MapPin className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm mb-2 sm:mb-3">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>{member.location}</span>
                   </div>
 
                   {/* Languages */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <Globe className="w-4 h-4 text-gray-400" />
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
                     <div className="flex flex-wrap gap-1">
                       {member.languages.map((lang, idx) => (
-                        <span key={idx} className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                        <span key={idx} className="text-[10px] sm:text-xs text-gray-600 bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded">
                           {lang}
                         </span>
                       ))}
@@ -521,11 +521,11 @@ export default function TeamPage() {
                   </div>
 
                   {/* Specialties */}
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-500 mb-2">Specialties</p>
+                  <div className="mb-3 sm:mb-4">
+                    <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Specialties</p>
                     <div className="flex flex-wrap gap-1">
                       {member.specialties.map((specialty, idx) => (
-                        <span key={idx} className="text-xs text-black bg-gray-100 px-2 py-1 rounded-lg font-medium">
+                        <span key={idx} className="text-[10px] sm:text-xs text-black bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg font-medium">
                           {specialty}
                         </span>
                       ))}
@@ -533,11 +533,11 @@ export default function TeamPage() {
                   </div>
 
                   {/* Tools */}
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-500 mb-2">Tools</p>
+                  <div className="mb-3 sm:mb-4">
+                    <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Tools</p>
                     <div className="flex flex-wrap gap-1">
                       {member.tools.map((tool, idx) => (
-                        <span key={idx} className="text-xs text-gray-700 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                        <span key={idx} className="text-[10px] sm:text-xs text-gray-700 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">
                           {tool}
                         </span>
                       ))}
@@ -545,30 +545,30 @@ export default function TeamPage() {
                   </div>
 
                   {/* Bio */}
-                  <div className="mb-4 flex-grow">
-                    <p className={`text-sm text-gray-600 leading-relaxed ${expandedBio !== member.id ? 'line-clamp-3' : ''}`}>
+                  <div className="mb-3 sm:mb-4 flex-grow">
+                    <p className={`text-xs sm:text-sm text-gray-600 leading-relaxed ${expandedBio !== member.id ? 'line-clamp-3' : ''}`}>
                       {member.bio}
                     </p>
                     {member.bio.length > 120 && (
                       <button
                         onClick={() => toggleBio(member.id)}
-                        className="text-xs text-gray-500 hover:text-black mt-1 flex items-center gap-1"
+                        className="text-[10px] sm:text-xs text-gray-500 hover:text-black mt-1 flex items-center gap-1"
                       >
                         {expandedBio === member.id ? (
-                          <>Show less <ChevronUp className="w-3 h-3" /></>
+                          <>Show less <ChevronUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" /></>
                         ) : (
-                          <>Read more <ChevronDown className="w-3 h-3" /></>
+                          <>Read more <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3" /></>
                         )}
                       </button>
                     )}
                   </div>
 
                   {/* Portfolio Preview */}
-                  <div className="mb-5">
-                    <p className="text-xs text-gray-500 mb-2">Portfolio</p>
-                    <div className="grid grid-cols-3 gap-2">
+                  <div className="mb-4 sm:mb-5">
+                    <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Portfolio</p>
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                       {member.portfolio.slice(0, 3).map((item) => (
-                        <div key={item.id} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                        <div key={item.id} className="aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden">
                           <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
                         </div>
                       ))}
@@ -576,16 +576,16 @@ export default function TeamPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-3 mt-auto">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto">
                     <Link
-                      href="/contact"
-                      className="flex-1 px-4 py-3 bg-black text-white rounded-xl font-semibold text-center text-sm hover:bg-gray-800 transition-colors"
+                      href={`/contact?designer=${encodeURIComponent(member.name)}`}
+                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-gray-800 transition-colors"
                     >
                       Get Quote
                     </Link>
                     <Link
                       href={`/team/${member.id}`}
-                      className="flex-1 px-4 py-3 border-2 border-black text-black rounded-xl font-semibold text-center text-sm hover:bg-black hover:text-white transition-colors"
+                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-black text-black rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-black hover:text-white transition-colors"
                     >
                       View Portfolio
                     </Link>
@@ -595,10 +595,10 @@ export default function TeamPage() {
             </div>
 
             {/* Bottom CTA */}
-            <div className="mt-16 text-center">
+            <div className="mt-10 sm:mt-12 md:mt-16 text-center">
               <button
                 onClick={() => setShowJoinModal(true)}
-                className="px-8 py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors text-sm sm:text-base"
               >
                 Join the Team
               </button>

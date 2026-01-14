@@ -8,7 +8,8 @@ import {
   Users,
   Mail,
   Menu,
-  X
+  X,
+  Info
 } from 'lucide-react';
 
 export default function Header() {
@@ -23,10 +24,23 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const navLinks = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Solutions', href: '/solutions', icon: Box },
     { name: 'Team', href: '/team', icon: Users },
+    { name: 'About', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Mail },
   ];
 
@@ -81,30 +95,49 @@ export default function Header() {
       </div>
 
       {/* Mobile Navigation Overlay */}
-      <div 
-        className={`fixed inset-0 bg-white/95 backdrop-blur-xl z-40 transition-transform duration-300 md:hidden flex flex-col items-center justify-center ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <nav className="flex flex-col gap-6 w-full max-w-xs px-6">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-4 text-xl font-medium text-gray-600 hover:text-black transition-colors p-2 rounded-xl hover:bg-gray-50"
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
-                  <Icon className="w-6 h-6" />
-                </div>
-                {link.name}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-white md:hidden flex flex-col items-center justify-center"
+          style={{
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            position: 'fixed',
+            width: '100vw',
+            height: '100vh'
+          }}
+        >
+          {/* Close button inside overlay */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 p-2 text-gray-600 hover:text-black transition-colors"
+            style={{ zIndex: 10000 }}
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <nav className="flex flex-col gap-6 w-full max-w-xs px-6">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-4 text-xl font-medium text-gray-600 hover:text-black transition-colors p-2 rounded-xl hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
