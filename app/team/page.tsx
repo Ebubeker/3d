@@ -8,9 +8,10 @@ import Footer from '../components/Footer';
 import EnterpriseForm from '../components/EnterpriseForm';
 import JoinTeamModal from '../components/JoinTeamModal';
 import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
   role: string;
   location: string;
@@ -18,19 +19,61 @@ interface TeamMember {
   specialties: string[];
   tools: string[];
   bio: string;
-  portrait: string;
-  portfolio: {
+  portrait: string | null;
+  portfolio_items?: {
     id: string;
-    thumbnail: string;
     title: string;
+    image_url: string | null;
   }[];
 }
+
+// Static fallback data
+const staticTeamMembers: TeamMember[] = [
+  {
+    id: '1',
+    name: 'Sarah Chen',
+    role: '3D Fashion Designer',
+    location: 'United States',
+    languages: ['English', 'Mandarin'],
+    specialties: ['Womenswear', 'Sportswear', 'Activewear'],
+    tools: ['CLO3D', 'Browzwear', 'Adobe Illustrator'],
+    bio: 'Senior 3D fashion designer with 5+ years of experience in virtual prototyping and digital sampling.',
+    portrait: '/images/team/sarah-chen.jpg',
+    portfolio_items: []
+  },
+  {
+    id: '2',
+    name: 'Marco Rossi',
+    role: 'Technical Designer',
+    location: 'Italy',
+    languages: ['English', 'Italian'],
+    specialties: ['Menswear', 'Tailoring', 'Outerwear'],
+    tools: ['Optitex', 'Adobe Illustrator', 'Gerber'],
+    bio: 'Technical designer specialized in menswear and tailoring. Expert in creating production-ready tech packs.',
+    portrait: '/images/team/marco-rossi.jpg',
+    portfolio_items: []
+  },
+  {
+    id: '3',
+    name: 'Aisha Kumar',
+    role: '3D Visualization Specialist',
+    location: 'India',
+    languages: ['English', 'Hindi'],
+    specialties: ['Womenswear', 'Lingerie', 'Swimwear'],
+    tools: ['Browzwear', 'Style3D', 'Adobe Photoshop'],
+    bio: 'Visualization specialist focused on creating photorealistic renders and e-commerce visuals.',
+    portrait: '/images/team/aisha-kumar.jpg',
+    portfolio_items: []
+  }
+];
 
 export default function TeamPage() {
   const [hasAccess, setHasAccess] = useState(false);
   const [showEnterpriseForm, setShowEnterpriseForm] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [expandedBio, setExpandedBio] = useState<number | null>(null);
+  const [expandedBio, setExpandedBio] = useState<string | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(staticTeamMembers);
+  const [isLoadingTeam, setIsLoadingTeam] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,105 +95,34 @@ export default function TeamPage() {
     }
   }, []);
 
-  // Team members data with new structure
-  const teamMembers: TeamMember[] = [
-    {
-      id: 1,
-      name: 'Sarah Chen',
-      role: '3D Fashion Designer',
-      location: 'United States',
-      languages: ['English', 'Mandarin'],
-      specialties: ['Womenswear', 'Sportswear', 'Activewear'],
-      tools: ['CLO3D', 'Browzwear', 'Adobe Illustrator'],
-      bio: 'Senior 3D fashion designer with 5+ years of experience in virtual prototyping and digital sampling. Specialized in sportswear and activewear categories with expertise in fit simulation and materials visualization.',
-      portrait: '/images/team/sarah-chen.jpg',
-      portfolio: [
-        { id: 'p1', title: 'Summer Collection 2024', thumbnail: '/placeholder.jpg' },
-        { id: 'p2', title: 'Athleisure Line', thumbnail: '/placeholder.jpg' },
-        { id: 'p3', title: 'Activewear Range', thumbnail: '/placeholder.jpg' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Marco Rossi',
-      role: 'Technical Designer',
-      location: 'Italy',
-      languages: ['English', 'Italian'],
-      specialties: ['Menswear', 'Tailoring', 'Outerwear'],
-      tools: ['Optitex', 'Adobe Illustrator', 'Gerber'],
-      bio: 'Technical designer specialized in menswear and tailoring. Expert in creating production-ready tech packs with precise measurements and construction details for high-end fashion brands.',
-      portrait: '/images/team/marco-rossi.jpg',
-      portfolio: [
-        { id: 'p4', title: 'Outerwear Tech Packs', thumbnail: '/placeholder.jpg' },
-        { id: 'p5', title: 'Tailored Suiting Line', thumbnail: '/placeholder.jpg' },
-        { id: 'p6', title: 'Formal Wear Patterns', thumbnail: '/placeholder.jpg' }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Aisha Kumar',
-      role: '3D Visualization Specialist',
-      location: 'India',
-      languages: ['English', 'Hindi'],
-      specialties: ['Womenswear', 'Lingerie', 'Swimwear'],
-      tools: ['Browzwear', 'Style3D', 'Adobe Photoshop'],
-      bio: 'Visualization specialist focused on creating photorealistic renders and e-commerce visuals. Expertise in materials simulation and virtual model imagery for product pages.',
-      portrait: '/images/team/aisha-kumar.jpg',
-      portfolio: [
-        { id: 'p7', title: 'Luxury Brand Renders', thumbnail: '/placeholder.jpg' },
-        { id: 'p8', title: 'Swimwear Visualization', thumbnail: '/placeholder.jpg' },
-        { id: 'p9', title: 'Virtual Showroom', thumbnail: '/placeholder.jpg' }
-      ]
-    },
-    {
-      id: 4,
-      name: 'Lucas Silva',
-      role: 'Collection Developer',
-      location: 'Brazil',
-      languages: ['English', 'Portuguese', 'Spanish'],
-      specialties: ['Streetwear', 'Denim', 'Kidswear'],
-      tools: ['CLO3D', 'Marvelous Designer', 'Adobe Illustrator'],
-      bio: 'Collection developer with a strong background in streetwear and denim categories. Helps brands plan and execute collections from concept to production-ready deliverables.',
-      portrait: '/images/team/lucas-silva.jpg',
-      portfolio: [
-        { id: 'p10', title: 'Fall/Winter 2024', thumbnail: '/placeholder.jpg' },
-        { id: 'p11', title: 'Streetwear Capsule', thumbnail: '/placeholder.jpg' },
-        { id: 'p12', title: 'Denim Collection', thumbnail: '/placeholder.jpg' }
-      ]
-    },
-    {
-      id: 5,
-      name: 'Emma Thompson',
-      role: 'Patternmaker',
-      location: 'United Kingdom',
-      languages: ['English', 'French'],
-      specialties: ['Womenswear', 'Knitwear', 'Outdoor'],
-      tools: ['Optitex', 'Lectra', 'Shima Seiki'],
-      bio: 'Senior patternmaker with 8+ years of experience in digital pattern development. Specialized in knitwear and outdoor categories with expertise in grading and fit optimization.',
-      portrait: '/images/team/emma-thompson.jpg',
-      portfolio: [
-        { id: 'p13', title: 'Premium Knitwear', thumbnail: '/placeholder.jpg' },
-        { id: 'p14', title: 'Outdoor Jackets', thumbnail: '/placeholder.jpg' },
-        { id: 'p15', title: 'Technical Outerwear', thumbnail: '/placeholder.jpg' }
-      ]
-    },
-    {
-      id: 6,
-      name: 'Hiroshi Tanaka',
-      role: '3D Fashion Designer',
-      location: 'Japan',
-      languages: ['English', 'Japanese'],
-      specialties: ['Menswear', 'Sportswear', 'Footwear'],
-      tools: ['CLO3D', 'Marvelous Designer', 'Style3D'],
-      bio: 'Digital fashion artist pushing the boundaries of 3D design. Creates innovative virtual prototypes and concept visualizations for avant-garde and sportswear brands.',
-      portrait: '/images/team/hiroshi-tanaka.jpg',
-      portfolio: [
-        { id: 'p16', title: 'Avant-Garde Collection', thumbnail: '/placeholder.jpg' },
-        { id: 'p17', title: 'Digital Fashion Week', thumbnail: '/placeholder.jpg' },
-        { id: 'p18', title: 'Concept Footwear', thumbnail: '/placeholder.jpg' }
-      ]
-    }
-  ];
+  // Fetch team members from Supabase
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('team_members')
+          .select('*, portfolio_items(*)')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching team members:', error);
+          setIsLoadingTeam(false);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setTeamMembers(data);
+        }
+        setIsLoadingTeam(false);
+      } catch (err) {
+        console.error('Error:', err);
+        setIsLoadingTeam(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -223,7 +195,7 @@ export default function TeamPage() {
     }
   };
 
-  const toggleBio = (id: number) => {
+  const toggleBio = (id: string) => {
     setExpandedBio(expandedBio === id ? null : id);
   };
 
@@ -472,6 +444,27 @@ export default function TeamPage() {
               </div>
             )}
 
+            {isLoadingTeam ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 border border-gray-200 animate-pulse">
+                    <div className="aspect-square bg-gray-200 rounded-xl sm:rounded-2xl mb-4 sm:mb-5" />
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
+                    <div className="h-4 bg-gray-200 rounded w-1/3 mb-4" />
+                    <div className="flex gap-2 mb-4">
+                      <div className="h-6 bg-gray-200 rounded w-16" />
+                      <div className="h-6 bg-gray-200 rounded w-16" />
+                    </div>
+                    <div className="h-20 bg-gray-200 rounded mb-4" />
+                    <div className="flex gap-3">
+                      <div className="h-10 bg-gray-200 rounded flex-1" />
+                      <div className="h-10 bg-gray-200 rounded flex-1" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {teamMembers.map((member, index) => (
                 <div
@@ -564,16 +557,28 @@ export default function TeamPage() {
                   </div>
 
                   {/* Portfolio Preview */}
-                  <div className="mb-4 sm:mb-5">
-                    <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Portfolio</p>
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-                      {member.portfolio.slice(0, 3).map((item) => (
-                        <div key={item.id} className="aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden">
-                          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-                        </div>
-                      ))}
+                  {member.portfolio_items && member.portfolio_items.length > 0 && (
+                    <div className="mb-4 sm:mb-5">
+                      <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Portfolio</p>
+                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                        {member.portfolio_items.slice(0, 3).map((item) => (
+                          <div key={item.id} className="aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden">
+                            {item.image_url ? (
+                              <Image
+                                src={item.image_url}
+                                alt={item.title}
+                                width={100}
+                                height={100}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto">
@@ -593,6 +598,7 @@ export default function TeamPage() {
                 </div>
               ))}
             </div>
+            )}
 
             {/* Bottom CTA */}
             <div className="mt-10 sm:mt-12 md:mt-16 text-center">

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-export default function ContactPage() {
+function ContactForm() {
   const searchParams = useSearchParams();
   const designerName = searchParams.get('designer');
 
@@ -248,5 +248,24 @@ export default function ContactPage() {
 
       <Footer />
     </>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <Header />
+        <div className="bg-white border-b border-gray-200 relative overflow-hidden">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 md:py-28 lg:py-32 pt-24 sm:pt-28 md:pt-32 relative z-10">
+            <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse" />
+            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
+          </div>
+        </div>
+        <Footer />
+      </>
+    }>
+      <ContactForm />
+    </Suspense>
   );
 }

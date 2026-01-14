@@ -9,7 +9,7 @@ export default function BenefitsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const benefits = [
+  const benefits: { id: number; title: string; description: string; type: string; image: string; video?: string }[] = [
     {
       id: 1,
       title: "Faster Production",
