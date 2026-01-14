@@ -6,14 +6,6 @@ import { motion } from 'framer-motion';
 export default function CTASection() {
   return (
     <section className="bg-black text-white py-16 sm:py-24 md:py-32 lg:py-40 relative overflow-hidden">
-      {/* Pattern background */}
-      <img
-          src="/images/6224739.jpg"
-          alt="Background pattern"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-      <div className="absolute inset-0 bg-black/40" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}

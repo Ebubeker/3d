@@ -18,6 +18,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,7 +47,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -61,9 +62,39 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
     }
 
     if (Object.keys(newErrors).length === 0) {
-      // In production, this would be sent to a backend
-      console.log('Join team form submitted:', formData);
-      setSubmitted(true);
+      setIsLoading(true);
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
+            fullName: formData.fullName,
+            email: formData.email,
+            roleSpecialty: formData.roleSpecialty,
+            portfolioLink: formData.portfolioLink,
+            message: formData.message,
+            subject: "New Team Application - Virtuality Fashion",
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setSubmitted(true);
+        } else {
+          console.error("Web3Forms Error:", result);
+          setErrors({ form: 'Something went wrong. Please try again.' });
+        }
+      } catch (error) {
+        console.error("Web3Forms Connection Error:", error);
+        setErrors({ form: 'Connection error. Please try again.' });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -220,12 +251,18 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                   />
                 </div>
 
+                {/* Error Message */}
+                {errors.form && (
+                  <p className="text-red-600 text-sm text-center">{errors.form}</p>
+                )}
+
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full px-6 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                  disabled={isLoading}
+                  className="w-full px-6 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Application
+                  {isLoading ? 'Submitting...' : 'Submit Application'}
                 </button>
 
                 {/* Calendly Link */}

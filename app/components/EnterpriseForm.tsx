@@ -26,6 +26,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -57,7 +58,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
     return emailRegex.test(email);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -70,28 +71,67 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
     }
 
     if (Object.keys(newErrors).length === 0) {
-      // In production, this would be sent to a backend
-      console.log('Enterprise form submitted:', formData);
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        onClose();
-        setFormData({
-          company: '',
-          name: '',
-          email: '',
-          role: '',
-          projectType: '',
-          category: '',
-          deliverables: {
-            techPacks: false,
-            prototyping: false,
-            productVisuals: false
+      setIsLoading(true);
+      try {
+        const deliverablesText = Object.entries(formData.deliverables)
+          .filter(([, value]) => value)
+          .map(([key]) => key)
+          .join(', ');
+
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
-          timeline: '',
-          notes: ''
+          body: JSON.stringify({
+            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
+            company: formData.company,
+            name: formData.name,
+            email: formData.email,
+            role: formData.role,
+            projectType: formData.projectType,
+            category: formData.category,
+            deliverables: deliverablesText,
+            timeline: formData.timeline,
+            notes: formData.notes,
+            subject: "Enterprise Quote Request - Virtuality Fashion",
+          }),
         });
-      }, 3000);
+
+        const result = await response.json();
+
+        if (result.success) {
+          setSubmitted(true);
+          setTimeout(() => {
+            setSubmitted(false);
+            onClose();
+            setFormData({
+              company: '',
+              name: '',
+              email: '',
+              role: '',
+              projectType: '',
+              category: '',
+              deliverables: {
+                techPacks: false,
+                prototyping: false,
+                productVisuals: false
+              },
+              timeline: '',
+              notes: ''
+            });
+          }, 3000);
+        } else {
+          console.error("Web3Forms Error:", result);
+          setErrors({ form: 'Something went wrong. Please try again.' });
+        }
+      } catch (error) {
+        console.error("Web3Forms Connection Error:", error);
+        setErrors({ form: 'Connection error. Please try again.' });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -312,12 +352,18 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
                   />
                 </div>
 
+                {/* Error Message */}
+                {errors.form && (
+                  <p className="text-red-600 text-sm text-center">{errors.form}</p>
+                )}
+
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full px-6 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                  disabled={isLoading}
+                  className="w-full px-6 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Request
+                  {isLoading ? 'Submitting...' : 'Submit Request'}
                 </button>
               </form>
             </>

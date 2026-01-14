@@ -176,10 +176,10 @@ export default function HowItWorksSection() {
                 <motion.div
                   key={output.id}
                   variants={itemVariants}
-                  className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-gray-200 hover:border-black transition-all duration-300"
+                  className="group bg-white rounded-2xl p-6 sm:p-8 border-2 border-gray-200 hover:border-black transition-all duration-300"
                 >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4 sm:mb-6">
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" strokeWidth={1.5} />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-100 group-hover:bg-black transition-colors duration-300 flex items-center justify-center mb-4 sm:mb-6">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                   </div>
                   <h4 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4 font-copperplate">
                     {output.title}

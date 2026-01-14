@@ -160,7 +160,7 @@ export default function TeamMemberPage() {
 
       {/* Member Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-8 md:px-12 py-16 md:py-20">
+        <div className="max-w-6xl mx-auto px-8 md:px-12 pt-32 pb-16 md:pt-40 md:pb-20">
           <Link
             href="/team"
             className="inline-flex items-center text-gray-600 hover:text-black mb-10 transition-colors group"

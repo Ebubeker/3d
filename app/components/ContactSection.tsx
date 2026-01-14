@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-// Web3Forms Access Key - Replace with your actual key from https://web3forms.com
-const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || '';
+// Web3Forms Access Key
+const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || '';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -38,7 +38,6 @@ export default function ContactSection() {
         company: formData.company,
         queryType: formData.queryType,
         message: formData.message,
-        to_email: `contact@virtuality.fashion,${formData.email}`,
         subject: `New Contact Query: ${formData.queryType} from ${formData.name}`,
         from_name: formData.name,
         redirect: '',

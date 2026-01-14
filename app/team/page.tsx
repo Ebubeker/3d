@@ -174,7 +174,7 @@ export default function TeamPage() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -189,10 +189,35 @@ export default function TeamPage() {
     if (!formData.consent) newErrors.consent = 'You must agree to the privacy policy';
 
     if (Object.keys(newErrors).length === 0) {
-      localStorage.setItem('teamAccess', 'granted');
-      localStorage.setItem('clientData', JSON.stringify(formData));
-      setHasAccess(true);
-      setSubmitted(true);
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
+            ...formData,
+            subject: "New Team Access Request - Virtuality Fashion",
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          localStorage.setItem('teamAccess', 'granted');
+          localStorage.setItem('clientData', JSON.stringify(formData));
+          setHasAccess(true);
+          setSubmitted(true);
+        } else {
+          console.error("Web3Forms Error:", result);
+          setErrors({ form: 'Something went wrong. Please try again.' });
+        }
+      } catch (error) {
+        console.error("Web3Forms Connection Error:", error);
+        setErrors({ form: 'Connection error. Please try again.' });
+      }
     } else {
       setErrors(newErrors);
     }
@@ -207,8 +232,17 @@ export default function TeamPage() {
       <Header />
 
       {/* Page Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
+      <div className="bg-white border-b border-gray-200 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute w-full h-full inset-0 z-0 pointer-events-none">
+          <img
+            src="/images/6224739.jpg"
+            alt="Background pattern"
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.05 }}
+          />
+        </div>
+        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32 relative z-10">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 animate-fade-in-up font-copperplate">Meet the Team</h1>
           <p className="text-xl md:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200 mb-8" style={{ animationFillMode: 'both' }}>
             {hasAccess
@@ -547,7 +581,7 @@ export default function TeamPage() {
                       href="/contact"
                       className="flex-1 px-4 py-3 bg-black text-white rounded-xl font-semibold text-center text-sm hover:bg-gray-800 transition-colors"
                     >
-                      Contact
+                      Get Quote
                     </Link>
                     <Link
                       href={`/team/${member.id}`}

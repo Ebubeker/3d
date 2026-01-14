@@ -24,7 +24,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <footer className="bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-8 md:gap-8">
           {/* Brand */}
@@ -32,7 +32,7 @@ export default function Footer() {
             <Link href="/">
               <img
                 src="/images/logo.png"
-                alt="Virtuality Fashion"
+                alt="Virtuality.Fashion"
                 className="h-10 sm:h-12 md:h-14 w-auto"
               />
             </Link>
@@ -103,7 +103,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
+        <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8">
           <p className="text-gray-500 text-xs sm:text-sm text-center">
             © {currentYear} Virtuality.Fashion. All rights reserved.
           </p>

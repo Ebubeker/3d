@@ -34,7 +34,9 @@ export default function ContactPage() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -48,9 +50,37 @@ export default function ContactPage() {
     if (!formData.message.trim()) newErrors.message = 'Message is required';
 
     if (Object.keys(newErrors).length === 0) {
-      setSubmitted(true);
-      setFormData({ name: '', email: '', company: '', message: '' });
-      setTimeout(() => setSubmitted(false), 5000);
+      setIsLoading(true);
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
+            ...formData,
+            subject: "New Contact Form Submission - Virtuality Fashion",
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setSubmitted(true);
+          setFormData({ name: '', email: '', company: '', message: '' });
+          setTimeout(() => setSubmitted(false), 5000);
+        } else {
+          console.error("Web3Forms Error:", result);
+          setErrors({ form: 'Something went wrong. Please try again.' });
+        }
+      } catch (error) {
+        console.error("Web3Forms Connection Error:", error);
+        setErrors({ form: 'Connection error. Please try again.' });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -61,11 +91,17 @@ export default function ContactPage() {
       <Header />
 
       {/* Page Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32">
-          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">
-            Contact Us
-          </p>
+      <div className="bg-white border-b border-gray-200 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute w-full h-full inset-0 z-0 pointer-events-none">
+          <img
+            src="/images/6224739.jpg"
+            alt="Background pattern"
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.05 }}
+          />
+        </div>
+        <div className="max-w-6xl mx-auto px-8 md:px-12 py-24 md:py-32 relative z-10">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-8 font-copperplate">Get in Touch</h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl leading-relaxed">
             Have a project in mind? Let&apos;s discuss how we can help bring your vision to life.
@@ -149,12 +185,18 @@ export default function ContactPage() {
                 {errors.message && <p className="text-red-600 text-sm mt-2">{errors.message}</p>}
               </div>
 
+              {/* Error Message */}
+              {errors.form && (
+                <p className="text-red-600 text-sm text-center">{errors.form}</p>
+              )}
+
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full px-8 py-4 bg-black text-white rounded font-semibold hover:bg-gray-900 transition-colors"
+                disabled={isLoading}
+                className="w-full px-8 py-4 bg-black text-white rounded font-semibold hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Message
+                {isLoading ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           )}

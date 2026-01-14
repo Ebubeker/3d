@@ -21,6 +21,15 @@ export default function SolutionsPage() {
 
       {/* Hero Section with Background Pattern */}
       <div ref={heroRef} className="relative bg-white min-h-[60vh] flex items-center pt-20 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute w-full h-full inset-0 z-0 pointer-events-none">
+          <img
+            src="/images/6224739.jpg"
+            alt="Background pattern"
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.05 }}
+          />
+        </div>
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-gray-100 rounded-full blur-3xl opacity-60 animate-pulse" />
@@ -72,9 +81,6 @@ export default function SolutionsPage() {
                 key={idx}
                 className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
               >
-                <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-white text-lg font-bold">{tool.name.substring(0, 2).toUpperCase()}</span>
-                </div>
                 <h3 className="text-xl font-bold text-black mb-2 font-copperplate">{tool.name}</h3>
                 <p className="text-sm font-medium text-gray-500 mb-4">{tool.desc}</p>
                 <p className="text-sm text-gray-600 leading-relaxed">{tool.detail}</p>
@@ -85,7 +91,7 @@ export default function SolutionsPage() {
           <div className="mt-20 text-center">
             <Link href="/contact">
               <button className="px-10 py-5 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 hover:scale-105 transform transition-all duration-300 text-lg shadow-lg">
-                Request a Demo
+                Request a Quote
               </button>
             </Link>
           </div>
@@ -95,14 +101,6 @@ export default function SolutionsPage() {
 
       {/* Get Started - Black CTA */}
       <div className="bg-black text-white py-32 md:py-40 relative overflow-hidden">
-        {/* Pattern background */}
-        <img
-          src="/images/6224739.jpg"
-          alt="Background pattern"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-black/40" />
-
         <div className="max-w-7xl mx-auto px-8 md:px-12 text-center relative z-10">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 font-copperplate">
             Get Started

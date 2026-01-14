@@ -21,22 +21,22 @@ export default function BenefitsSection() {
       id: 2,
       title: "Cost Savings",
       description: "Reduce sampling iterations and lower development cost per style by cutting rework and physical sample shipments. Digital prototypes support clearer decisions earlier in the process.",
-      type: "video",
-      video: "https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4"
+      type: "image",
+      image: "/images/portfolio/f3.jpg"
     },
     {
       id: 3,
       title: "Expert Team",
       description: "Access a vetted network of fashion specialists for tech pack services, apparel technical design, and 3D garment visualization. The team follows industry best practices and proven delivery workflows.",
       type: "image",
-      image: "/images/portfolio/f3.jpg"
+      image: "/images/portfolio/f4.png"
     },
     {
       id: 4,
       title: "Top Technology",
       description: "Advanced 3D virtualization and patternmaking workflows support 3D garment prototyping, fit simulation, and production-ready outputs. AI-based tools are used to create e-commerce visuals, presenting collections on virtual models for consistent product pages and listings. Our specialists work with Optitex, CLO3D, Browzwear, Style3D, Shima Seiki, and other leading 3D virtualization and patternmaking solutions.",
-      type: "video",
-      video: "https://videos.pexels.com/video-files/5532765/5532765-uhd_2560_1440_25fps.mp4"
+      type: "image",
+      image: "/images/portfolio/f5.png"
     }
   ];
 
@@ -208,7 +208,7 @@ export default function BenefitsSection() {
                           src={benefit.image || '/placeholder.jpg'}
                           alt={benefit.title}
                           fill
-                          className="object-cover"
+                          className="object-cover object-top"
                         />
                         <div className="absolute inset-0 bg-black/10" />
                       </div>

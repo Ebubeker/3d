@@ -60,7 +60,7 @@ export default function HeroSection() {
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <img
-              src="/images/hero.png"
+              src="/images/hero/hero-hero.png"
               alt="Fashion models"
               className="h-[80%] w-auto object-contain"
             />
@@ -76,7 +76,7 @@ export default function HeroSection() {
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <img
-              src="/images/hero.png"
+              src="/images/hero/hero-hero.png"
               alt="Fashion models"
               className="h-[85%] w-auto object-contain"
             />

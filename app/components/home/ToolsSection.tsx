@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 
 export default function ToolsSection() {
   const tools = [
-    { id: 1, name: "Optitex" },
-    { id: 2, name: "CLO3D" },
-    { id: 3, name: "Browzwear" },
-    { id: 4, name: "Style3D" },
-    { id: 5, name: "Shima Seiki" },
-    { id: 6, name: "Marvelous Designer" }
+    { id: 1, name: "Optitex", url: "https://optitex.com/" },
+    { id: 2, name: "CLO3D", url: "https://www.clo3d.com/" },
+    { id: 3, name: "Browzwear", url: "https://browzwear.com/" },
+    { id: 4, name: "Style3D", url: "https://www.style3d.com/" },
+    { id: 5, name: "Shima Seiki", url: "https://www.shimaseiki.com/" },
+    { id: 6, name: "Marvelous Designer", url: "https://www.marvelousdesigner.com/" }
   ];
 
   const containerVariants = {
@@ -62,21 +62,24 @@ export default function ToolsSection() {
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 mb-8 sm:mb-12"
         >
           {tools.map((tool) => (
-            <motion.div
+            <motion.a
               key={tool.id}
+              href={tool.url}
+              target="_blank"
+              rel="noopener noreferrer"
               variants={itemVariants}
-              className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center aspect-square"
+              className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center aspect-square cursor-pointer"
             >
               {/* Placeholder for logo - text only for now */}
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 flex items-center justify-center mb-3 sm:mb-4">
+              {/* <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 flex items-center justify-center mb-3 sm:mb-4">
                 <span className="text-2xl sm:text-3xl font-bold text-gray-400 font-copperplate">
                   {tool.name.charAt(0)}
                 </span>
-              </div>
+              </div> */}
               <span className="text-sm sm:text-base font-semibold text-black text-center font-copperplate">
                 {tool.name}
               </span>
-            </motion.div>
+            </motion.a>
           ))}
         </motion.div>
 

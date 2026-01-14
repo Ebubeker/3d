@@ -133,10 +133,10 @@ export default function WhyUsSection() {
               <motion.div
                 key={reason.id}
                 variants={itemVariants}
-                className="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all duration-300"
+                className="group bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-black hover:shadow-lg transition-all duration-300"
               >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-black flex items-center justify-center mb-4 sm:mb-6">
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={1.5} />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gray-100 group-hover:bg-black transition-colors duration-300 flex items-center justify-center mb-4 sm:mb-6">
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-black mb-2 sm:mb-3 font-copperplate">
                   {reason.title}
@@ -157,11 +157,11 @@ export default function WhyUsSection() {
                         </span>
                         <span>
                           {text}
-                          {source && (
+                          {/* {source && (
                             <span className="text-gray-500 ml-1">
                               {formatSource(source)}
                             </span>
-                          )}
+                          )} */}
                         </span>
                       </li>
                     );
