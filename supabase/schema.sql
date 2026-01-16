@@ -70,6 +70,50 @@ CREATE POLICY "Public can read portfolio_items"
   TO public
   USING (true);
 
+-- Allow anonymous insert for team_members (admin panel uses localStorage auth)
+CREATE POLICY "Anyone can insert team_members"
+  ON team_members
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+-- Allow anonymous update for team_members
+CREATE POLICY "Anyone can update team_members"
+  ON team_members
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Allow anonymous delete for team_members
+CREATE POLICY "Anyone can delete team_members"
+  ON team_members
+  FOR DELETE
+  TO anon
+  USING (true);
+
+-- Allow anonymous insert for portfolio_items
+CREATE POLICY "Anyone can insert portfolio_items"
+  ON portfolio_items
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+-- Allow anonymous update for portfolio_items
+CREATE POLICY "Anyone can update portfolio_items"
+  ON portfolio_items
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Allow anonymous delete for portfolio_items
+CREATE POLICY "Anyone can delete portfolio_items"
+  ON portfolio_items
+  FOR DELETE
+  TO anon
+  USING (true);
+
 -- Authenticated users can insert team_members
 CREATE POLICY "Authenticated users can insert team_members"
   ON team_members
