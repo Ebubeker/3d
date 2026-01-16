@@ -114,9 +114,55 @@ CREATE POLICY "Authenticated users can delete portfolio_items"
   TO authenticated
   USING (true);
 
--- Storage bucket for images (run this separately in Storage settings or use SQL)
--- INSERT INTO storage.buckets (id, name, public) VALUES ('portraits', 'portraits', true);
--- INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio', 'portfolio', true);
+-- Storage bucket for images
+-- Run these commands to create storage buckets
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('images', 'images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for the images bucket
+CREATE POLICY "Public can view images"
+  ON storage.objects
+  FOR SELECT
+  TO public
+  USING (bucket_id = 'images');
+
+CREATE POLICY "Authenticated users can upload images"
+  ON storage.objects
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'images');
+
+CREATE POLICY "Authenticated users can update images"
+  ON storage.objects
+  FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'images');
+
+CREATE POLICY "Authenticated users can delete images"
+  ON storage.objects
+  FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'images');
+
+-- Allow anonymous uploads (for admin panel without full auth)
+CREATE POLICY "Anyone can upload images"
+  ON storage.objects
+  FOR INSERT
+  TO anon
+  WITH CHECK (bucket_id = 'images');
+
+CREATE POLICY "Anyone can update images"
+  ON storage.objects
+  FOR UPDATE
+  TO anon
+  USING (bucket_id = 'images');
+
+CREATE POLICY "Anyone can delete images"
+  ON storage.objects
+  FOR DELETE
+  TO anon
+  USING (bucket_id = 'images');
 
 -- Sample data (optional - uncomment to insert)
 /*

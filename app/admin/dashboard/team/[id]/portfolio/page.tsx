@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import { uploadImage } from '@/lib/supabase/storage';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
-import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 
 export default function PortfolioManagementPage() {
   const params = useParams();
@@ -18,6 +20,9 @@ export default function PortfolioManagementPage() {
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -48,6 +53,38 @@ export default function PortfolioManagementPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image size should be less than 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError('');
+
+    const url = await uploadImage(file, 'portfolio');
+
+    if (url) {
+      setFormData((prev) => ({ ...prev, image_url: url }));
+    } else {
+      setUploadError('Failed to upload image. Please try again.');
+    }
+
+    setIsUploading(false);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const openAddModal = () => {
@@ -256,15 +293,73 @@ export default function PortfolioManagementPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                <input
-                  type="url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
-                  placeholder="https://example.com/image.jpg"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+
+                {/* Image Preview */}
+                {formData.image_url && (
+                  <div className="mb-4 relative w-full aspect-video max-w-xs">
+                    <Image
+                      src={formData.image_url}
+                      alt="Project preview"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Upload Button */}
+                <div className="flex gap-3">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors text-gray-600 disabled:opacity-50"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5" />
+                        Upload from device
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Upload Error */}
+                {uploadError && (
+                  <p className="text-red-600 text-sm mt-2">{uploadError}</p>
+                )}
+
+                {/* OR URL Input */}
+                <div className="mt-3">
+                  <p className="text-xs text-gray-500 mb-2">Or enter image URL:</p>
+                  <input
+                    type="url"
+                    name="image_url"
+                    value={formData.image_url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
               </div>
 
               <div>

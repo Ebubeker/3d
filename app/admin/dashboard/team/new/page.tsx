@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { uploadImage } from '@/lib/supabase/storage';
+import { ArrowLeft, Plus, X, Upload, Loader2 } from 'lucide-react';
 
 export default function NewTeamMemberPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -50,6 +54,36 @@ export default function NewTeamMemberPage() {
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
     }));
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    setError('');
+
+    const url = await uploadImage(file, 'portraits');
+
+    if (url) {
+      setFormData((prev) => ({ ...prev, portrait: url }));
+    } else {
+      setError('Failed to upload image. Please try again.');
+    }
+
+    setIsUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,15 +184,68 @@ export default function NewTeamMemberPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Portrait URL</label>
-              <input
-                type="url"
-                name="portrait"
-                value={formData.portrait}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
-                placeholder="https://example.com/image.jpg"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Portrait</label>
+
+              {/* Image Preview */}
+              {formData.portrait && (
+                <div className="mb-4 relative w-32 h-32">
+                  <Image
+                    src={formData.portrait}
+                    alt="Portrait preview"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, portrait: '' }))}
+                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <div className="flex gap-3">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors text-gray-600 disabled:opacity-50"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5" />
+                      Upload from device
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* OR URL Input */}
+              <div className="mt-3">
+                <p className="text-xs text-gray-500 mb-2">Or enter image URL:</p>
+                <input
+                  type="url"
+                  name="portrait"
+                  value={formData.portrait}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
             </div>
 
             <div>
