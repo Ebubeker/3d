@@ -10,6 +10,13 @@ import JoinTeamModal from '../components/JoinTeamModal';
 import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
+interface PortfolioItemPreview {
+  id: string;
+  title: string;
+  image_url: string | null;
+  display_type: 'project' | 'gallery';
+}
+
 interface TeamMember {
   id: string;
   name: string;
@@ -20,11 +27,7 @@ interface TeamMember {
   tools: string[];
   bio: string;
   portrait: string | null;
-  portfolio_items?: {
-    id: string;
-    title: string;
-    image_url: string | null;
-  }[];
+  portfolio_items?: PortfolioItemPreview[];
 }
 
 // Static fallback data
@@ -561,21 +564,39 @@ export default function TeamPage() {
                     <div className="mb-4 sm:mb-5">
                       <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Portfolio</p>
                       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-                        {member.portfolio_items.slice(0, 3).map((item) => (
-                          <div key={item.id} className="aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden">
-                            {item.image_url ? (
-                              <Image
-                                src={item.image_url}
-                                alt={item.title}
-                                width={100}
-                                height={100}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-                            )}
-                          </div>
-                        ))}
+                        {member.portfolio_items.slice(0, 3).map((item) => {
+                          const isProject = item.display_type === 'project';
+                          const content = (
+                            <div className={`aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden relative group ${isProject ? 'cursor-pointer' : ''}`}>
+                              {item.image_url ? (
+                                <Image
+                                  src={item.image_url}
+                                  alt={item.title}
+                                  width={100}
+                                  height={100}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                              )}
+                              {isProject && (
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                  <span className="opacity-0 group-hover:opacity-100 text-white text-[8px] sm:text-xs font-medium transition-opacity">View</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+
+                          return isProject ? (
+                            <Link key={item.id} href={`/team/${member.id}?project=${item.id}`}>
+                              {content}
+                            </Link>
+                          ) : (
+                            <div key={item.id}>
+                              {content}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

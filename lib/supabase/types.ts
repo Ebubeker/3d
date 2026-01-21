@@ -20,6 +20,7 @@ export interface PortfolioItem {
   description: string | null;
   image_url: string | null;
   category: string | null;
+  display_type: 'project' | 'gallery';
   created_at: string;
 }
 

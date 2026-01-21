@@ -7,7 +7,9 @@ import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { uploadImage } from '@/lib/supabase/storage';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
-import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images } from 'lucide-react';
+
+type DisplayType = 'project' | 'gallery';
 
 export default function PortfolioManagementPage() {
   const params = useParams();
@@ -23,6 +25,8 @@ export default function PortfolioManagementPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState<DisplayType>('project');
+  const [modalType, setModalType] = useState<DisplayType>('project');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -30,6 +34,9 @@ export default function PortfolioManagementPage() {
     image_url: '',
     category: '',
   });
+
+  // Filter items based on active tab
+  const filteredItems = portfolioItems.filter(item => item.display_type === activeTab);
 
   useEffect(() => {
     fetchData();
@@ -87,9 +94,10 @@ export default function PortfolioManagementPage() {
     }
   };
 
-  const openAddModal = () => {
+  const openAddModal = (type: DisplayType) => {
     setFormData({ title: '', description: '', image_url: '', category: '' });
     setEditingItem(null);
+    setModalType(type);
     setShowModal(true);
   };
 
@@ -101,6 +109,7 @@ export default function PortfolioManagementPage() {
       category: item.category || '',
     });
     setEditingItem(item);
+    setModalType(item.display_type);
     setShowModal(true);
   };
 
@@ -110,21 +119,33 @@ export default function PortfolioManagementPage() {
 
     const supabase = createClient();
 
+    // Prepare data based on modal type
+    const submitData = modalType === 'gallery'
+      ? {
+          title: formData.title || 'Gallery Image',
+          image_url: formData.image_url,
+          display_type: 'gallery' as const
+        }
+      : {
+          ...formData,
+          display_type: 'project' as const
+        };
+
     if (editingItem) {
       const { error } = await supabase
         .from('portfolio_items')
-        .update(formData)
+        .update(submitData)
         .eq('id', editingItem.id);
 
       if (!error) {
         setPortfolioItems(portfolioItems.map((item) =>
-          item.id === editingItem.id ? { ...item, ...formData } : item
+          item.id === editingItem.id ? { ...item, ...submitData } : item
         ));
       }
     } else {
       const { data, error } = await supabase
         .from('portfolio_items')
-        .insert([{ ...formData, team_member_id: memberId }])
+        .insert([{ ...submitData, team_member_id: memberId }])
         .select()
         .single();
 
@@ -177,36 +198,82 @@ export default function PortfolioManagementPage() {
             </p>
           </div>
           <button
-            onClick={openAddModal}
+            onClick={() => openAddModal(activeTab)}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Project
+            {activeTab === 'project' ? 'Add Project' : 'Add Gallery Image'}
           </button>
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setActiveTab('project')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            activeTab === 'project'
+              ? 'bg-black text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          <FolderOpen className="w-4 h-4" />
+          Projects
+          <span className={`ml-1 px-2 py-0.5 text-xs rounded-full ${
+            activeTab === 'project' ? 'bg-white/20' : 'bg-gray-200'
+          }`}>
+            {portfolioItems.filter(i => i.display_type === 'project').length}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('gallery')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            activeTab === 'gallery'
+              ? 'bg-black text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          <Images className="w-4 h-4" />
+          Gallery Images
+          <span className={`ml-1 px-2 py-0.5 text-xs rounded-full ${
+            activeTab === 'gallery' ? 'bg-white/20' : 'bg-gray-200'
+          }`}>
+            {portfolioItems.filter(i => i.display_type === 'gallery').length}
+          </span>
+        </button>
+      </div>
+
       {/* Portfolio Grid */}
-      {portfolioItems.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">No portfolio items yet.</p>
+          {activeTab === 'project' ? (
+            <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          ) : (
+            <Images className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          )}
+          <p className="text-gray-600 mb-4">
+            {activeTab === 'project' ? 'No projects yet.' : 'No gallery images yet.'}
+          </p>
           <button
-            onClick={openAddModal}
+            onClick={() => openAddModal(activeTab)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add First Project
+            {activeTab === 'project' ? 'Add First Project' : 'Add First Gallery Image'}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {portfolioItems.map((item) => (
+        <div className={`grid gap-4 sm:gap-6 ${
+          activeTab === 'gallery'
+            ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {filteredItems.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
             >
-              <div className="aspect-video bg-gray-100 relative">
+              <div className={`bg-gray-100 relative ${activeTab === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
                 {item.image_url ? (
                   <img
                     src={item.image_url}
@@ -218,33 +285,51 @@ export default function PortfolioManagementPage() {
                     <ImageIcon className="w-12 h-12 text-gray-300" />
                   </div>
                 )}
-                {item.category && (
+                {activeTab === 'project' && item.category && (
                   <span className="absolute top-2 right-2 px-2 py-1 bg-black text-white text-xs rounded">
                     {item.category}
                   </span>
                 )}
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                {item.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
-                )}
-                <div className="flex gap-2 mt-4">
+              {activeTab === 'project' ? (
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                  {item.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+                  )}
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => openEditModal(item)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setDeleteId(item.id)}
+                      className="px-3 py-2 border border-gray-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-2 flex gap-1">
                   <button
                     onClick={() => openEditModal(item)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-xs"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-3 h-3" />
                     Edit
                   </button>
                   <button
                     onClick={() => setDeleteId(item.id)}
-                    className="px-3 py-2 border border-gray-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    className="px-2 py-1.5 border border-gray-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
@@ -256,7 +341,9 @@ export default function PortfolioManagementPage() {
           <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900">
-                {editingItem ? 'Edit Project' : 'Add Project'}
+                {modalType === 'gallery'
+                  ? editingItem ? 'Edit Gallery Image' : 'Add Gallery Image'
+                  : editingItem ? 'Edit Project' : 'Add Project'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -267,40 +354,48 @@ export default function PortfolioManagementPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
-                  placeholder="Project title"
-                  required
-                />
-              </div>
+              {/* Title - only required for projects */}
+              {modalType === 'project' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                    placeholder="Project title"
+                    required
+                  />
+                </div>
+              )}
+
+              {/* Category - only for projects */}
+              {modalType === 'project' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <input
+                    type="text"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                    placeholder="e.g., Sportswear, Outerwear"
+                  />
+                </div>
+              )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
-                  placeholder="e.g., Sportswear, Outerwear"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image {modalType === 'gallery' && '*'}
+                </label>
 
                 {/* Image Preview */}
                 {formData.image_url && (
-                  <div className="mb-4 relative w-full aspect-video max-w-xs">
+                  <div className={`mb-4 relative w-full max-w-xs ${modalType === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
                     <Image
                       src={formData.image_url}
-                      alt="Project preview"
+                      alt="Preview"
                       fill
                       className="object-cover rounded-lg"
                     />
@@ -358,21 +453,25 @@ export default function PortfolioManagementPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
                     placeholder="https://example.com/image.jpg"
+                    required={modalType === 'gallery'}
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-black"
-                  placeholder="Describe the project..."
-                />
-              </div>
+              {/* Description - only for projects */}
+              {modalType === 'project' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors resize-none text-black"
+                    placeholder="Describe the project..."
+                  />
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <button
@@ -387,7 +486,13 @@ export default function PortfolioManagementPage() {
                   disabled={isSaving}
                   className="flex-1 px-4 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSaving ? 'Saving...' : editingItem ? 'Save Changes' : 'Add Project'}
+                  {isSaving
+                    ? 'Saving...'
+                    : editingItem
+                      ? 'Save Changes'
+                      : modalType === 'gallery'
+                        ? 'Add Image'
+                        : 'Add Project'}
                 </button>
               </div>
             </form>

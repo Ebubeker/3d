@@ -6,6 +6,7 @@ import ServicesGrid from './components/home/ServicesGrid';
 import AudienceSegments from './components/home/AudienceSegments';
 import BenefitsSection from './components/home/BenefitsSection';
 import ToolsSection from './components/home/ToolsSection';
+import JoinTeamSection from './components/home/JoinTeamSection';
 import CTASection from './components/home/CTASection';
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default function Home() {
       <ServicesGrid />
       <AudienceSegments />
       <BenefitsSection />
+      <JoinTeamSection />
       <ToolsSection />
       <CTASection />
       <Footer />

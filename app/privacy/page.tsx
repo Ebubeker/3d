@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-black mb-4">1. Introduction</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Virtuality.Fashion (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
+                virtuality.fashion (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
               </p>
             </section>
 
@@ -99,8 +99,7 @@ export default function PrivacyPolicy() {
                 If you have any questions about this Privacy Policy, please contact us at:
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Email: privacy@virtuality.fashion<br />
-                Address: 123 Fashion District, New York, NY 10001
+                Email: info@virtuality.fashion
               </p>
             </section>
           </div>

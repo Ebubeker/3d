@@ -11,14 +11,14 @@ export default function AboutSection() {
           <div>
             <div className="inline-block mb-4">
               <span className="px-4 py-2 bg-linear-to-r from-purple-100 to-blue-100 text-purple-600 text-sm font-semibold rounded-full border border-purple-200">
-                About Virtuality.Fashion
+                About virtuality.fashion
               </span>
             </div>
             <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               The Future of Digital Fashion
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-6">
-              Virtuality.Fashion is a cutting-edge 3D fashion simulator that revolutionizes how brands and consumers interact with apparel. We&apos;re building the next generation of digital fashion experiences with realistic 3D rendering and immersive environments.
+              virtuality.fashion is a cutting-edge 3D fashion simulator that revolutionizes how brands and consumers interact with apparel. We&apos;re building the next generation of digital fashion experiences with realistic 3D rendering and immersive environments.
             </p>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
               After our initial venture with AI integration, we&apos;ve completely rebuilt the platform from the ground up. Our focus is on delivering premium quality, exceptional performance, and a seamless experience that sets new standards in digital fashion.

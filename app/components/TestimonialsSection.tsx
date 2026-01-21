@@ -9,7 +9,7 @@ export default function TestimonialsSection() {
       company: "Premium Brands Co.",
       icon: User,
       rating: 5,
-      text: "Virtuality.Fashion has completely transformed how we showcase our collections. The 3D rendering quality is exceptional, and our customers love the virtual try-on experience.",
+      text: "virtuality.fashion has completely transformed how we showcase our collections. The 3D rendering quality is exceptional, and our customers love the virtual try-on experience.",
     },
     {
       id: 2,
@@ -18,7 +18,7 @@ export default function TestimonialsSection() {
       company: "Luxury Apparel Inc.",
       icon: Briefcase,
       rating: 5,
-      text: "The platform is incredibly fast and intuitive. Our conversion rates increased by 40% after implementing Virtuality.Fashion. Highly recommended for any fashion brand.",
+      text: "The platform is incredibly fast and intuitive. Our conversion rates increased by 40% after implementing virtuality.fashion. Highly recommended for any fashion brand.",
     },
     {
       id: 3,
@@ -61,7 +61,7 @@ export default function TestimonialsSection() {
             Loved by Fashion Brands
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            See what industry leaders are saying about Virtuality.Fashion
+            See what industry leaders are saying about virtuality.fashion
           </p>
         </div>
 

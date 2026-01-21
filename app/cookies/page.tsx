@@ -24,7 +24,7 @@ export default function CookiePolicy() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-black mb-4">2. How We Use Cookies</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Virtuality.Fashion uses cookies for several purposes:
+                virtuality.fashion uses cookies for several purposes:
               </p>
               <ul className="list-disc pl-6 text-gray-600 space-y-2 mb-4">
                 <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
@@ -125,8 +125,7 @@ export default function CookiePolicy() {
                 If you have any questions about our use of cookies, please contact us at:
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Email: privacy@virtuality.fashion<br />
-                Address: 123 Fashion District, New York, NY 10001
+                Email: info@virtuality.fashion
               </p>
             </section>
           </div>

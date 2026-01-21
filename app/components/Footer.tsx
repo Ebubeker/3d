@@ -95,8 +95,7 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Contact</h3>
             <div className="flex flex-col gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
-              <p>amnon@virtuality.fashion</p>
-              <p>+972 73-374-4885</p>
+              <p>info@virtuality.fashion</p>
               <p>Israel</p>
             </div>
           </div>
@@ -105,7 +104,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8">
           <p className="text-gray-500 text-xs sm:text-sm text-center">
-            © {currentYear} Virtuality.Fashion. All rights reserved.
+            © {currentYear} virtuality.fashion. All rights reserved.
           </p>
         </div>
       </div>

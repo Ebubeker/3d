@@ -17,14 +17,14 @@ export default function TermsOfService() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-black mb-4">1. Agreement to Terms</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                By accessing or using Virtuality.Fashion&apos;s website and services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using our services.
+                By accessing or using virtuality.fashion&apos;s website and services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using our services.
               </p>
             </section>
 
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-black mb-4">2. Services Description</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Virtuality.Fashion provides digital fashion design services including but not limited to:
+                virtuality.fashion provides digital fashion design services including but not limited to:
               </p>
               <ul className="list-disc pl-6 text-gray-600 space-y-2 mb-4">
                 <li>3D garment design and visualization</li>
@@ -50,7 +50,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-bold text-black mb-4">4. Intellectual Property</h2>
               <h3 className="text-xl font-semibold text-black mb-3">Our Content</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                All content on our website, including text, graphics, logos, and software, is the property of Virtuality.Fashion and is protected by intellectual property laws.
+                All content on our website, including text, graphics, logos, and software, is the property of virtuality.fashion and is protected by intellectual property laws.
               </p>
               <h3 className="text-xl font-semibold text-black mb-3">Your Content</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
@@ -85,7 +85,7 @@ export default function TermsOfService() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-black mb-4">7. Limitation of Liability</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                To the maximum extent permitted by law, Virtuality.Fashion shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of our services.
+                To the maximum extent permitted by law, virtuality.fashion shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of our services.
               </p>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Our total liability shall not exceed the amount paid by you for the specific service giving rise to the claim.
@@ -119,8 +119,7 @@ export default function TermsOfService() {
                 If you have any questions about these Terms of Service, please contact us at:
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Email: legal@virtuality.fashion<br />
-                Address: 123 Fashion District, New York, NY 10001
+                Email: info@virtuality.fashion
               </p>
             </section>
           </div>

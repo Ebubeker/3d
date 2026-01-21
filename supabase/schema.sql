@@ -28,8 +28,13 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
   description TEXT,
   image_url TEXT,
   category VARCHAR(100),
+  display_type VARCHAR(20) DEFAULT 'project',  -- 'project' or 'gallery'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Migration: Add display_type column if it doesn't exist
+-- Run this separately if table already exists:
+-- ALTER TABLE portfolio_items ADD COLUMN IF NOT EXISTS display_type VARCHAR(20) DEFAULT 'project';
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_portfolio_team_member ON portfolio_items(team_member_id);
