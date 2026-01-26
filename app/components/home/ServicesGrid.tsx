@@ -139,6 +139,23 @@ export default function ServicesGrid() {
             );
           })}
         </motion.div>
+
+        {/* Join the Team Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex justify-center mt-12 sm:mt-16"
+        >
+          <Link
+            href="/team"
+            className="inline-flex items-center gap-2 px-8 py-4 border-2 border-black text-black font-semibold rounded-full hover:bg-black hover:text-white transition-all duration-300"
+          >
+            <span>Join the Team</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

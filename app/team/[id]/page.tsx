@@ -265,30 +265,28 @@ export default function TeamMemberPage() {
         </div>
       )}
 
-      {/* Gallery Images Section */}
+      {/* Gallery Images Section - Masonry Layout */}
       {galleryImages.length > 0 && (
         <div className={projects.length > 0 ? 'bg-white' : 'bg-gray-50'}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-12 sm:py-16 md:py-20">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-6 sm:mb-10">Gallery</h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+            <div className="columns-2 sm:columns-3 md:columns-4 gap-2 sm:gap-3 md:gap-4">
               {galleryImages.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => image.image_url && setLightboxImage(image.image_url)}
-                  className="aspect-square bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up"
+                  className="block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid"
                   style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                 >
                   {image.image_url ? (
-                    <Image
+                    <img
                       src={image.image_url}
                       alt="Gallery image"
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto object-contain"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                    <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
                   )}
                 </button>
               ))}

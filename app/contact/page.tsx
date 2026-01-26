@@ -4,10 +4,12 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { createClient } from '@/lib/supabase/client';
 
 function ContactForm() {
   const searchParams = useSearchParams();
   const designerName = searchParams.get('designer');
+  const projectName = searchParams.get('project');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -16,15 +18,35 @@ function ContactForm() {
     message: '',
   });
 
-  // Pre-fill message if designer name is provided
+  const [designerEmail, setDesignerEmail] = useState<string | null>(null);
+
+  // Fetch designer email and pre-fill message if designer name is provided
   useEffect(() => {
     if (designerName) {
+      // Pre-fill message
+      const projectRef = projectName ? ` regarding the project "${projectName}"` : '';
       setFormData(prev => ({
         ...prev,
-        message: `I'm interested in working with ${designerName}.\n\n`
+        message: `I'm interested in working with ${designerName}${projectRef}.\n\n`
       }));
+
+      // Fetch designer email from Supabase
+      const fetchDesignerEmail = async () => {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('team_members')
+          .select('email')
+          .eq('name', designerName)
+          .single();
+
+        if (data?.email) {
+          setDesignerEmail(data.email);
+        }
+      };
+
+      fetchDesignerEmail();
     }
-  }, [designerName]);
+  }, [designerName, projectName]);
 
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,19 +88,17 @@ function ContactForm() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        const response = await fetch("https://api.web3forms.com/submit", {
+        const response = await fetch("/api/send-email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
           },
           body: JSON.stringify({
-            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
             ...formData,
             designer: designerName || 'Not specified',
-            subject: designerName
-              ? `Quote Request for ${designerName} - Virtuality Fashion`
-              : "New Contact Form Submission - Virtuality Fashion",
+            designerEmail: designerEmail || 'No email on file',
+            projectReference: projectName || 'Not specified',
+            formType: 'contact',
           }),
         });
 
@@ -89,11 +109,11 @@ function ContactForm() {
           setFormData({ name: '', email: '', company: '', message: '' });
           setTimeout(() => setSubmitted(false), 5000);
         } else {
-          console.error("Web3Forms Error:", result);
+          console.error("Email Error:", result);
           setErrors({ form: 'Something went wrong. Please try again.' });
         }
       } catch (error) {
-        console.error("Web3Forms Connection Error:", error);
+        console.error("Email Connection Error:", error);
         setErrors({ form: 'Connection error. Please try again.' });
       } finally {
         setIsLoading(false);

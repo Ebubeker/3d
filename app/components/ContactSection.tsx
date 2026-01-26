@@ -2,9 +2,6 @@
 
 import { useState } from 'react';
 
-// Web3Forms Access Key
-const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || '';
-
 export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: '',
@@ -30,27 +27,19 @@ export default function ContactSection() {
     setIsLoading(true);
 
     try {
-      // Prepare form data for Web3Forms
-      const formPayload = {
-        access_key: WEB3FORMS_ACCESS_KEY,
-        name: formData.name,
-        email: formData.email,
-        company: formData.company,
-        queryType: formData.queryType,
-        message: formData.message,
-        subject: `New Contact Query: ${formData.queryType} from ${formData.name}`,
-        from_name: formData.name,
-        redirect: '',
-      };
-
-      // Send to Web3Forms API
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
         },
-        body: JSON.stringify(formPayload),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          queryType: formData.queryType,
+          message: formData.message,
+          formType: 'general',
+        }),
       });
 
       const result = await response.json();

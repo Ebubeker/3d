@@ -8,6 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS team_members (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),  -- Optional email for receiving quote notifications
   role VARCHAR(255) NOT NULL,
   location VARCHAR(255) NOT NULL,
   bio TEXT NOT NULL,
@@ -19,6 +20,10 @@ CREATE TABLE IF NOT EXISTS team_members (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Migration: Add email column if it doesn't exist
+-- Run this separately if table already exists:
+-- ALTER TABLE team_members ADD COLUMN IF NOT EXISTS email VARCHAR(255);
 
 -- Portfolio Items Table
 CREATE TABLE IF NOT EXISTS portfolio_items (

@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { uploadImage } from '@/lib/supabase/storage';
+import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
-import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video } from 'lucide-react';
 
 type DisplayType = 'project' | 'gallery';
 
@@ -66,25 +66,32 @@ export default function PortfolioManagementPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Please upload an image file');
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+
+    if (!isImage && !isVideo) {
+      setUploadError('Please upload an image or video file');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Image size should be less than 5MB');
+    // Different size limits for images vs videos
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+    const maxSizeLabel = isVideo ? '100MB' : '5MB';
+
+    if (file.size > maxSize) {
+      setUploadError(`File size should be less than ${maxSizeLabel}`);
       return;
     }
 
     setIsUploading(true);
     setUploadError('');
 
-    const url = await uploadImage(file, 'portfolio');
+    const result = await uploadMedia(file, 'portfolio');
 
-    if (url) {
-      setFormData((prev) => ({ ...prev, image_url: url }));
+    if (result) {
+      setFormData((prev) => ({ ...prev, image_url: result.url }));
     } else {
-      setUploadError('Failed to upload image. Please try again.');
+      setUploadError('Failed to upload file. Please try again.');
     }
 
     setIsUploading(false);
@@ -275,15 +282,33 @@ export default function PortfolioManagementPage() {
             >
               <div className={`bg-gray-100 relative ${activeTab === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
                 {item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+                  getMediaType(item.image_url) === 'video' ? (
+                    <video
+                      src={item.image_url}
+                      className="w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      onMouseEnter={(e) => e.currentTarget.play()}
+                      onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                    />
+                  ) : (
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <ImageIcon className="w-12 h-12 text-gray-300" />
                   </div>
+                )}
+                {item.image_url && getMediaType(item.image_url) === 'video' && (
+                  <span className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded flex items-center gap-1">
+                    <Video className="w-3 h-3" />
+                    Video
+                  </span>
                 )}
                 {activeTab === 'project' && item.category && (
                   <span className="absolute top-2 right-2 px-2 py-1 bg-black text-white text-xs rounded">
@@ -387,22 +412,31 @@ export default function PortfolioManagementPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image {modalType === 'gallery' && '*'}
+                  Image / Video {modalType === 'gallery' && '*'}
                 </label>
 
-                {/* Image Preview */}
+                {/* Media Preview */}
                 {formData.image_url && (
                   <div className={`mb-4 relative w-full max-w-xs ${modalType === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
-                    <Image
-                      src={formData.image_url}
-                      alt="Preview"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
+                    {getMediaType(formData.image_url) === 'video' ? (
+                      <video
+                        src={formData.image_url}
+                        className="w-full h-full object-cover rounded-lg"
+                        controls
+                        muted
+                      />
+                    ) : (
+                      <Image
+                        src={formData.image_url}
+                        alt="Preview"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    )}
                     <button
                       type="button"
                       onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}
-                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -415,7 +449,7 @@ export default function PortfolioManagementPage() {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
-                    accept="image/*"
+                    accept="image/*,video/*"
                     className="hidden"
                   />
                   <button
@@ -432,11 +466,14 @@ export default function PortfolioManagementPage() {
                     ) : (
                       <>
                         <Upload className="w-5 h-5" />
-                        Upload from device
+                        Upload image or video
                       </>
                     )}
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Images: max 5MB | Videos: max 100MB (MP4, WebM, MOV)
+                </p>
 
                 {/* Upload Error */}
                 {uploadError && (

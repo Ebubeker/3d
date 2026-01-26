@@ -17,6 +17,7 @@ export default function NewTeamMemberPage() {
 
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     role: '',
     location: '',
     bio: '',
@@ -143,6 +144,21 @@ export default function NewTeamMemberPage() {
                 placeholder="e.g., Sarah Chen"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                placeholder="e.g., sarah@example.com"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Quote requests for this designer will be sent to this email (and CC&apos;d to amnon@virtuality.fashion)
+              </p>
             </div>
 
             <div>

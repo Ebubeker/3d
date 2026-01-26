@@ -78,14 +78,12 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
           .map(([key]) => key)
           .join(', ');
 
-        const response = await fetch("https://api.web3forms.com/submit", {
+        const response = await fetch("/api/send-email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
           },
           body: JSON.stringify({
-            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
             company: formData.company,
             name: formData.name,
             email: formData.email,
@@ -95,7 +93,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
             deliverables: deliverablesText,
             timeline: formData.timeline,
             notes: formData.notes,
-            subject: "Enterprise Quote Request - Virtuality Fashion",
+            formType: 'enterprise',
           }),
         });
 
@@ -123,11 +121,11 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
             });
           }, 3000);
         } else {
-          console.error("Web3Forms Error:", result);
+          console.error("Email Error:", result);
           setErrors({ form: 'Something went wrong. Please try again.' });
         }
       } catch (error) {
-        console.error("Web3Forms Connection Error:", error);
+        console.error("Email Connection Error:", error);
         setErrors({ form: 'Connection error. Please try again.' });
       } finally {
         setIsLoading(false);

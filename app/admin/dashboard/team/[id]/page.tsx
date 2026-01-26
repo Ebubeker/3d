@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { uploadImage } from '@/lib/supabase/storage';
+import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
 import { TeamMember } from '@/lib/supabase/types';
 import { ArrowLeft, Plus, X, Upload, Loader2 } from 'lucide-react';
 
@@ -22,6 +22,7 @@ export default function EditTeamMemberPage() {
 
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     role: '',
     location: '',
     bio: '',
@@ -52,6 +53,7 @@ export default function EditTeamMemberPage() {
 
       setFormData({
         name: data.name,
+        email: data.email || '',
         role: data.role,
         location: data.location,
         bio: data.bio,
@@ -96,25 +98,32 @@ export default function EditTeamMemberPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file');
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+
+    if (!isImage && !isVideo) {
+      setError('Please upload an image or video file');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size should be less than 5MB');
+    // Different size limits for images vs videos
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+    const maxSizeLabel = isVideo ? '100MB' : '5MB';
+
+    if (file.size > maxSize) {
+      setError(`File size should be less than ${maxSizeLabel}`);
       return;
     }
 
     setIsUploading(true);
     setError('');
 
-    const url = await uploadImage(file, 'portraits');
+    const result = await uploadMedia(file, 'portraits');
 
-    if (url) {
-      setFormData((prev) => ({ ...prev, portrait: url }));
+    if (result) {
+      setFormData((prev) => ({ ...prev, portrait: result.url }));
     } else {
-      setError('Failed to upload image. Please try again.');
+      setError('Failed to upload file. Please try again.');
     }
 
     setIsUploading(false);
@@ -189,6 +198,21 @@ export default function EditTeamMemberPage() {
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
+                placeholder="e.g., sarah@example.com"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Quote requests for this designer will be sent to this email (and CC&apos;d to amnon@virtuality.fashion)
+              </p>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
               <input
                 type="text"
@@ -225,21 +249,32 @@ export default function EditTeamMemberPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Portrait</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Portrait (Image or Video)</label>
 
-              {/* Image Preview */}
+              {/* Media Preview */}
               {formData.portrait && (
                 <div className="mb-4 relative w-32 h-32">
-                  <Image
-                    src={formData.portrait}
-                    alt="Portrait preview"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
+                  {getMediaType(formData.portrait) === 'video' ? (
+                    <video
+                      src={formData.portrait}
+                      className="w-full h-full object-cover rounded-lg"
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                    />
+                  ) : (
+                    <Image
+                      src={formData.portrait}
+                      alt="Portrait preview"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, portrait: '' }))}
-                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -252,7 +287,7 @@ export default function EditTeamMemberPage() {
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileUpload}
-                  accept="image/*"
+                  accept="image/*,video/*"
                   className="hidden"
                 />
                 <button
@@ -269,15 +304,18 @@ export default function EditTeamMemberPage() {
                   ) : (
                     <>
                       <Upload className="w-5 h-5" />
-                      Upload from device
+                      Upload image or video
                     </>
                   )}
                 </button>
               </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Images: max 5MB | Videos: max 100MB (MP4, WebM, MOV)
+              </p>
 
               {/* OR URL Input */}
               <div className="mt-3">
-                <p className="text-xs text-gray-500 mb-2">Or enter image URL:</p>
+                <p className="text-xs text-gray-500 mb-2">Or enter media URL:</p>
                 <input
                   type="url"
                   name="portrait"
