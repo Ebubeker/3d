@@ -8,6 +8,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { createClient } from '@/lib/supabase/client';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
+import { getMediaType } from '@/lib/supabase/storage';
 import { MapPin, Globe, ArrowLeft, X } from 'lucide-react';
 
 export default function TeamMemberPage() {
@@ -150,13 +151,24 @@ export default function TeamMemberPage() {
             {/* Portrait */}
             <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center shrink-0 animate-scale-in shadow-lg overflow-hidden">
               {member.portrait && member.portrait !== '/placeholder.jpg' ? (
-                <Image
-                  src={member.portrait}
-                  alt={member.name}
-                  width={160}
-                  height={160}
-                  className="w-full h-full object-cover grayscale"
-                />
+                getMediaType(member.portrait) === 'video' ? (
+                  <video
+                    src={member.portrait}
+                    className="w-full h-full object-cover grayscale"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <Image
+                    src={member.portrait}
+                    alt={member.name}
+                    width={160}
+                    height={160}
+                    className="w-full h-full object-cover grayscale"
+                  />
+                )
               ) : (
                 <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-400">
                   {member.name.split(' ').map(n => n[0]).join('')}
@@ -239,13 +251,25 @@ export default function TeamMemberPage() {
                 >
                   <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                     {project.image_url ? (
-                      <Image
-                        src={project.image_url}
-                        alt={project.title}
-                        width={400}
-                        height={225}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      getMediaType(project.image_url) === 'video' ? (
+                        <video
+                          src={project.image_url}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          muted
+                          loop
+                          playsInline
+                          onMouseEnter={(e) => e.currentTarget.play()}
+                          onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                        />
+                      ) : (
+                        <Image
+                          src={project.image_url}
+                          alt={project.title}
+                          width={400}
+                          height={225}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )
                     ) : (
                       <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -280,11 +304,23 @@ export default function TeamMemberPage() {
                   style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                 >
                   {image.image_url ? (
-                    <img
-                      src={image.image_url}
-                      alt="Gallery image"
-                      className="w-full h-auto object-contain"
-                    />
+                    getMediaType(image.image_url) === 'video' ? (
+                      <video
+                        src={image.image_url}
+                        className="w-full h-auto object-contain"
+                        muted
+                        loop
+                        playsInline
+                        onMouseEnter={(e) => e.currentTarget.play()}
+                        onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                      />
+                    ) : (
+                      <img
+                        src={image.image_url}
+                        alt="Gallery image"
+                        className="w-full h-auto object-contain"
+                      />
+                    )
                   ) : (
                     <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
                   )}
@@ -332,13 +368,24 @@ export default function TeamMemberPage() {
             <div className="relative">
               {selectedProject.image_url && (
                 <div className="aspect-video bg-gray-100">
-                  <Image
-                    src={selectedProject.image_url}
-                    alt={selectedProject.title}
-                    width={800}
-                    height={450}
-                    className="w-full h-full object-cover"
-                  />
+                  {getMediaType(selectedProject.image_url) === 'video' ? (
+                    <video
+                      src={selectedProject.image_url}
+                      className="w-full h-full object-cover"
+                      controls
+                      autoPlay
+                      muted
+                      loop
+                    />
+                  ) : (
+                    <Image
+                      src={selectedProject.image_url}
+                      alt={selectedProject.title}
+                      width={800}
+                      height={450}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               )}
               <button
@@ -387,14 +434,26 @@ export default function TeamMemberPage() {
           >
             <X className="w-8 h-8" />
           </button>
-          <Image
-            src={lightboxImage}
-            alt="Gallery image"
-            width={1200}
-            height={1200}
-            className="max-w-full max-h-[90vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {getMediaType(lightboxImage) === 'video' ? (
+            <video
+              src={lightboxImage}
+              className="max-w-full max-h-[90vh] object-contain"
+              controls
+              autoPlay
+              muted
+              loop
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <Image
+              src={lightboxImage}
+              alt="Gallery image"
+              width={1200}
+              height={1200}
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
         </div>
       )}
     </>
