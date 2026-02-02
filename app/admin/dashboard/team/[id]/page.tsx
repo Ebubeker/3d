@@ -258,9 +258,7 @@ export default function EditTeamMemberPage() {
                     <video
                       src={formData.portrait}
                       className="w-full h-full object-cover rounded-lg"
-                      muted
-                      loop
-                      autoPlay
+                      preload="metadata"
                       playsInline
                     />
                   ) : (

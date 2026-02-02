@@ -286,11 +286,8 @@ export default function PortfolioManagementPage() {
                     <video
                       src={item.image_url}
                       className="w-full h-full object-cover"
-                      muted
-                      loop
+                      preload="metadata"
                       playsInline
-                      onMouseEnter={(e) => e.currentTarget.play()}
-                      onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
                     />
                   ) : (
                     <img
@@ -423,7 +420,8 @@ export default function PortfolioManagementPage() {
                         src={formData.image_url}
                         className="w-full h-full object-cover rounded-lg"
                         controls
-                        muted
+                        preload="metadata"
+                        playsInline
                       />
                     ) : (
                       <Image

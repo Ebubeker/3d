@@ -155,9 +155,7 @@ export default function TeamMemberPage() {
                   <video
                     src={member.portrait}
                     className="w-full h-full object-cover grayscale"
-                    autoPlay
-                    muted
-                    loop
+                    preload="metadata"
                     playsInline
                   />
                 ) : (
@@ -255,11 +253,8 @@ export default function TeamMemberPage() {
                         <video
                           src={project.image_url}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          muted
-                          loop
+                          preload="metadata"
                           playsInline
-                          onMouseEnter={(e) => e.currentTarget.play()}
-                          onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
                         />
                       ) : (
                         <Image
@@ -308,11 +303,8 @@ export default function TeamMemberPage() {
                       <video
                         src={image.image_url}
                         className="w-full h-auto object-contain"
-                        muted
-                        loop
+                        preload="metadata"
                         playsInline
-                        onMouseEnter={(e) => e.currentTarget.play()}
-                        onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
                       />
                     ) : (
                       <img
@@ -373,9 +365,8 @@ export default function TeamMemberPage() {
                       src={selectedProject.image_url}
                       className="w-full h-full object-cover"
                       controls
-                      autoPlay
-                      muted
-                      loop
+                      preload="metadata"
+                      playsInline
                     />
                   ) : (
                     <Image
@@ -439,9 +430,8 @@ export default function TeamMemberPage() {
               src={lightboxImage}
               className="max-w-full max-h-[90vh] object-contain"
               controls
-              autoPlay
-              muted
-              loop
+              preload="metadata"
+              playsInline
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
