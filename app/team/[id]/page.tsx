@@ -157,6 +157,9 @@ export default function TeamMemberPage() {
                     className="w-full h-full object-cover grayscale"
                     preload="metadata"
                     playsInline
+                    muted
+                    onError={(e) => console.error('Video load error:', member.portrait, e)}
+                    onLoadedData={() => console.log('Video loaded:', member.portrait)}
                   />
                 ) : (
                   <Image
@@ -255,6 +258,15 @@ export default function TeamMemberPage() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           preload="metadata"
                           playsInline
+                          muted
+                          loop
+                          onMouseEnter={(e) => e.currentTarget.play()}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.pause();
+                            e.currentTarget.currentTime = 0;
+                          }}
+                          onError={(e) => console.error('Video load error:', project.image_url, e)}
+                          onLoadedData={() => console.log('Video loaded:', project.image_url)}
                         />
                       ) : (
                         <Image
@@ -305,6 +317,15 @@ export default function TeamMemberPage() {
                         className="w-full h-auto object-contain"
                         preload="metadata"
                         playsInline
+                        muted
+                        loop
+                        onMouseEnter={(e) => e.currentTarget.play()}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.pause();
+                          e.currentTarget.currentTime = 0;
+                        }}
+                        onError={(e) => console.error('Video load error:', image.image_url, e)}
+                        onLoadedData={() => console.log('Video loaded:', image.image_url)}
                       />
                     ) : (
                       <img
@@ -362,11 +383,12 @@ export default function TeamMemberPage() {
                 <div className="aspect-video bg-gray-100">
                   {getMediaType(selectedProject.image_url) === 'video' ? (
                     <video
-                      src={`${selectedProject.image_url}#t=0.1`}
+                      src={selectedProject.image_url}
                       className="w-full h-full object-cover"
                       controls
-                      preload="metadata"
+                      preload="auto"
                       playsInline
+                      muted
                     />
                   ) : (
                     <Image
@@ -427,11 +449,12 @@ export default function TeamMemberPage() {
           </button>
           {getMediaType(lightboxImage) === 'video' ? (
             <video
-              src={`${lightboxImage}#t=0.1`}
+              src={lightboxImage}
               className="max-w-full max-h-[90vh] object-contain"
               controls
-              preload="metadata"
+              preload="auto"
               playsInline
+              muted
               onClick={(e) => e.stopPropagation()}
             />
           ) : (

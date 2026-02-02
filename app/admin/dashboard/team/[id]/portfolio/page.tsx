@@ -284,10 +284,11 @@ export default function PortfolioManagementPage() {
                 {item.image_url ? (
                   getMediaType(item.image_url) === 'video' ? (
                     <video
-                      src={`${item.image_url}#t=0.1`}
+                      src={item.image_url}
                       className="w-full h-full object-cover"
-                      preload="metadata"
+                      preload="auto"
                       playsInline
+                      muted
                     />
                   ) : (
                     <img
@@ -417,11 +418,12 @@ export default function PortfolioManagementPage() {
                   <div className={`mb-4 relative w-full max-w-xs ${modalType === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
                     {getMediaType(formData.image_url) === 'video' ? (
                       <video
-                        src={`${formData.image_url}#t=0.1`}
+                        src={formData.image_url}
                         className="w-full h-full object-cover rounded-lg"
                         controls
-                        preload="metadata"
+                        preload="auto"
                         playsInline
+                        muted
                       />
                     ) : (
                       <Image

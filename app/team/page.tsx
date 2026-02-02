@@ -566,16 +566,33 @@ export default function TeamPage() {
                       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                         {member.portfolio_items.slice(0, 3).map((item) => {
                           const isProject = item.display_type === 'project';
+                          const isVideo = item.image_url && item.image_url.toLowerCase().match(/\.(mp4|webm|mov|avi|mkv)$/);
                           const content = (
                             <div className={`aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden relative group ${isProject ? 'cursor-pointer' : ''}`}>
                               {item.image_url ? (
-                                <Image
-                                  src={item.image_url}
-                                  alt={item.title}
-                                  width={100}
-                                  height={100}
-                                  className="w-full h-full object-cover"
-                                />
+                                isVideo ? (
+                                  <video
+                                    src={`${item.image_url}#t=0.1`}
+                                    className="w-full h-full object-cover"
+                                    preload="metadata"
+                                    playsInline
+                                    muted
+                                    loop
+                                    onMouseEnter={(e) => e.currentTarget.play()}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.pause();
+                                      e.currentTarget.currentTime = 0;
+                                    }}
+                                  />
+                                ) : (
+                                  <Image
+                                    src={item.image_url}
+                                    alt={item.title}
+                                    width={100}
+                                    height={100}
+                                    className="w-full h-full object-cover"
+                                  />
+                                )
                               ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
                               )}
