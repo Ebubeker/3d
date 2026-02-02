@@ -153,7 +153,7 @@ export default function TeamMemberPage() {
               {member.portrait && member.portrait !== '/placeholder.jpg' ? (
                 getMediaType(member.portrait) === 'video' ? (
                   <video
-                    src={member.portrait}
+                    src={`${member.portrait}#t=0.1`}
                     className="w-full h-full object-cover grayscale"
                     preload="metadata"
                     playsInline
@@ -251,7 +251,7 @@ export default function TeamMemberPage() {
                     {project.image_url ? (
                       getMediaType(project.image_url) === 'video' ? (
                         <video
-                          src={project.image_url}
+                          src={`${project.image_url}#t=0.1`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           preload="metadata"
                           playsInline
@@ -301,7 +301,7 @@ export default function TeamMemberPage() {
                   {image.image_url ? (
                     getMediaType(image.image_url) === 'video' ? (
                       <video
-                        src={image.image_url}
+                        src={`${image.image_url}#t=0.1`}
                         className="w-full h-auto object-contain"
                         preload="metadata"
                         playsInline
@@ -362,7 +362,7 @@ export default function TeamMemberPage() {
                 <div className="aspect-video bg-gray-100">
                   {getMediaType(selectedProject.image_url) === 'video' ? (
                     <video
-                      src={selectedProject.image_url}
+                      src={`${selectedProject.image_url}#t=0.1`}
                       className="w-full h-full object-cover"
                       controls
                       preload="metadata"
@@ -427,7 +427,7 @@ export default function TeamMemberPage() {
           </button>
           {getMediaType(lightboxImage) === 'video' ? (
             <video
-              src={lightboxImage}
+              src={`${lightboxImage}#t=0.1`}
               className="max-w-full max-h-[90vh] object-contain"
               controls
               preload="metadata"

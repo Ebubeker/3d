@@ -256,7 +256,7 @@ export default function EditTeamMemberPage() {
                 <div className="mb-4 relative w-32 h-32">
                   {getMediaType(formData.portrait) === 'video' ? (
                     <video
-                      src={formData.portrait}
+                      src={`${formData.portrait}#t=0.1`}
                       className="w-full h-full object-cover rounded-lg"
                       preload="metadata"
                       playsInline
