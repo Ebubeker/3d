@@ -16,47 +16,65 @@ function ContactForm() {
     email: '',
     company: '',
     message: '',
+    designer: '',
   });
 
+  const [designers, setDesigners] = useState<Array<{ id: string; name: string; email: string }>>([]);
   const [designerEmail, setDesignerEmail] = useState<string | null>(null);
 
-  // Fetch designer email and pre-fill message if designer name is provided
+  // Fetch all designers
+  useEffect(() => {
+    const fetchDesigners = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('team_members')
+        .select('id, name, email')
+        .order('name');
+
+      if (data) {
+        setDesigners(data);
+
+        // If designer name provided in URL, pre-select it
+        if (designerName) {
+          const matchedDesigner = data.find(d => d.name === designerName);
+          if (matchedDesigner) {
+            setFormData(prev => ({ ...prev, designer: matchedDesigner.name }));
+            setDesignerEmail(matchedDesigner.email);
+          }
+        }
+      }
+    };
+
+    fetchDesigners();
+  }, []);
+
+  // Pre-fill message if designer name and/or project provided
   useEffect(() => {
     if (designerName) {
-      // Pre-fill message
       const projectRef = projectName ? ` regarding the project "${projectName}"` : '';
       setFormData(prev => ({
         ...prev,
         message: `I'm interested in working with ${designerName}${projectRef}.\n\n`
       }));
-
-      // Fetch designer email from Supabase
-      const fetchDesignerEmail = async () => {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from('team_members')
-          .select('email')
-          .eq('name', designerName)
-          .single();
-
-        if (data?.email) {
-          setDesignerEmail(data.email);
-        }
-      };
-
-      fetchDesignerEmail();
     }
   }, [designerName, projectName]);
 
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Update designer email when designer is selected
+    if (name === 'designer') {
+      const selectedDesigner = designers.find(d => d.name === value);
+      setDesignerEmail(selectedDesigner?.email || null);
+    }
+
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -83,6 +101,7 @@ function ContactForm() {
       newErrors.email = 'Please enter a valid email';
     }
     if (!formData.company.trim()) newErrors.company = 'Company name is required';
+    if (!formData.designer.trim()) newErrors.designer = 'Please select a designer';
     if (!formData.message.trim()) newErrors.message = 'Message is required';
 
     if (Object.keys(newErrors).length === 0) {
@@ -94,10 +113,13 @@ function ContactForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            ...formData,
-            designer: designerName || 'Not specified',
-            designerEmail: designerEmail || 'No email on file',
-            projectReference: projectName || 'Not specified',
+            name: formData.name,
+            email: formData.email,
+            company: formData.company,
+            message: formData.message,
+            designer: formData.designer,
+            designerEmail: designerEmail || '',
+            projectReference: projectName || '',
             formType: 'contact',
           }),
         });
@@ -106,7 +128,8 @@ function ContactForm() {
 
         if (result.success) {
           setSubmitted(true);
-          setFormData({ name: '', email: '', company: '', message: '' });
+          setFormData({ name: '', email: '', company: '', message: '', designer: '' });
+          setDesignerEmail(null);
           setTimeout(() => setSubmitted(false), 5000);
         } else {
           console.error("Email Error:", result);
@@ -204,6 +227,27 @@ function ContactForm() {
                   placeholder="Your Company"
                 />
                 {errors.company && <p className="text-red-600 text-xs sm:text-sm mt-1.5 sm:mt-2">{errors.company}</p>}
+              </div>
+
+              {/* Designer Selection */}
+              <div>
+                <label className="block text-black font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Select Designer *</label>
+                <select
+                  name="designer"
+                  value={formData.designer}
+                  onChange={handleChange}
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 rounded font-medium transition-colors text-black text-sm sm:text-base ${
+                    errors.designer ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 focus:border-black focus:bg-white'
+                  } outline-none`}
+                >
+                  <option value="">Choose a designer...</option>
+                  {designers.map((designer) => (
+                    <option key={designer.id} value={designer.name}>
+                      {designer.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.designer && <p className="text-red-600 text-xs sm:text-sm mt-1.5 sm:mt-2">{errors.designer}</p>}
               </div>
 
               {/* Message */}
