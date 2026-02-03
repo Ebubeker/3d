@@ -165,16 +165,30 @@ export default function TeamPage() {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const response = await fetch("https://api.web3forms.com/submit", {
+        // Build message with only filled fields
+        let messageContent = `Project Type: ${formData.projectType}`;
+        if (formData.volume.trim()) {
+          messageContent += `\nVolume: ${formData.volume}`;
+        }
+        if (formData.timeline.trim()) {
+          messageContent += `\nTimeline: ${formData.timeline}`;
+        }
+        if (formData.message.trim()) {
+          messageContent += `\n\nAdditional Details:\n${formData.message}`;
+        }
+
+        const response = await fetch("/api/send-email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
           },
           body: JSON.stringify({
-            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
-            ...formData,
-            subject: "New Team Access Request - Virtuality Fashion",
+            name: formData.name,
+            email: formData.email,
+            company: formData.company,
+            message: messageContent,
+            formType: 'general',
+            queryType: 'Team Access Request',
           }),
         });
 
@@ -186,11 +200,11 @@ export default function TeamPage() {
           setHasAccess(true);
           setSubmitted(true);
         } else {
-          console.error("Web3Forms Error:", result);
+          console.error("Email Error:", result);
           setErrors({ form: 'Something went wrong. Please try again.' });
         }
       } catch (error) {
-        console.error("Web3Forms Connection Error:", error);
+        console.error("Email Connection Error:", error);
         setErrors({ form: 'Connection error. Please try again.' });
       }
     } else {
