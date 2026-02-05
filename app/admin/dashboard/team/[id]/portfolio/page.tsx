@@ -6,8 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
-import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
-import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video } from 'lucide-react';
+import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
+import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video, FileText } from 'lucide-react';
 
 type DisplayType = 'project' | 'gallery';
 
@@ -31,7 +31,7 @@ export default function PortfolioManagementPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image_url: '',
+    media_urls: [] as string[],
     category: '',
   });
 
@@ -63,48 +63,60 @@ export default function PortfolioManagementPage() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
-
-    if (!isImage && !isVideo) {
-      setUploadError('Please upload an image or video file');
-      return;
-    }
-
-    // Different size limits for images vs videos
-    const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
-    const maxSizeLabel = isVideo ? '100MB' : '5MB';
-
-    if (file.size > maxSize) {
-      setUploadError(`File size should be less than ${maxSizeLabel}`);
-      return;
-    }
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
     setUploadError('');
 
-    const result = await uploadMedia(file, 'portfolio');
+    const uploadedUrls: string[] = [];
 
-    if (result) {
-      setFormData((prev) => ({ ...prev, image_url: result.url }));
-    } else {
-      setUploadError('Failed to upload file. Please try again.');
+    for (const file of Array.from(files)) {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      const isPdf = file.type === 'application/pdf';
+
+      if (!isImage && !isVideo && !isPdf) {
+        setUploadError('Please upload image, video, or PDF files only');
+        continue;
+      }
+
+      // Different size limits
+      const maxSize = isVideo ? 100 * 1024 * 1024 : isPdf ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+      const maxSizeLabel = isVideo ? '100MB' : isPdf ? '20MB' : '5MB';
+
+      if (file.size > maxSize) {
+        setUploadError(`${file.name} exceeds ${maxSizeLabel} limit`);
+        continue;
+      }
+
+      const result = await uploadMedia(file, 'portfolio');
+
+      if (result) {
+        uploadedUrls.push(result.url);
+      } else {
+        setUploadError(`Failed to upload ${file.name}`);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        media_urls: [...prev.media_urls, ...uploadedUrls]
+      }));
     }
 
     setIsUploading(false);
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const openAddModal = (type: DisplayType) => {
-    setFormData({ title: '', description: '', image_url: '', category: '' });
+    setFormData({ title: '', description: '', media_urls: [], category: '' });
     setEditingItem(null);
     setModalType(type);
+    setUploadError('');
     setShowModal(true);
   };
 
@@ -112,29 +124,47 @@ export default function PortfolioManagementPage() {
     setFormData({
       title: item.title,
       description: item.description || '',
-      image_url: item.image_url || '',
+      media_urls: getMediaUrls(item),
       category: item.category || '',
     });
     setEditingItem(item);
     setModalType(item.display_type);
+    setUploadError('');
     setShowModal(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate gallery requires at least one file
+    if (modalType === 'gallery' && formData.media_urls.length === 0) {
+      setUploadError('Please upload at least one file');
+      return;
+    }
+
     setIsSaving(true);
 
     const supabase = createClient();
+
+    // Store media URLs as JSON string (or single URL for backwards compatibility if only one)
+    const imageUrlValue = formData.media_urls.length === 1
+      ? formData.media_urls[0]
+      : formData.media_urls.length > 1
+        ? JSON.stringify(formData.media_urls)
+        : null;
 
     // Prepare data based on modal type
     const submitData = modalType === 'gallery'
       ? {
           title: formData.title || 'Gallery Image',
-          image_url: formData.image_url,
+          image_url: imageUrlValue,
           display_type: 'gallery' as const
         }
       : {
-          ...formData,
+          title: formData.title,
+          description: formData.description || null,
+          category: formData.category || null,
+          image_url: imageUrlValue,
           display_type: 'project' as const
         };
 
@@ -275,24 +305,35 @@ export default function PortfolioManagementPage() {
             ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
         }`}>
-          {filteredItems.map((item) => (
+          {filteredItems.map((item) => {
+            const mediaUrls = getMediaUrls(item);
+            const firstUrl = mediaUrls[0];
+            const firstMediaType = firstUrl ? getMediaType(firstUrl) : null;
+            const fileCount = mediaUrls.length;
+
+            return (
             <div
               key={item.id}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className={`bg-gray-100 relative ${activeTab === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
-                {item.image_url ? (
-                  getMediaType(item.image_url) === 'video' ? (
+                {firstUrl ? (
+                  firstMediaType === 'video' ? (
                     <video
-                      src={item.image_url}
+                      src={firstUrl}
                       className="w-full h-full object-cover"
-                      preload="auto"
+                      preload="metadata"
                       playsInline
                       muted
                     />
+                  ) : firstMediaType === 'pdf' ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
+                      <FileText className="w-12 h-12 text-red-500 mb-2" />
+                      <span className="text-sm text-gray-500">PDF Document</span>
+                    </div>
                   ) : (
                     <img
-                      src={item.image_url}
+                      src={firstUrl}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -302,10 +343,16 @@ export default function PortfolioManagementPage() {
                     <ImageIcon className="w-12 h-12 text-gray-300" />
                   </div>
                 )}
-                {item.image_url && getMediaType(item.image_url) === 'video' && (
+                {firstMediaType === 'video' && (
                   <span className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded flex items-center gap-1">
                     <Video className="w-3 h-3" />
                     Video
+                  </span>
+                )}
+                {fileCount > 1 && (
+                  <span className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded flex items-center gap-1">
+                    <Images className="w-3 h-3" />
+                    {fileCount} files
                   </span>
                 )}
                 {activeTab === 'project' && item.category && (
@@ -354,7 +401,8 @@ export default function PortfolioManagementPage() {
                 </div>
               )}
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
 
@@ -410,36 +458,57 @@ export default function PortfolioManagementPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image / Video {modalType === 'gallery' && '*'}
+                  Files {modalType === 'gallery' && '*'}
+                  {formData.media_urls.length > 0 && (
+                    <span className="text-gray-500 font-normal ml-2">({formData.media_urls.length} file{formData.media_urls.length > 1 ? 's' : ''})</span>
+                  )}
                 </label>
 
-                {/* Media Preview */}
-                {formData.image_url && (
-                  <div className={`mb-4 relative w-full max-w-xs ${modalType === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
-                    {getMediaType(formData.image_url) === 'video' ? (
-                      <video
-                        src={formData.image_url}
-                        className="w-full h-full object-cover rounded-lg"
-                        controls
-                        preload="auto"
-                        playsInline
-                        muted
-                      />
-                    ) : (
-                      <Image
-                        src={formData.image_url}
-                        alt="Preview"
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}
-                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                {/* Media Preview Grid */}
+                {formData.media_urls.length > 0 && (
+                  <div className="mb-4 grid grid-cols-3 gap-2">
+                    {formData.media_urls.map((url, index) => {
+                      const mediaType = getMediaType(url);
+                      return (
+                        <div key={index} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                          {mediaType === 'video' ? (
+                            <video
+                              src={url}
+                              className="w-full h-full object-cover"
+                              preload="metadata"
+                              muted
+                            />
+                          ) : mediaType === 'pdf' ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
+                              <FileText className="w-8 h-8 text-red-500 mb-1" />
+                              <span className="text-xs text-gray-500">PDF</span>
+                            </div>
+                          ) : (
+                            <Image
+                              src={url}
+                              alt={`File ${index + 1}`}
+                              fill
+                              className="object-cover"
+                            />
+                          )}
+                          {mediaType === 'video' && (
+                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white text-[10px] rounded flex items-center gap-0.5">
+                              <Video className="w-2.5 h-2.5" />
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setFormData((prev) => ({
+                              ...prev,
+                              media_urls: prev.media_urls.filter((_, i) => i !== index)
+                            }))}
+                            className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 z-10"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -449,14 +518,15 @@ export default function PortfolioManagementPage() {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
-                    accept="image/*,video/*"
+                    accept="image/*,video/*,.pdf"
+                    multiple
                     className="hidden"
                   />
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors text-gray-600 disabled:opacity-50"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors text-gray-600 disabled:opacity-50"
                   >
                     {isUploading ? (
                       <>
@@ -466,33 +536,19 @@ export default function PortfolioManagementPage() {
                     ) : (
                       <>
                         <Upload className="w-5 h-5" />
-                        Upload image or video
+                        {formData.media_urls.length > 0 ? 'Add more files' : 'Upload files'}
                       </>
                     )}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Images: max 5MB | Videos: max 100MB (MP4, WebM, MOV)
+                  Images: max 5MB | Videos: max 100MB | PDFs: max 20MB
                 </p>
 
                 {/* Upload Error */}
                 {uploadError && (
                   <p className="text-red-600 text-sm mt-2">{uploadError}</p>
                 )}
-
-                {/* OR URL Input */}
-                <div className="mt-3">
-                  <p className="text-xs text-gray-500 mb-2">Or enter image URL:</p>
-                  <input
-                    type="url"
-                    name="image_url"
-                    value={formData.image_url}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
-                    placeholder="https://example.com/image.jpg"
-                    required={modalType === 'gallery'}
-                  />
-                </div>
               </div>
 
               {/* Description - only for projects */}

@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { createClient } from '@/lib/supabase/client';
-import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
+import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
 import { MapPin, Globe, ArrowLeft, X } from 'lucide-react';
 
@@ -251,37 +251,49 @@ export default function TeamMemberPage() {
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
                   <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                    {project.image_url ? (
-                      getMediaType(project.image_url) === 'video' ? (
-                        <video
-                          src={`${project.image_url}#t=0.1`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          preload="metadata"
-                          playsInline
-                          muted
-                          loop
-                          onMouseEnter={(e) => e.currentTarget.play()}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.pause();
-                            e.currentTarget.currentTime = 0;
-                          }}
-                          onError={(e) => console.error('Video load error:', project.image_url, e)}
-                          onLoadedData={() => console.log('Video loaded:', project.image_url)}
-                        />
-                      ) : (
+                    {(() => {
+                      const mediaUrls = getMediaUrls(project);
+                      const firstUrl = mediaUrls[0];
+                      const mediaType = firstUrl ? getMediaType(firstUrl) : null;
+
+                      if (!firstUrl) {
+                        return (
+                          <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        );
+                      }
+
+                      if (mediaType === 'video') {
+                        return (
+                          <video
+                            src={`${firstUrl}#t=0.1`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            preload="metadata"
+                            playsInline
+                            muted
+                            loop
+                            onMouseEnter={(e) => e.currentTarget.play()}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.pause();
+                              e.currentTarget.currentTime = 0;
+                            }}
+                            onError={(e) => console.error('Video load error:', firstUrl, e)}
+                            onLoadedData={() => console.log('Video loaded:', firstUrl)}
+                          />
+                        );
+                      }
+
+                      return (
                         <Image
-                          src={project.image_url}
+                          src={firstUrl}
                           alt={project.title}
                           width={400}
                           height={225}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                      )
-                    ) : (
-                      <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="p-4 sm:p-6">
                     {project.category && (
@@ -303,42 +315,48 @@ export default function TeamMemberPage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-6 sm:mb-10">Gallery</h2>
 
             <div className="columns-2 sm:columns-3 md:columns-4 gap-2 sm:gap-3 md:gap-4">
-              {galleryImages.map((image, index) => (
-                <button
-                  key={image.id}
-                  onClick={() => image.image_url && setLightboxImage(image.image_url)}
-                  className="block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid"
-                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
-                >
-                  {image.image_url ? (
-                    getMediaType(image.image_url) === 'video' ? (
-                      <video
-                        src={`${image.image_url}#t=0.1`}
-                        className="w-full h-auto object-contain"
-                        preload="metadata"
-                        playsInline
-                        muted
-                        loop
-                        onMouseEnter={(e) => e.currentTarget.play()}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.pause();
-                          e.currentTarget.currentTime = 0;
-                        }}
-                        onError={(e) => console.error('Video load error:', image.image_url, e)}
-                        onLoadedData={() => console.log('Video loaded:', image.image_url)}
-                      />
+              {galleryImages.map((image, index) => {
+                const mediaUrls = getMediaUrls(image);
+                const firstUrl = mediaUrls[0];
+                const mediaType = firstUrl ? getMediaType(firstUrl) : null;
+
+                return (
+                  <button
+                    key={image.id}
+                    onClick={() => firstUrl && setLightboxImage(firstUrl)}
+                    className="block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid"
+                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+                  >
+                    {firstUrl ? (
+                      mediaType === 'video' ? (
+                        <video
+                          src={`${firstUrl}#t=0.1`}
+                          className="w-full h-auto object-contain"
+                          preload="metadata"
+                          playsInline
+                          muted
+                          loop
+                          onMouseEnter={(e) => e.currentTarget.play()}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.pause();
+                            e.currentTarget.currentTime = 0;
+                          }}
+                          onError={(e) => console.error('Video load error:', firstUrl, e)}
+                          onLoadedData={() => console.log('Video loaded:', firstUrl)}
+                        />
+                      ) : (
+                        <img
+                          src={firstUrl}
+                          alt="Gallery image"
+                          className="w-full h-auto object-contain"
+                        />
+                      )
                     ) : (
-                      <img
-                        src={image.image_url}
-                        alt="Gallery image"
-                        className="w-full h-auto object-contain"
-                      />
-                    )
-                  ) : (
-                    <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
-                  )}
-                </button>
-              ))}
+                      <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -379,28 +397,61 @@ export default function TeamMemberPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative">
-              {selectedProject.image_url && (
-                <div className="aspect-video bg-gray-100">
-                  {getMediaType(selectedProject.image_url) === 'video' ? (
-                    <video
-                      src={selectedProject.image_url}
-                      className="w-full h-full object-cover"
-                      controls
-                      preload="auto"
-                      playsInline
-                      muted
-                    />
-                  ) : (
-                    <Image
-                      src={selectedProject.image_url}
-                      alt={selectedProject.title}
-                      width={800}
-                      height={450}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-              )}
+              {(() => {
+                const mediaUrls = getMediaUrls(selectedProject);
+                if (mediaUrls.length === 0) return null;
+
+                const displayUrls = mediaUrls.slice(0, 6);
+                const remainingCount = mediaUrls.length - 6;
+
+                return (
+                  <div className="px-6 pt-6 pb-2">
+                    <div className="grid grid-cols-4 gap-1">
+                      {displayUrls.map((url, index) => {
+                        const mediaType = getMediaType(url);
+                        const isLastVisible = index === 5 && remainingCount > 0;
+
+                        return (
+                          <div key={index} className="relative aspect-square bg-gray-100 rounded overflow-hidden">
+                            {mediaType === 'video' ? (
+                              <video
+                                src={url}
+                                className="w-full h-full object-cover"
+                                preload="metadata"
+                                playsInline
+                                muted
+                              />
+                            ) : mediaType === 'pdf' ? (
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full h-full flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                              >
+                                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                              </a>
+                            ) : (
+                              <Image
+                                src={url}
+                                alt={`${selectedProject.title} - ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            )}
+                            {isLastVisible && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">+{remainingCount}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
               <button
                 onClick={closeProjectModal}
                 className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"

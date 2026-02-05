@@ -1,6 +1,6 @@
 export interface UploadResult {
   url: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'pdf';
 }
 
 export async function uploadMedia(
@@ -48,8 +48,10 @@ export async function deleteImage(url: string): Promise<boolean> {
 }
 
 // Helper to detect media type from URL
-export function getMediaType(url: string): 'image' | 'video' {
-  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv'];
+export function getMediaType(url: string): 'image' | 'video' | 'pdf' {
   const lowerUrl = url.toLowerCase();
-  return videoExtensions.some(ext => lowerUrl.includes(ext)) ? 'video' : 'image';
+  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv'];
+  if (videoExtensions.some(ext => lowerUrl.includes(ext))) return 'video';
+  if (lowerUrl.includes('.pdf')) return 'pdf';
+  return 'image';
 }

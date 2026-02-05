@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
-import { FolderOpen, Image as ImageIcon, ExternalLink } from 'lucide-react';
+import { FolderOpen, Image as ImageIcon, ExternalLink, FileText, Images } from 'lucide-react';
+import { getMediaType } from '@/lib/supabase/storage';
+import { getMediaUrls } from '@/lib/supabase/types';
 
 interface PortfolioWithMember extends PortfolioItem {
   team_members: TeamMember;
@@ -60,22 +62,41 @@ export default function AllPortfolioPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {portfolioItems.map((item) => (
+          {portfolioItems.map((item) => {
+            const mediaUrls = getMediaUrls(item);
+            const firstUrl = mediaUrls[0];
+            const firstMediaType = firstUrl ? getMediaType(firstUrl) : null;
+            const fileCount = mediaUrls.length;
+
+            return (
             <div
               key={item.id}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="aspect-video bg-gray-100 relative">
-                {item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+                {firstUrl ? (
+                  firstMediaType === 'pdf' ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
+                      <FileText className="w-12 h-12 text-red-500 mb-2" />
+                      <span className="text-sm text-gray-500">PDF Document</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={firstUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <ImageIcon className="w-12 h-12 text-gray-300" />
                   </div>
+                )}
+                {fileCount > 1 && (
+                  <span className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded flex items-center gap-1">
+                    <Images className="w-3 h-3" />
+                    {fileCount} files
+                  </span>
                 )}
                 {item.category && (
                   <span className="absolute top-2 right-2 px-2 py-1 bg-black text-white text-xs rounded">
@@ -115,7 +136,8 @@ export default function AllPortfolioPage() {
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
     </div>

@@ -19,10 +19,21 @@ export interface PortfolioItem {
   team_member_id: string;
   title: string;
   description: string | null;
-  image_url: string | null;
+  image_url: string | null; // Can be a single URL or JSON array of URLs
   category: string | null;
   display_type: 'project' | 'gallery';
   created_at: string;
+}
+
+// Helper to parse media URLs from portfolio item (handles both single URL and JSON array)
+export function getMediaUrls(item: PortfolioItem): string[] {
+  if (!item.image_url) return [];
+  try {
+    const parsed = JSON.parse(item.image_url);
+    return Array.isArray(parsed) ? parsed : [item.image_url];
+  } catch {
+    return [item.image_url];
+  }
 }
 
 export interface AdminUser {

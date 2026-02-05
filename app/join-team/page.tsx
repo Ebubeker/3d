@@ -1,14 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Calendar } from 'lucide-react';
+import { Calendar, Briefcase, DollarSign, Globe, CheckCircle } from 'lucide-react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-interface JoinTeamModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
+export default function JoinTeamPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -38,7 +35,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
   };
 
   const validateUrl = (url: string) => {
-    if (!url) return true; // Optional field
+    if (!url) return true;
     try {
       new URL(url);
       return true;
@@ -64,7 +61,6 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        // Build message with only filled fields
         const messageParts = [
           `Name: ${formData.fullName}`,
           `Email: ${formData.email}`
@@ -121,42 +117,48 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
       portfolioLink: '',
       message: ''
     });
-    onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <>
+      <Header />
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
+      {/* Hero Section */}
+      <section className="pt-32 pb-16 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black mb-6">
+            Join the Team
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Become part of our global network of fashion technical designers and work with leading brands worldwide.
+          </p>
+        </div>
+      </section>
 
-        <div className="p-6 sm:p-8">
+      {/* Form Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4">Ready to Join?</h2>
+            <p className="text-lg text-gray-600">
+              Become part of the marketplace community.
+            </p>
+          </div>
+
           {submitted ? (
-            <div className="text-center py-8">
-              <div className="text-5xl mb-4">🎉</div>
-              <h2 className="text-2xl font-bold text-black mb-3">Application Received!</h2>
-              <p className="text-gray-600 mb-6">
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+              <div className="flex justify-center mb-6">
+                <CheckCircle className="w-16 h-16 text-green-500" />
+              </div>
+              <h2 className="text-3xl font-bold text-black mb-4">Application Received!</h2>
+              <p className="text-gray-600 mb-8 text-lg">
                 Thanks for your interest! Book a short interview to complete your application.
               </p>
               <a
                 href="https://calendly.com/amnon-vf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-4"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition-colors mb-6"
               >
                 <Calendar className="w-5 h-5" />
                 Book an Interview
@@ -165,21 +167,21 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                 onClick={handleReset}
                 className="block mx-auto text-gray-500 hover:text-black text-sm transition-colors"
               >
-                Close this window
+                Submit another application
               </button>
             </div>
           ) : (
-            <>
-              <div className="mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-black mb-2">
-                  Join the Team
-                </h2>
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 sm:p-10">
+              <div className="mb-8 text-center">
+                <h3 className="text-2xl font-bold text-black mb-2">
+                  Quick Application
+                </h3>
                 <p className="text-gray-600">
                   Introduce yourself and book a short interview.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-semibold text-black mb-2">Full Name *</label>
@@ -188,7 +190,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-lg text-black ${
+                    className={`w-full px-4 py-3 border-2 rounded-xl text-black bg-white ${
                       errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'
                     } outline-none transition-colors`}
                     placeholder="Your Full Name"
@@ -204,7 +206,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-lg text-black ${
+                    className={`w-full px-4 py-3 border-2 rounded-xl text-black bg-white ${
                       errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'
                     } outline-none transition-colors`}
                     placeholder="your@email.com"
@@ -219,18 +221,18 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                     name="roleSpecialty"
                     value={formData.roleSpecialty}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-black focus:border-black outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-black bg-white focus:border-black outline-none transition-colors"
                   >
                     <option value="">Select your specialty</option>
-                    <option value="technical-designer">Technical Designer</option>
-                    <option value="3d-fashion-designer">3D Fashion Designer</option>
-                    <option value="patternmaker">Patternmaker</option>
-                    <option value="collection-developer">Collection Developer</option>
-                    <option value="3d-visualization-specialist">3D Visualization Specialist</option>
-                    <option value="knitwear-specialist">Knitwear Specialist</option>
-                    <option value="footwear-designer">Footwear Designer</option>
-                    <option value="accessories-designer">Accessories Designer</option>
-                    <option value="other">Other</option>
+                    <option value="Technical Designer">Technical Designer</option>
+                    <option value="3D Fashion Designer">3D Fashion Designer</option>
+                    <option value="Patternmaker">Patternmaker</option>
+                    <option value="Collection Developer">Collection Developer</option>
+                    <option value="3D Visualization Specialist">3D Visualization Specialist</option>
+                    <option value="Knitwear Specialist">Knitwear Specialist</option>
+                    <option value="Footwear Designer">Footwear Designer</option>
+                    <option value="Accessories Designer">Accessories Designer</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
@@ -242,7 +244,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                     name="portfolioLink"
                     value={formData.portfolioLink}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-lg text-black ${
+                    className={`w-full px-4 py-3 border-2 rounded-xl text-black bg-white ${
                       errors.portfolioLink ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'
                     } outline-none transition-colors`}
                     placeholder="https://your-portfolio.com"
@@ -257,8 +259,8 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    rows={3}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-black focus:border-black outline-none transition-colors resize-none"
+                    rows={4}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-black bg-white focus:border-black outline-none transition-colors resize-none"
                     placeholder="Tell us briefly about your experience..."
                   />
                 </div>
@@ -272,14 +274,14 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-4 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Submitting...' : 'Submit Application'}
                 </button>
 
                 {/* Calendly Link */}
-                <div className="text-center">
-                  <span className="text-gray-500 text-sm">or</span>
+                <div className="text-center pt-4 border-t border-gray-200">
+                  <span className="text-gray-500 text-sm">or skip the form</span>
                   <a
                     href="https://calendly.com/amnon-vf"
                     target="_blank"
@@ -291,10 +293,77 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                   </a>
                 </div>
               </form>
-            </>
+            </div>
           )}
         </div>
-      </div>
-    </div>
+      </section>
+
+      {/* Who We Are */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div>
+              <h2 className="text-3xl font-bold text-black mb-4">Who is virtuality.fashion?</h2>
+              <p className="text-gray-600 leading-relaxed">
+                Founded in 2016 to connect fashion brands with top-level professionals who turn ideas into production-ready assets. We&apos;re a global team of vetted freelancers across technical design, tech packs, 3D visualization, and digital product development.
+              </p>
+            </div>
+            <div className="space-y-6">
+              <div className="border-l-4 border-black pl-5">
+                <p className="font-semibold text-black text-lg">
+                  &quot;Back to basics. Strong foundations. Digital tools as enablers, not shortcuts.&quot;
+                </p>
+              </div>
+              <p className="text-gray-600 leading-relaxed">
+                Today, we&apos;re evolving into a curated marketplace for professionals who understand both design and execution, delivering assets that move products forward.
+              </p>
+              <p className="font-bold text-black">
+                We are building a marketplace for the best in the industry.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-black mb-12 text-center">Why Join Us?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3">Premium Projects</h3>
+              <p className="text-gray-600">
+                Work with established fashion brands including Adidas, Under Armour, and more.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                <DollarSign className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3">Competitive Rates</h3>
+              <p className="text-gray-600">
+                Earn competitive hourly rates based on your skills and experience level.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3">Work Remotely</h3>
+              <p className="text-gray-600">
+                Flexible remote work from anywhere in the world. Set your own schedule.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </>
   );
 }

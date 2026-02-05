@@ -4,11 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/mov'];
-const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
+const ALLOWED_PDF_TYPES = ['application/pdf'];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES, ...ALLOWED_PDF_TYPES];
 
 // Max file sizes
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_PDF_SIZE = 20 * 1024 * 1024; // 20MB
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,14 +24,15 @@ export async function POST(request: NextRequest) {
 
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
+    const isPdf = file.type === 'application/pdf';
 
     // Validate file type
-    if (!isImage && !isVideo) {
-      return NextResponse.json({ error: 'Only image and video files are allowed' }, { status: 400 });
+    if (!isImage && !isVideo && !isPdf) {
+      return NextResponse.json({ error: 'Only image, video, and PDF files are allowed' }, { status: 400 });
     }
 
     // Validate file size based on type
-    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+    const maxSize = isVideo ? MAX_VIDEO_SIZE : isPdf ? MAX_PDF_SIZE : MAX_IMAGE_SIZE;
     if (file.size > maxSize) {
       const maxSizeMB = maxSize / (1024 * 1024);
       return NextResponse.json({ error: `File size must be less than ${maxSizeMB}MB` }, { status: 400 });
@@ -54,7 +57,7 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Determine bucket based on file type
+    // Determine bucket based on file type (PDFs go to images bucket)
     const bucket = isVideo ? 'videos' : 'images';
 
     // Upload to Supabase Storage
@@ -76,9 +79,12 @@ export async function POST(request: NextRequest) {
       .from(bucket)
       .getPublicUrl(data.path);
 
+    // Determine file type for response
+    const fileType = isVideo ? 'video' : isPdf ? 'pdf' : 'image';
+
     return NextResponse.json({
       url: urlData.publicUrl,
-      type: isVideo ? 'video' : 'image'
+      type: fileType
     });
   } catch (error) {
     console.error('Upload error:', error);

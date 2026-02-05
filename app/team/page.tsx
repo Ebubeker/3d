@@ -9,6 +9,8 @@ import EnterpriseForm from '../components/EnterpriseForm';
 import JoinTeamModal from '../components/JoinTeamModal';
 import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getMediaUrls } from '@/lib/supabase/types';
+import { getMediaType } from '@/lib/supabase/storage';
 
 interface PortfolioItemPreview {
   id: string;
@@ -580,13 +582,16 @@ export default function TeamPage() {
                       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                         {member.portfolio_items.slice(0, 3).map((item) => {
                           const isProject = item.display_type === 'project';
-                          const isVideo = item.image_url && item.image_url.toLowerCase().match(/\.(mp4|webm|mov|avi|mkv)$/);
+                          // Get first media URL from the item (handles both single URL and JSON array)
+                          const mediaUrls = getMediaUrls({ ...item, id: item.id, team_member_id: '', description: null, category: null, created_at: '' });
+                          const firstUrl = mediaUrls[0];
+                          const mediaType = firstUrl ? getMediaType(firstUrl) : null;
                           const content = (
                             <div className={`aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden relative group ${isProject ? 'cursor-pointer' : ''}`}>
-                              {item.image_url ? (
-                                isVideo ? (
+                              {firstUrl ? (
+                                mediaType === 'video' ? (
                                   <video
-                                    src={`${item.image_url}#t=0.1`}
+                                    src={`${firstUrl}#t=0.1`}
                                     className="w-full h-full object-cover"
                                     preload="metadata"
                                     playsInline
@@ -598,9 +603,13 @@ export default function TeamPage() {
                                       e.currentTarget.currentTime = 0;
                                     }}
                                   />
+                                ) : mediaType === 'pdf' ? (
+                                  <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+                                    <span className="text-red-500 text-xs font-medium">PDF</span>
+                                  </div>
                                 ) : (
                                   <Image
-                                    src={item.image_url}
+                                    src={firstUrl}
                                     alt={item.title}
                                     width={100}
                                     height={100}
