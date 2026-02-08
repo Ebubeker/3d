@@ -71,7 +71,6 @@ export async function POST(request: NextRequest) {
         <p><strong>From:</strong> ${name} (${email})</p>
         <p><strong>Company:</strong> ${company}</p>
         ${designer ? `<p><strong>Designer:</strong> ${designer}</p>` : ''}
-        ${designerEmail ? `<p><strong>Designer Email:</strong> ${designerEmail}</p>` : ''}
         ${projectReference ? `<p><strong>Project Reference:</strong> ${projectReference}</p>` : ''}
         <h3>Message:</h3>
         <p>${message?.replace(/\n/g, '<br>')}</p>
@@ -103,19 +102,17 @@ export async function POST(request: NextRequest) {
       `;
     }
 
-    // Determine recipients
-    const toEmails: string[] = [ADMIN_EMAIL];
-
-    // If there's a designer email, add them as a recipient
+    // Send to info@ and BCC the freelancer/designer if available
+    const bccEmails: string[] = [];
     if (designerEmail && designerEmail !== 'No email on file') {
-      toEmails.push(designerEmail);
+      bccEmails.push(designerEmail);
     }
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: 'Virtuality Fashion <amnon@virtuality.fashion>',
-      to: toEmails,
-      cc: ADMIN_EMAIL, // CC yourself on all emails
+      to: 'info@virtuality.fashion',
+      ...(bccEmails.length > 0 && { bcc: bccEmails }),
       replyTo: email, // Reply goes to the person who submitted the form
       subject: emailSubject,
       html: htmlContent,
