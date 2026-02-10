@@ -1,3 +1,5 @@
+import { createClient } from './client';
+
 export interface UploadResult {
   url: string;
   type: 'image' | 'video' | 'pdf';
@@ -8,23 +10,34 @@ export async function uploadMedia(
   folder: 'portraits' | 'portfolio'
 ): Promise<UploadResult | null> {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', folder);
+    const isVideo = file.type.startsWith('video/');
+    const isPdf = file.type === 'application/pdf';
+    const bucket = isVideo ? 'videos' : 'images';
+    const fileType: 'image' | 'video' | 'pdf' = isVideo ? 'video' : isPdf ? 'pdf' : 'image';
 
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Upload error:', error);
+    const supabase = createClient();
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file, {
+        contentType: file.type,
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
       return null;
     }
 
-    const data = await response.json();
-    return { url: data.url, type: data.type || 'image' };
+    const { data: urlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+
+    return { url: urlData.publicUrl, type: fileType };
   } catch (err) {
     console.error('Upload error:', err);
     return null;
