@@ -414,13 +414,23 @@ export default function TeamMemberPage() {
                         return (
                           <div key={index} className="relative aspect-square bg-gray-100 rounded overflow-hidden">
                             {mediaType === 'video' ? (
-                              <video
-                                src={url}
-                                className="w-full h-full object-cover"
-                                preload="metadata"
-                                playsInline
-                                muted
-                              />
+                              <button
+                                onClick={() => setLightboxImage(url)}
+                                className="w-full h-full relative group cursor-pointer"
+                              >
+                                <video
+                                  src={`${url}#t=0.1`}
+                                  className="w-full h-full object-cover"
+                                  preload="metadata"
+                                  playsInline
+                                  muted
+                                />
+                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                                  <svg className="w-8 h-8 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                </div>
+                              </button>
                             ) : mediaType === 'pdf' ? (
                               <a
                                 href={url}
@@ -433,15 +443,20 @@ export default function TeamMemberPage() {
                                 </svg>
                               </a>
                             ) : (
-                              <Image
-                                src={url}
-                                alt={`${selectedProject.title} - ${index + 1}`}
-                                fill
-                                className="object-cover"
-                              />
+                              <button
+                                onClick={() => setLightboxImage(url)}
+                                className="w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
+                              >
+                                <Image
+                                  src={url}
+                                  alt={`${selectedProject.title} - ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </button>
                             )}
                             {isLastVisible && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center pointer-events-none">
                                 <span className="text-white text-sm font-bold">+{remainingCount}</span>
                               </div>
                             )}
@@ -503,9 +518,9 @@ export default function TeamMemberPage() {
               src={lightboxImage}
               className="max-w-full max-h-[90vh] object-contain"
               controls
+              autoPlay
               preload="auto"
               playsInline
-              muted
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
