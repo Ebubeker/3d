@@ -169,7 +169,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
                   Enterprise Quote Request
                 </h2>
                 <p className="text-gray-600">
-                  Get a tailored quote and a curated team for your project.
+                  We will review your request and curate the right technical team for your project.
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
                   Subject: Enterprise quote and team build request

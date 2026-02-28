@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import EnterpriseForm from '../components/EnterpriseForm';
-import JoinTeamModal from '../components/JoinTeamModal';
 import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getMediaUrls } from '@/lib/supabase/types';
@@ -75,7 +74,6 @@ const staticTeamMembers: TeamMember[] = [
 export default function TeamPage() {
   const [hasAccess, setHasAccess] = useState(false);
   const [showEnterpriseForm, setShowEnterpriseForm] = useState(false);
-  const [showJoinModal, setShowJoinModal] = useState(false);
   const [expandedBio, setExpandedBio] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(staticTeamMembers);
   const [isLoadingTeam, setIsLoadingTeam] = useState(true);
@@ -234,10 +232,10 @@ export default function TeamPage() {
           />
         </div>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 md:py-32 relative z-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 animate-fade-in-up font-copperplate">Meet the Team</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 animate-fade-in-up font-copperplate">Meet Your Fashion Development Team</h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-2xl animate-fade-in-up delay-200 mb-6 sm:mb-8" style={{ animationFillMode: 'both' }}>
             {hasAccess
-              ? 'Our vetted Fashion Technical Designers ready to bring your vision to life.'
+              ? 'Browse our vetted specialists and choose who you want to work with. For larger projects, request an Enterprise team, and we will curate the right experts for you.'
               : 'Unlock access to our marketplace of vetted Fashion Technical Designers.'}
           </p>
 
@@ -248,17 +246,8 @@ export default function TeamPage() {
                 onClick={() => setShowEnterpriseForm(true)}
                 className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm sm:text-base"
               >
-                Enterprise
+                Build My Enterprise Team
               </button>
-              <button
-                onClick={() => setShowJoinModal(true)}
-                className="w-full sm:w-auto px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors text-sm sm:text-base"
-              >
-                Join the Team
-              </button>
-              <p className="w-full text-xs sm:text-sm text-gray-500 mt-2">
-                Get a tailored quote and a curated team for your project.
-              </p>
             </div>
           )}
         </div>
@@ -647,7 +636,7 @@ export default function TeamPage() {
                       href={`/contact?designer=${encodeURIComponent(member.name)}`}
                       className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-gray-800 transition-colors"
                     >
-                      Get Quote
+                      Work with {member.name.split(' ')[0]}
                     </Link>
                     <Link
                       href={`/team/${member.id}`}
@@ -661,15 +650,6 @@ export default function TeamPage() {
             </div>
             )}
 
-            {/* Bottom CTA */}
-            <div className="mt-10 sm:mt-12 md:mt-16 text-center">
-              <button
-                onClick={() => setShowJoinModal(true)}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors text-sm sm:text-base"
-              >
-                Join the Team
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -680,10 +660,6 @@ export default function TeamPage() {
       <EnterpriseForm
         isOpen={showEnterpriseForm}
         onClose={() => setShowEnterpriseForm(false)}
-      />
-      <JoinTeamModal
-        isOpen={showJoinModal}
-        onClose={() => setShowJoinModal(false)}
       />
     </>
   );

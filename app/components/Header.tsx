@@ -9,7 +9,8 @@ import {
   Mail,
   Menu,
   X,
-  Info
+  Info,
+  ArrowRight
 } from 'lucide-react';
 
 export default function Header() {
@@ -85,6 +86,15 @@ export default function Header() {
           })}
         </nav>
 
+        {/* Join the Team CTA */}
+        <Link
+          href="/join-team"
+          className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-medium text-gray-500 hover:text-black border border-gray-200 hover:border-gray-400 rounded-full transition-all duration-200 group"
+        >
+          <span>Fashion specialist? <span className="font-semibold">Join the Team</span></span>
+          <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -135,6 +145,14 @@ export default function Header() {
                 </Link>
               );
             })}
+            <Link
+              href="/join-team"
+              className="flex items-center justify-between text-sm text-gray-500 hover:text-black transition-colors pt-4 border-t border-gray-200 p-2 group"
+              onClick={() => setIsOpen(false)}
+            >
+              <span>Fashion specialist? <span className="font-semibold">Join the Team</span></span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </nav>
         </div>
       )}
