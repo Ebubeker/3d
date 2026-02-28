@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import EnterpriseForm from '../components/EnterpriseForm';
-import { MapPin, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Globe, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getMediaUrls } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
@@ -631,18 +631,19 @@ export default function TeamPage() {
                   )}
 
                   {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto">
+                  <div className="flex gap-2 sm:gap-3 mt-auto">
                     <Link
                       href={`/contact?designer=${encodeURIComponent(member.name)}`}
-                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-gray-800 transition-colors"
+                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-gray-800 transition-colors whitespace-nowrap"
                     >
                       Work with {member.name.split(' ')[0]}
                     </Link>
                     <Link
                       href={`/team/${member.id}`}
-                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-black text-black rounded-lg sm:rounded-xl font-semibold text-center text-xs sm:text-sm hover:bg-black hover:text-white transition-colors"
+                      className="px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-black text-black rounded-lg sm:rounded-xl hover:bg-black hover:text-white transition-colors flex items-center justify-center"
+                      title="View Portfolio"
                     >
-                      View Portfolio
+                      <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Link>
                   </div>
                 </div>
