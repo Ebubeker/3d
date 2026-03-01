@@ -61,7 +61,17 @@ export async function deleteImage(url: string): Promise<boolean> {
 }
 
 // Helper to detect media type from URL
-export function getMediaType(url: string): 'image' | 'video' | 'pdf' {
+export function getMediaType(url: string): 'image' | 'video' | 'pdf' | 'link' {
+  // Check for link entries (JSON-encoded objects)
+  try {
+    const parsed = JSON.parse(url);
+    if (parsed && typeof parsed === 'object' && 'link' in parsed && 'type' in parsed) {
+      return parsed.type === 'link' ? 'link' : parsed.type;
+    }
+  } catch {
+    // Not a link entry, continue with extension-based detection
+  }
+
   const lowerUrl = url.toLowerCase();
   const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv'];
   if (videoExtensions.some(ext => lowerUrl.includes(ext))) return 'video';

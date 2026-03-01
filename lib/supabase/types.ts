@@ -36,6 +36,32 @@ export function getMediaUrls(item: PortfolioItem): string[] {
   }
 }
 
+// Link entry types for external URLs in portfolio items
+export interface LinkEntry {
+  link: string;
+  label: string;
+  type: 'link' | 'image' | 'video';
+}
+
+export function isLinkEntry(url: string): boolean {
+  try {
+    const parsed = JSON.parse(url);
+    return parsed && typeof parsed === 'object' && 'link' in parsed && 'type' in parsed;
+  } catch {
+    return false;
+  }
+}
+
+export function parseLinkEntry(url: string): LinkEntry | null {
+  try {
+    const parsed = JSON.parse(url);
+    if (parsed && parsed.link && parsed.type) return parsed as LinkEntry;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export interface AdminUser {
   id: string;
   email: string;

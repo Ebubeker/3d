@@ -7,10 +7,11 @@ import Image from 'next/image';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { createClient } from '@/lib/supabase/client';
-import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
+import { TeamMember, PortfolioItem, getMediaUrls, isLinkEntry, parseLinkEntry } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
 import { MapPin, Globe, ArrowLeft, X } from 'lucide-react';
 import PdfThumbnail from '../../components/PdfThumbnail';
+import LinkThumbnail from '../../components/LinkThumbnail';
 
 export default function TeamMemberPage() {
   const params = useParams();
@@ -254,10 +255,19 @@ export default function TeamMemberPage() {
                   <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                     {(() => {
                       const mediaUrls = getMediaUrls(project);
-                      const firstUrl = mediaUrls[0];
-                      const mediaType = firstUrl ? getMediaType(firstUrl) : null;
 
-                      if (!firstUrl) {
+                      // Find the first image or video URL to use as thumbnail
+                      const thumbnailUrl = mediaUrls.find((url) => {
+                        if (isLinkEntry(url)) {
+                          const entry = parseLinkEntry(url);
+                          return entry?.type === 'image' || entry?.type === 'video';
+                        }
+                        const type = getMediaType(url);
+                        return type === 'image' || type === 'video';
+                      });
+
+                      // No media at all
+                      if (mediaUrls.length === 0) {
                         return (
                           <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -265,34 +275,80 @@ export default function TeamMemberPage() {
                         );
                       }
 
-                      if (mediaType === 'video') {
+                      // Has an image or video — use it as thumbnail
+                      if (thumbnailUrl) {
+                        if (isLinkEntry(thumbnailUrl)) {
+                          const entry = parseLinkEntry(thumbnailUrl);
+                          if (entry) return <LinkThumbnail entry={entry} className="group-hover:scale-105 transition-transform duration-500" />;
+                        }
+
+                        const mediaType = getMediaType(thumbnailUrl);
+                        if (mediaType === 'video') {
+                          return (
+                            <video
+                              src={`${thumbnailUrl}#t=0.1`}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              preload="metadata"
+                              playsInline
+                              muted
+                              loop
+                              onMouseEnter={(e) => e.currentTarget.play()}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.pause();
+                                e.currentTarget.currentTime = 0;
+                              }}
+                            />
+                          );
+                        }
+
                         return (
-                          <video
-                            src={`${firstUrl}#t=0.1`}
+                          <Image
+                            src={thumbnailUrl}
+                            alt={project.title}
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            preload="metadata"
-                            playsInline
-                            muted
-                            loop
-                            onMouseEnter={(e) => e.currentTarget.play()}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.pause();
-                              e.currentTarget.currentTime = 0;
-                            }}
-                            onError={(e) => console.error('Video load error:', firstUrl, e)}
-                            onLoadedData={() => console.log('Video loaded:', firstUrl)}
                           />
                         );
                       }
 
+                      // Only PDFs and/or links — show a placeholder based on first item
+                      const firstUrl = mediaUrls[0];
+                      const firstType = getMediaType(firstUrl);
+
+                      if (firstType === 'pdf') {
+                        return (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex flex-col items-center justify-center gap-2">
+                            <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-white/80 text-sm sm:text-base font-semibold tracking-wide">PDF</span>
+                          </div>
+                        );
+                      }
+
+                      // Link type — show label or "Link"
+                      if (isLinkEntry(firstUrl)) {
+                        const entry = parseLinkEntry(firstUrl);
+                        return (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex flex-col items-center justify-center gap-2 px-4">
+                            <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            <span className="text-white/80 text-sm sm:text-base font-semibold tracking-wide text-center line-clamp-2">
+                              {entry?.label || 'Link'}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      // Fallback
                       return (
-                        <Image
-                          src={firstUrl}
-                          alt={project.title}
-                          width={400}
-                          height={225}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex flex-col items-center justify-center gap-2">
+                          <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
                       );
                     })()}
                   </div>
@@ -324,12 +380,16 @@ export default function TeamMemberPage() {
                 return (
                   <button
                     key={image.id}
-                    onClick={() => firstUrl && setLightboxImage(firstUrl)}
+                    onClick={() => firstUrl && !isLinkEntry(firstUrl) && setLightboxImage(firstUrl)}
                     className="block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid"
                     style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                   >
                     {firstUrl ? (
-                      mediaType === 'video' ? (
+                      isLinkEntry(firstUrl) ? (
+                        <div className="aspect-square">
+                          <LinkThumbnail entry={parseLinkEntry(firstUrl)!} />
+                        </div>
+                      ) : mediaType === 'video' ? (
                         <video
                           src={`${firstUrl}#t=0.1`}
                           className="w-full h-auto object-contain"
@@ -414,7 +474,9 @@ export default function TeamMemberPage() {
 
                         return (
                           <div key={index} className="relative aspect-square bg-gray-100 rounded overflow-hidden">
-                            {mediaType === 'video' ? (
+                            {isLinkEntry(url) ? (
+                              <LinkThumbnail entry={parseLinkEntry(url)!} />
+                            ) : mediaType === 'video' ? (
                               <button
                                 onClick={() => setLightboxImage(url)}
                                 className="w-full h-full relative group cursor-pointer"

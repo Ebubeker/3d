@@ -6,9 +6,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
-import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
-import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video, FileText } from 'lucide-react';
+import { TeamMember, PortfolioItem, getMediaUrls, isLinkEntry, parseLinkEntry } from '@/lib/supabase/types';
+import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video, FileText, Link2, ExternalLink } from 'lucide-react';
 import PdfThumbnail from '@/app/components/PdfThumbnail';
+import LinkThumbnail from '@/app/components/LinkThumbnail';
 
 type DisplayType = 'project' | 'gallery';
 
@@ -28,6 +29,8 @@ export default function PortfolioManagementPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<DisplayType>('project');
   const [modalType, setModalType] = useState<DisplayType>('project');
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [linkData, setLinkData] = useState({ url: '', label: '', type: 'link' as 'link' | 'image' | 'video' });
 
   const [formData, setFormData] = useState({
     title: '',
@@ -118,6 +121,8 @@ export default function PortfolioManagementPage() {
     setEditingItem(null);
     setModalType(type);
     setUploadError('');
+    setShowLinkForm(false);
+    setLinkData({ url: '', label: '', type: 'link' });
     setShowModal(true);
   };
 
@@ -131,6 +136,8 @@ export default function PortfolioManagementPage() {
     setEditingItem(item);
     setModalType(item.display_type);
     setUploadError('');
+    setShowLinkForm(false);
+    setLinkData({ url: '', label: '', type: 'link' });
     setShowModal(true);
   };
 
@@ -319,7 +326,9 @@ export default function PortfolioManagementPage() {
             >
               <div className={`bg-gray-100 relative ${activeTab === 'gallery' ? 'aspect-square' : 'aspect-video'}`}>
                 {firstUrl ? (
-                  firstMediaType === 'video' ? (
+                  isLinkEntry(firstUrl) ? (
+                    <LinkThumbnail entry={parseLinkEntry(firstUrl)!} />
+                  ) : firstMediaType === 'video' ? (
                     <video
                       src={firstUrl}
                       className="w-full h-full object-cover"
@@ -466,10 +475,13 @@ export default function PortfolioManagementPage() {
                 {formData.media_urls.length > 0 && (
                   <div className="mb-4 grid grid-cols-3 gap-2">
                     {formData.media_urls.map((url, index) => {
-                      const mediaType = getMediaType(url);
+                      const linkEntry = isLinkEntry(url) ? parseLinkEntry(url) : null;
+                      const mediaType = linkEntry ? 'link-entry' : getMediaType(url);
                       return (
                         <div key={index} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                          {mediaType === 'video' ? (
+                          {linkEntry ? (
+                            <LinkThumbnail entry={linkEntry} />
+                          ) : mediaType === 'video' ? (
                             <video
                               src={url}
                               className="w-full h-full object-cover"
@@ -489,6 +501,11 @@ export default function PortfolioManagementPage() {
                           {mediaType === 'video' && (
                             <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white text-[10px] rounded flex items-center gap-0.5">
                               <Video className="w-2.5 h-2.5" />
+                            </span>
+                          )}
+                          {linkEntry && (
+                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white text-[10px] rounded flex items-center gap-0.5">
+                              <Link2 className="w-2.5 h-2.5" />
                             </span>
                           )}
                           <button
@@ -539,6 +556,69 @@ export default function PortfolioManagementPage() {
                 <p className="text-xs text-gray-500 mt-2">
                   Images: max 5MB | Videos: max 100MB | PDFs: max 20MB
                 </p>
+
+                {/* Or Add Link */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setShowLinkForm(!showLinkForm)}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                  >
+                    <Link2 className="w-4 h-4" />
+                    {showLinkForm ? 'Hide link form' : 'Or add a link'}
+                  </button>
+
+                  {showLinkForm && (
+                    <div className="mt-3 space-y-3 p-3 bg-gray-50 rounded-lg">
+                      <input
+                        type="url"
+                        value={linkData.url}
+                        onChange={(e) => setLinkData(prev => ({ ...prev, url: e.target.value }))}
+                        placeholder="https://example.com/..."
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm text-black"
+                      />
+                      <input
+                        type="text"
+                        value={linkData.label}
+                        onChange={(e) => setLinkData(prev => ({ ...prev, label: e.target.value }))}
+                        placeholder="Display name"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-sm text-black"
+                      />
+                      <div className="flex gap-2">
+                        {(['link', 'image', 'video'] as const).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setLinkData(prev => ({ ...prev, type: t }))}
+                            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                              linkData.type === t
+                                ? 'bg-black text-white'
+                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            {t === 'link' && <ExternalLink className="w-3 h-3" />}
+                            {t === 'image' && <ImageIcon className="w-3 h-3" />}
+                            {t === 'video' && <Video className="w-3 h-3" />}
+                            {t.charAt(0).toUpperCase() + t.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!linkData.url || !linkData.label) return;
+                          const entry = JSON.stringify({ link: linkData.url, label: linkData.label, type: linkData.type });
+                          setFormData(prev => ({ ...prev, media_urls: [...prev.media_urls, entry] }));
+                          setLinkData({ url: '', label: '', type: 'link' });
+                        }}
+                        disabled={!linkData.url || !linkData.label}
+                        className="w-full px-3 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        Add Link
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* Upload Error */}
                 {uploadError && (

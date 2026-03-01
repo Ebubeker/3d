@@ -8,9 +8,10 @@ import Footer from '../components/Footer';
 import EnterpriseForm from '../components/EnterpriseForm';
 import { MapPin, Globe, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { getMediaUrls } from '@/lib/supabase/types';
+import { getMediaUrls, isLinkEntry, parseLinkEntry } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
 import PdfThumbnail from '../components/PdfThumbnail';
+import LinkThumbnail from '../components/LinkThumbnail';
 
 interface PortfolioItemPreview {
   id: string;
@@ -586,10 +587,13 @@ export default function TeamPage() {
                           const mediaUrls = getMediaUrls({ ...item, id: item.id, team_member_id: '', description: null, category: null, created_at: '' });
                           const firstUrl = mediaUrls[0];
                           const mediaType = firstUrl ? getMediaType(firstUrl) : null;
+                          const linkEntry = firstUrl && isLinkEntry(firstUrl) ? parseLinkEntry(firstUrl) : null;
                           const content = (
                             <div className={`aspect-square bg-gray-100 rounded-md sm:rounded-lg overflow-hidden relative group ${isProject ? 'cursor-pointer' : ''}`}>
                               {firstUrl ? (
-                                mediaType === 'video' ? (
+                                linkEntry ? (
+                                  <LinkThumbnail entry={linkEntry} />
+                                ) : mediaType === 'video' ? (
                                   <video
                                     src={`${firstUrl}#t=0.1`}
                                     className="w-full h-full object-cover"

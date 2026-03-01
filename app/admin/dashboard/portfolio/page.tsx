@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/client';
 import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
 import { FolderOpen, Image as ImageIcon, ExternalLink, FileText, Images } from 'lucide-react';
 import { getMediaType } from '@/lib/supabase/storage';
-import { getMediaUrls } from '@/lib/supabase/types';
+import { getMediaUrls, isLinkEntry, parseLinkEntry } from '@/lib/supabase/types';
 import PdfThumbnail from '@/app/components/PdfThumbnail';
+import LinkThumbnail from '@/app/components/LinkThumbnail';
 
 interface PortfolioWithMember extends PortfolioItem {
   team_members: TeamMember;
@@ -76,7 +77,9 @@ export default function AllPortfolioPage() {
             >
               <div className="aspect-video bg-gray-100 relative">
                 {firstUrl ? (
-                  firstMediaType === 'pdf' ? (
+                  isLinkEntry(firstUrl) ? (
+                    <LinkThumbnail entry={parseLinkEntry(firstUrl)!} />
+                  ) : firstMediaType === 'pdf' ? (
                     <PdfThumbnail url={firstUrl} />
                   ) : (
                     <img
