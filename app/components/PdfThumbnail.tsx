@@ -14,13 +14,20 @@ export default function PdfThumbnail({ url, className = '' }: PdfThumbnailProps)
 
   useEffect(() => {
     let cancelled = false;
+    let blobUrl: string | null = null;
 
     async function renderPdf() {
       try {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
-        const pdf = await pdfjsLib.getDocument(url).promise;
+        // Fetch as blob to avoid CORS issues with pdfjs direct URL loading
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch PDF');
+        const blob = await response.blob();
+        blobUrl = URL.createObjectURL(blob);
+
+        const pdf = await pdfjsLib.getDocument(blobUrl).promise;
         if (cancelled) return;
 
         const page = await pdf.getPage(1);
@@ -49,7 +56,8 @@ export default function PdfThumbnail({ url, className = '' }: PdfThumbnailProps)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await page.render({ canvasContext: ctx, viewport: scaledViewport, canvas } as any).promise;
         if (!cancelled) setLoading(false);
-      } catch {
+      } catch (err) {
+        console.error('PdfThumbnail render error:', err);
         if (!cancelled) {
           setError(true);
           setLoading(false);
@@ -58,7 +66,10 @@ export default function PdfThumbnail({ url, className = '' }: PdfThumbnailProps)
     }
 
     renderPdf();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
   }, [url]);
 
   if (error) {
