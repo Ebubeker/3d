@@ -525,11 +525,16 @@ export default function TeamPage() {
                   <div className="mb-3 sm:mb-4">
                     <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Specialties</p>
                     <div className="flex flex-wrap gap-1">
-                      {member.specialties.map((specialty, idx) => (
+                      {member.specialties.slice(0, 3).map((specialty, idx) => (
                         <span key={idx} className="text-[10px] sm:text-xs text-black bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg font-medium">
                           {specialty}
                         </span>
                       ))}
+                      {member.specialties.length > 3 && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 bg-gray-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">
+                          +{member.specialties.length - 3} more
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -537,11 +542,16 @@ export default function TeamPage() {
                   <div className="mb-3 sm:mb-4">
                     <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Tools</p>
                     <div className="flex flex-wrap gap-1">
-                      {member.tools.map((tool, idx) => (
+                      {member.tools.slice(0, 4).map((tool, idx) => (
                         <span key={idx} className="text-[10px] sm:text-xs text-gray-700 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">
                           {tool}
                         </span>
                       ))}
+                      {member.tools.length > 4 && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 bg-gray-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">
+                          +{member.tools.length - 4} more
+                        </span>
+                      )}
                     </div>
                   </div>
 
