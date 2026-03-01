@@ -34,7 +34,7 @@ export default function CTASection() {
           transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-4"
         >
-          <Link href="/contact">
+          <Link href="/join-team">
             <button className="w-full sm:w-auto px-8 sm:px-10 md:px-12 py-4 sm:py-5 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg md:text-xl shadow-lg hover:shadow-xl">
               Contact Us
             </button>

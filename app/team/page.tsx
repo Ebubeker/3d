@@ -10,6 +10,7 @@ import { MapPin, Globe, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getMediaUrls } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
+import PdfThumbnail from '../components/PdfThumbnail';
 
 interface PortfolioItemPreview {
   id: string;
@@ -603,9 +604,7 @@ export default function TeamPage() {
                                     }}
                                   />
                                 ) : mediaType === 'pdf' ? (
-                                  <div className="w-full h-full bg-gray-50 flex items-center justify-center">
-                                    <span className="text-red-500 text-xs font-medium">PDF</span>
-                                  </div>
+                                  <PdfThumbnail url={firstUrl} />
                                 ) : (
                                   <Image
                                     src={firstUrl}

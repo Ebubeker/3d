@@ -89,7 +89,7 @@ export default function SolutionsPage() {
           </div>
 
           <div className="mt-10 sm:mt-14 md:mt-20 text-center">
-            <Link href="/contact">
+            <Link href="/team">
               <button className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg shadow-lg">
                 Request a Quote
               </button>
@@ -111,7 +111,7 @@ export default function SolutionsPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center px-4 sm:px-0">
-            <Link href="/contact">
+            <Link href="/join-team">
               <button className="w-full sm:w-auto px-8 sm:px-10 md:px-12 py-4 sm:py-5 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg md:text-xl shadow-lg hover:shadow-xl">
                 Contact Us
               </button>

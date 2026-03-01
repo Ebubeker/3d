@@ -15,7 +15,7 @@ export default function AudienceSegments() {
         "Visual assets for product pages and e-commerce listings"
       ],
       cta: "Get Started",
-      ctaLink: "/contact"
+      ctaLink: "/team"
     },
     {
       id: 2,
@@ -39,7 +39,7 @@ export default function AudienceSegments() {
         "3D garment prototyping to reduce sampling iterations"
       ],
       cta: "Contact Sales",
-      ctaLink: "/contact"
+      ctaLink: "/join-team"
     }
   ];
 

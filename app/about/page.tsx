@@ -335,7 +335,7 @@ export default function AboutPage() {
               Meet the Team
             </Link>
             <Link
-              href="/contact"
+              href="/join-team"
               className="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 border-2 border-white text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base md:text-lg hover:bg-white hover:text-black transition-all hover:scale-105"
             >
               Get in Touch

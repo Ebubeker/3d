@@ -42,7 +42,7 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <Link href="/contact">
+              <Link href="/team">
                 <button className="w-full sm:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl">
                   Get a quote
                 </button>

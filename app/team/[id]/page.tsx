@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
 import { getMediaType } from '@/lib/supabase/storage';
 import { MapPin, Globe, ArrowLeft, X } from 'lucide-react';
+import PdfThumbnail from '../../components/PdfThumbnail';
 
 export default function TeamMemberPage() {
   const params = useParams();
@@ -436,11 +437,9 @@ export default function TeamMemberPage() {
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full h-full flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                                className="w-full h-full block relative group"
                               >
-                                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
+                                <PdfThumbnail url={url} />
                               </a>
                             ) : (
                               <button

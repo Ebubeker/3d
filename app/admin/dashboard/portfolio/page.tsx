@@ -7,6 +7,7 @@ import { TeamMember, PortfolioItem } from '@/lib/supabase/types';
 import { FolderOpen, Image as ImageIcon, ExternalLink, FileText, Images } from 'lucide-react';
 import { getMediaType } from '@/lib/supabase/storage';
 import { getMediaUrls } from '@/lib/supabase/types';
+import PdfThumbnail from '@/app/components/PdfThumbnail';
 
 interface PortfolioWithMember extends PortfolioItem {
   team_members: TeamMember;
@@ -76,10 +77,7 @@ export default function AllPortfolioPage() {
               <div className="aspect-video bg-gray-100 relative">
                 {firstUrl ? (
                   firstMediaType === 'pdf' ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
-                      <FileText className="w-12 h-12 text-red-500 mb-2" />
-                      <span className="text-sm text-gray-500">PDF Document</span>
-                    </div>
+                    <PdfThumbnail url={firstUrl} />
                   ) : (
                     <img
                       src={firstUrl}

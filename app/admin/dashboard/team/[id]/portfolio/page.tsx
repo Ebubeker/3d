@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
 import { TeamMember, PortfolioItem, getMediaUrls } from '@/lib/supabase/types';
 import { ArrowLeft, Plus, Edit, Trash2, X, Image as ImageIcon, Upload, Loader2, FolderOpen, Images, Video, FileText } from 'lucide-react';
+import PdfThumbnail from '@/app/components/PdfThumbnail';
 
 type DisplayType = 'project' | 'gallery';
 
@@ -327,10 +328,7 @@ export default function PortfolioManagementPage() {
                       muted
                     />
                   ) : firstMediaType === 'pdf' ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
-                      <FileText className="w-12 h-12 text-red-500 mb-2" />
-                      <span className="text-sm text-gray-500">PDF Document</span>
-                    </div>
+                    <PdfThumbnail url={firstUrl} />
                   ) : (
                     <img
                       src={firstUrl}
@@ -479,10 +477,7 @@ export default function PortfolioManagementPage() {
                               muted
                             />
                           ) : mediaType === 'pdf' ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
-                              <FileText className="w-8 h-8 text-red-500 mb-1" />
-                              <span className="text-xs text-gray-500">PDF</span>
-                            </div>
+                            <PdfThumbnail url={url} />
                           ) : (
                             <Image
                               src={url}
