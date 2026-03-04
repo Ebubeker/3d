@@ -87,10 +87,22 @@ function scoreEmail(email: string): { score: number; reasons: string[] } {
     reasons.push('Suspicious TLD');
   }
 
-  // Gibberish local part: 5+ consecutive consonants
+  // Gibberish local part: use Markov chain analysis
+  if (localPart.length >= 4) {
+    try {
+      if (gibberish.detect(localPart)) {
+        score += 30;
+        reasons.push('Gibberish email username');
+      }
+    } catch {
+      // Fallback to regex if library fails
+    }
+  }
+
+  // Gibberish local part: 5+ consecutive consonants (regex fallback)
   if (/[bcdfghjklmnpqrstvwxyz]{5,}/i.test(localPart)) {
     score += 25;
-    reasons.push('Gibberish email username');
+    reasons.push('Consonant cluster in email username');
   }
 
   // Random alphanumeric string 15+ chars with very low vowel ratio
@@ -170,7 +182,6 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
   }
 
   // Gibberish detection using Markov chain analysis (gibberish-detective)
-  // Check each word individually and overall content
   const words = trimmed.split(/\s+/).filter(w => w.length > 0);
   if (trimmed.length >= 6) {
     try {
@@ -180,19 +191,19 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
         reasons.push('Gibberish content detected (Markov chain)');
       }
 
-      // Also check individual long words (catches single gibberish strings)
-      if (words.length <= 2) {
-        const longWords = words.filter(w => w.length >= 6);
-        for (const word of longWords) {
-          if (gibberish.detect(word)) {
-            score += 50;
-            reasons.push('Gibberish word detected');
-            break;
-          }
+      // Check individual words >= 6 chars (the library is unreliable on shorter strings)
+      // If majority of testable words are gibberish, flag it
+      const testableWords = words.filter(w => w.length >= 6);
+      if (testableWords.length > 0) {
+        const gibberishWords = testableWords.filter(w => gibberish.detect(w));
+        const gibberishRatio = gibberishWords.length / testableWords.length;
+        if (gibberishRatio > 0.5) {
+          score += 50;
+          reasons.push(`Gibberish words detected (${gibberishWords.length}/${testableWords.length})`);
         }
       }
     } catch {
-      // Fallback: if the library fails, use heuristic checks
+      // Fallback: if the library fails, use heuristic checks below
     }
   }
 
