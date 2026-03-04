@@ -87,19 +87,7 @@ function scoreEmail(email: string): { score: number; reasons: string[] } {
     reasons.push('Suspicious TLD');
   }
 
-  // Gibberish local part: use Markov chain analysis
-  if (localPart.length >= 4) {
-    try {
-      if (gibberish.detect(localPart)) {
-        score += 30;
-        reasons.push('Gibberish email username');
-      }
-    } catch {
-      // Fallback to regex if library fails
-    }
-  }
-
-  // Gibberish local part: 5+ consecutive consonants (regex fallback)
+  // Gibberish local part: 5+ consecutive consonants
   if (/[bcdfghjklmnpqrstvwxyz]{5,}/i.test(localPart)) {
     score += 25;
     reasons.push('Consonant cluster in email username');
@@ -273,12 +261,7 @@ function calculateCombinedScore(emailScore: number, contentScore: number): numbe
     return contentScore;
   }
 
-  // If email is clearly bad (score >= 50), flag as spam regardless of content
-  if (emailScore >= 50) {
-    return emailScore;
-  }
-
-  // For moderate scores, require both to contribute
+  // Email alone should NEVER flag as spam — require both signals for moderate scores
   const e = emailScore / 100;
   const c = contentScore / 100;
 
