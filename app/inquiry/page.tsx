@@ -106,6 +106,54 @@ export default function InquiryPage() {
     e.preventDefault();
     if (validateStep(currentStep)) {
       try {
+        // Check for spam before sending to Web3Forms
+        let isSpam = false;
+        try {
+          const spamRes = await fetch('/api/check-spam', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.email,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              company: formData.company,
+              productName: formData.productName,
+              targetMarket: formData.targetMarket,
+              additionalNotes: formData.additionalNotes,
+            }),
+          });
+          const spamData = await spamRes.json();
+          isSpam = spamData.isSpam === true;
+        } catch {
+          // Spam check failed — let the submission through
+          isSpam = false;
+        }
+
+        if (isSpam) {
+          // Show fake success — spammer thinks it went through
+          setSubmitted(true);
+          setTimeout(() => {
+            setCurrentStep(1);
+            setFormData({
+              firstName: '',
+              lastName: '',
+              email: '',
+              phone: '',
+              company: '',
+              productName: '',
+              productType: 'apparel',
+              quantity: '',
+              targetMarket: '',
+              budgetRange: 'standard',
+              timeline: '3-months',
+              additionalNotes: '',
+              filesUploaded: false,
+            });
+            setSubmitted(false);
+          }, 3000);
+          return;
+        }
+
         // Prepare the form data for Web3Forms
         const formPayload = {
           access_key: WEB3FORMS_ACCESS_KEY,

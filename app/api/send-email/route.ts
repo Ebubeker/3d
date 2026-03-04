@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { checkSpam, extractContentForSpamCheck } from '@/lib/spam-detection';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -56,6 +57,25 @@ export async function POST(request: NextRequest) {
       notes,
       formType,
     } = body;
+
+    // Spam detection: check before sending
+    const contentForCheck = extractContentForSpamCheck(body as unknown as Record<string, unknown>);
+    const spamResult = checkSpam({ email, content: contentForCheck, name });
+
+    if (spamResult.isSpam) {
+      console.log('[SPAM BLOCKED]', {
+        email,
+        formType,
+        scores: {
+          email: spamResult.emailScore,
+          content: spamResult.contentScore,
+          combined: spamResult.combinedScore,
+        },
+        reason: spamResult.reason,
+      });
+      // Return fake success — spammer sees "success" but no email is sent
+      return NextResponse.json({ success: true, data: { id: 'filtered' } });
+    }
 
     // Build email content based on form type
     let emailSubject = subject || 'New Contact Form Submission - Virtuality Fashion';
