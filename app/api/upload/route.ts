@@ -8,7 +8,7 @@ const ALLOWED_PDF_TYPES = ['application/pdf'];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES, ...ALLOWED_PDF_TYPES];
 
 // Max file sizes
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 const MAX_PDF_SIZE = 20 * 1024 * 1024; // 20MB
 
