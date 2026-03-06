@@ -86,8 +86,8 @@ export default function PortfolioManagementPage() {
       }
 
       // Different size limits
-      const maxSize = isVideo ? 100 * 1024 * 1024 : isPdf ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
-      const maxSizeLabel = isVideo ? '100MB' : isPdf ? '20MB' : '5MB';
+      const maxSize = isVideo ? 100 * 1024 * 1024 : isPdf ? 20 * 1024 * 1024 : 50 * 1024 * 1024;
+      const maxSizeLabel = isVideo ? '100MB' : isPdf ? '20MB' : '50MB';
 
       if (file.size > maxSize) {
         setUploadError(`${file.name} exceeds ${maxSizeLabel} limit`);
@@ -554,7 +554,7 @@ export default function PortfolioManagementPage() {
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Images: max 5MB | Videos: max 100MB | PDFs: max 20MB
+                  Images: max 50MB | Videos: max 100MB | PDFs: max 20MB
                 </p>
 
                 {/* Or Add Link */}

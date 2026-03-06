@@ -67,9 +67,9 @@ export default function NewTeamMemberPage() {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size should be less than 5MB');
+    // Validate file size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      setError('Image size should be less than 50MB');
       return;
     }
 

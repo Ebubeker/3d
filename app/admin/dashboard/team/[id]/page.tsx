@@ -107,8 +107,8 @@ export default function EditTeamMemberPage() {
     }
 
     // Different size limits for images vs videos
-    const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
-    const maxSizeLabel = isVideo ? '100MB' : '5MB';
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 50 * 1024 * 1024;
+    const maxSizeLabel = isVideo ? '100MB' : '50MB';
 
     if (file.size > maxSize) {
       setError(`File size should be less than ${maxSizeLabel}`);
@@ -309,7 +309,7 @@ export default function EditTeamMemberPage() {
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Images: max 5MB | Videos: max 100MB (MP4, WebM, MOV)
+                Images: max 50MB | Videos: max 100MB (MP4, WebM, MOV)
               </p>
 
               {/* OR URL Input */}
