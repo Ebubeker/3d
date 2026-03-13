@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { generatePdfThumbnail } from '@/lib/pdf-thumbnail';
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -51,7 +52,8 @@ export async function POST(request: NextRequest) {
 
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const baseName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}`;
+    const fileName = `${baseName}.${fileExt}`;
 
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
@@ -82,9 +84,33 @@ export async function POST(request: NextRequest) {
     // Determine file type for response
     const fileType = isVideo ? 'video' : isPdf ? 'pdf' : 'image';
 
+    // Generate and upload PDF thumbnail
+    let thumbnailUrl: string | undefined;
+    if (isPdf) {
+      const thumbBuffer = await generatePdfThumbnail(buffer);
+      if (thumbBuffer) {
+        const thumbFileName = `${baseName}_thumb.png`;
+        const { data: thumbData, error: thumbError } = await supabase.storage
+          .from(bucket)
+          .upload(thumbFileName, thumbBuffer, {
+            contentType: 'image/png',
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (!thumbError && thumbData) {
+          const { data: thumbUrlData } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(thumbData.path);
+          thumbnailUrl = thumbUrlData.publicUrl;
+        }
+      }
+    }
+
     return NextResponse.json({
       url: urlData.publicUrl,
-      type: fileType
+      type: fileType,
+      ...(thumbnailUrl && { thumbnailUrl }),
     });
   } catch (error) {
     console.error('Upload error:', error);
