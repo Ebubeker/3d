@@ -32,7 +32,7 @@ interface EmailRequest {
   notes?: string;
 
   // Form type identifier
-  formType: 'contact' | 'general' | 'enterprise';
+  formType: 'contact' | 'general' | 'enterprise' | 'join-team';
 }
 
 export async function POST(request: NextRequest) {
@@ -105,6 +105,16 @@ export async function POST(request: NextRequest) {
         <p><strong>Query Type:</strong> ${queryType}</p>
         <h3>Message:</h3>
         <p>${message?.replace(/\n/g, '<br>')}</p>
+      `;
+    } else if (formType === 'join-team') {
+      emailSubject = `New Team Application - Virtuality Fashion`;
+
+      htmlContent = `
+        <h2>New Team Application</h2>
+        <p><strong>From:</strong> ${name} (${email})</p>
+        ${role ? `<p><strong>Role/Specialty:</strong> ${role}</p>` : ''}
+        ${notes ? `<p><strong>Portfolio:</strong> <a href="${notes}">${notes}</a></p>` : ''}
+        ${message ? `<h3>Message:</h3><p>${message.replace(/\n/g, '<br>')}</p>` : ''}
       `;
     } else if (formType === 'enterprise') {
       emailSubject = 'Enterprise Quote Request - Virtuality Fashion';

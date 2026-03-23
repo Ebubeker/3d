@@ -64,22 +64,6 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        // Build message with only filled fields
-        const messageParts = [
-          `Name: ${formData.fullName}`,
-          `Email: ${formData.email}`
-        ];
-
-        if (formData.roleSpecialty) {
-          messageParts.push(`Role/Specialty: ${formData.roleSpecialty}`);
-        }
-        if (formData.portfolioLink) {
-          messageParts.push(`Portfolio: ${formData.portfolioLink}`);
-        }
-        if (formData.message) {
-          messageParts.push(`\nMessage:\n${formData.message}`);
-        }
-
         const response = await fetch('/api/send-email', {
           method: 'POST',
           headers: {
@@ -88,8 +72,11 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
           body: JSON.stringify({
             name: formData.fullName,
             email: formData.email,
-            subject: 'New Team Application - Virtuality Fashion',
-            message: messageParts.join('\n'),
+            company: '',
+            role: formData.roleSpecialty,
+            notes: formData.portfolioLink,
+            message: formData.message,
+            formType: 'join-team',
           }),
         });
 

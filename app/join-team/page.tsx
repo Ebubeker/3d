@@ -61,21 +61,6 @@ export default function JoinTeamPage() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        const messageParts = [
-          `Name: ${formData.fullName}`,
-          `Email: ${formData.email}`
-        ];
-
-        if (formData.roleSpecialty) {
-          messageParts.push(`Role/Specialty: ${formData.roleSpecialty}`);
-        }
-        if (formData.portfolioLink) {
-          messageParts.push(`Portfolio: ${formData.portfolioLink}`);
-        }
-        if (formData.message) {
-          messageParts.push(`\nMessage:\n${formData.message}`);
-        }
-
         const response = await fetch('/api/send-email', {
           method: 'POST',
           headers: {
@@ -84,8 +69,11 @@ export default function JoinTeamPage() {
           body: JSON.stringify({
             name: formData.fullName,
             email: formData.email,
-            subject: 'New Team Application - Virtuality Fashion',
-            message: messageParts.join('\n'),
+            company: '',
+            role: formData.roleSpecialty,
+            notes: formData.portfolioLink,
+            message: formData.message,
+            formType: 'join-team',
           }),
         });
 
