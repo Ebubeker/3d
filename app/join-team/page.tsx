@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Briefcase, DollarSign, Globe, CheckCircle } from 'lucide-react';
+import { Calendar, Briefcase, DollarSign, Globe, CheckCircle, X } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -10,7 +10,7 @@ export default function JoinTeamPage() {
     fullName: '',
     email: '',
     roleSpecialty: '',
-    portfolioLink: '',
+    portfolioLinks: [''],
     message: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,19 +29,50 @@ export default function JoinTeamPage() {
     }
   };
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const handleLinkChange = (index: number, value: string) => {
+    setFormData((prev) => {
+      const updated = [...prev.portfolioLinks];
+      updated[index] = value;
+      return { ...prev, portfolioLinks: updated };
+    });
+    if (errors.portfolioLinks) {
+      setErrors((prev) => ({ ...prev, portfolioLinks: '' }));
+    }
+  };
+
+  const addLink = () => {
+    if (formData.portfolioLinks.length < 5) {
+      setFormData((prev) => ({ ...prev, portfolioLinks: [...prev.portfolioLinks, ''] }));
+    }
+  };
+
+  const removeLink = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      portfolioLinks: prev.portfolioLinks.filter((_, i) => i !== index)
+    }));
+  };
+
+  const normalizeUrl = (url: string): string => {
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
   };
 
   const validateUrl = (url: string) => {
-    if (!url) return true;
+    if (!url.trim()) return true;
     try {
-      new URL(url);
+      new URL(normalizeUrl(url));
       return true;
     } catch {
       return false;
     }
+  };
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,13 +85,19 @@ export default function JoinTeamPage() {
     } else if (!validateEmail(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    if (formData.portfolioLink && !validateUrl(formData.portfolioLink)) {
-      newErrors.portfolioLink = 'Please enter a valid URL';
+    const filledLinks = formData.portfolioLinks.filter(l => l.trim());
+    for (const link of filledLinks) {
+      if (!validateUrl(link)) {
+        newErrors.portfolioLinks = 'One or more links are invalid';
+        break;
+      }
     }
 
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
+        const normalizedLinks = filledLinks.map(normalizeUrl).filter(Boolean);
+
         const response = await fetch('/api/send-email', {
           method: 'POST',
           headers: {
@@ -71,7 +108,7 @@ export default function JoinTeamPage() {
             email: formData.email,
             company: '',
             role: formData.roleSpecialty,
-            notes: formData.portfolioLink,
+            notes: normalizedLinks.join('\n'),
             message: formData.message,
             formType: 'join-team',
           }),
@@ -102,7 +139,7 @@ export default function JoinTeamPage() {
       fullName: '',
       email: '',
       roleSpecialty: '',
-      portfolioLink: '',
+      portfolioLinks: [''],
       message: ''
     });
   };
@@ -224,20 +261,42 @@ export default function JoinTeamPage() {
                   </select>
                 </div>
 
-                {/* Portfolio Link */}
+                {/* Portfolio Links */}
                 <div>
-                  <label className="block text-sm font-semibold text-black mb-2">Portfolio Link</label>
-                  <input
-                    type="url"
-                    name="portfolioLink"
-                    value={formData.portfolioLink}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl text-black bg-white ${
-                      errors.portfolioLink ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'
-                    } outline-none transition-colors`}
-                    placeholder="https://your-portfolio.com"
-                  />
-                  {errors.portfolioLink && <p className="text-red-600 text-sm mt-1">{errors.portfolioLink}</p>}
+                  <label className="block text-sm font-semibold text-black mb-2">Portfolio Links</label>
+                  <p className="text-xs text-gray-500 mb-2">Google Drive, Behance, personal website, etc.</p>
+                  {formData.portfolioLinks.map((link, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={link}
+                        onChange={(e) => handleLinkChange(index, e.target.value)}
+                        className={`w-full px-4 py-3 border-2 rounded-xl text-black bg-white ${
+                          errors.portfolioLinks ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-black'
+                        } outline-none transition-colors`}
+                        placeholder="drive.google.com/... or your-portfolio.com"
+                      />
+                      {formData.portfolioLinks.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeLink(index)}
+                          className="px-3 py-3 text-gray-400 hover:text-red-500 transition-colors shrink-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {formData.portfolioLinks.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={addLink}
+                      className="text-sm text-gray-500 hover:text-black transition-colors mt-1"
+                    >
+                      + Add another link
+                    </button>
+                  )}
+                  {errors.portfolioLinks && <p className="text-red-600 text-sm mt-1">{errors.portfolioLinks}</p>}
                 </div>
 
                 {/* Short Message */}

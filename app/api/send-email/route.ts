@@ -109,11 +109,16 @@ export async function POST(request: NextRequest) {
     } else if (formType === 'join-team') {
       emailSubject = `New Team Application - Virtuality Fashion`;
 
+      const portfolioLinks = notes ? notes.split('\n').filter((l: string) => l.trim()) : [];
+      const portfolioHtml = portfolioLinks.length > 0
+        ? `<p><strong>Portfolio:</strong></p><ul>${portfolioLinks.map((l: string) => `<li><a href="${l}">${l}</a></li>`).join('')}</ul>`
+        : '';
+
       htmlContent = `
         <h2>New Team Application</h2>
         <p><strong>From:</strong> ${name} (${email})</p>
         ${role ? `<p><strong>Role/Specialty:</strong> ${role}</p>` : ''}
-        ${notes ? `<p><strong>Portfolio:</strong> <a href="${notes}">${notes}</a></p>` : ''}
+        ${portfolioHtml}
         ${message ? `<h3>Message:</h3><p>${message.replace(/\n/g, '<br>')}</p>` : ''}
       `;
     } else if (formType === 'enterprise') {
