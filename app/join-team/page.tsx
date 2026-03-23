@@ -143,7 +143,7 @@ export default function JoinTeamPage() {
                 Thanks for your interest! Book a short interview to complete your application.
               </p>
               <a
-                href="https://calendly.com/amnon-vf"
+                href="https://app.hubspot.com/meetings/amnon2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition-colors mb-6"
@@ -271,7 +271,7 @@ export default function JoinTeamPage() {
                 <div className="text-center pt-4 border-t border-gray-200">
                   <span className="text-gray-500 text-sm">or skip the form</span>
                   <a
-                    href="https://calendly.com/amnon-vf"
+                    href="https://app.hubspot.com/meetings/amnon2"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 mt-3 text-black font-medium hover:underline"

@@ -140,7 +140,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                 Thanks for your interest! Book a short interview to complete your application.
               </p>
               <a
-                href="https://calendly.com/amnon-vf"
+                href="https://app.hubspot.com/meetings/amnon2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-4"
@@ -268,7 +268,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                 <div className="text-center">
                   <span className="text-gray-500 text-sm">or</span>
                   <a
-                    href="https://calendly.com/amnon-vf"
+                    href="https://app.hubspot.com/meetings/amnon2"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 mt-3 text-black font-medium hover:underline"
