@@ -75,7 +75,8 @@ export async function getTeamMembers(): Promise<TeamMemberDisplay[]> {
     const { data, error } = await supabase
       .from('team_members')
       .select('*, portfolio_items(*)')
-      .order('created_at', { ascending: false });
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
 
     if (error || !data || data.length === 0) {
       // Return static data as fallback

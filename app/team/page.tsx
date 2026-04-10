@@ -108,7 +108,8 @@ export default function TeamPage() {
         const { data, error } = await supabase
           .from('team_members')
           .select('*, portfolio_items(*)')
-          .order('created_at', { ascending: false });
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
 
         if (error) {
           console.error('Error fetching team members:', error);

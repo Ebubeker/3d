@@ -10,6 +10,8 @@ export interface TeamMember {
   specialties: string[];
   tools: string[];
   years_experience: number;
+  display_order: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }

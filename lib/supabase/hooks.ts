@@ -18,7 +18,8 @@ export function useTeamMembers() {
         const { data, error } = await supabase
           .from('team_members')
           .select('*, portfolio_items(*)')
-          .order('created_at', { ascending: false });
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
 
         if (error) {
           setError(error.message);
@@ -52,6 +53,7 @@ export function useTeamMember(id: string) {
           .from('team_members')
           .select('*, portfolio_items(*)')
           .eq('id', id)
+          .eq('is_active', true)
           .single();
 
         if (error) {

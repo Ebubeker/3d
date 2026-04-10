@@ -4,13 +4,37 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { TeamMember } from '@/lib/supabase/types';
-import { Plus, Edit, Trash2, Search, FolderOpen } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FolderOpen, GripVertical, Eye, EyeOff } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function TeamManagementPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   useEffect(() => {
     fetchTeamMembers();
@@ -21,10 +45,11 @@ export default function TeamManagementPage() {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('display_order', { ascending: true });
 
     if (error) {
       console.error('Error fetching team members:', error);
+      setIsLoading(false);
       return;
     }
 
@@ -49,6 +74,74 @@ export default function TeamManagementPage() {
     setDeleteId(null);
   };
 
+  const handleToggleActive = async (member: TeamMember) => {
+    const nextActive = !member.is_active;
+
+    // Optimistic update
+    setTeamMembers((prev) =>
+      prev.map((m) => (m.id === member.id ? { ...m, is_active: nextActive } : m))
+    );
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('team_members')
+      .update({ is_active: nextActive })
+      .eq('id', member.id);
+
+    if (error) {
+      console.error('Error toggling active state:', error);
+      alert('Failed to update member status');
+      // Rollback
+      setTeamMembers((prev) =>
+        prev.map((m) => (m.id === member.id ? { ...m, is_active: member.is_active } : m))
+      );
+    }
+  };
+
+  const persistOrder = async (ordered: TeamMember[]) => {
+    setSavingOrder(true);
+    setOrderError(null);
+
+    const supabase = createClient();
+    // Write updated display_order for every member in parallel
+    const updates = ordered.map((member, index) =>
+      supabase
+        .from('team_members')
+        .update({ display_order: index + 1 })
+        .eq('id', member.id)
+    );
+
+    const results = await Promise.all(updates);
+    const failed = results.find((r) => r.error);
+
+    if (failed?.error) {
+      console.error('Error saving order:', failed.error);
+      setOrderError('Failed to save order. Please refresh and try again.');
+    }
+
+    setSavingOrder(false);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    // Only allow reordering when not searching — otherwise indexes are confusing
+    if (searchQuery) return;
+
+    const oldIndex = teamMembers.findIndex((m) => m.id === active.id);
+    const newIndex = teamMembers.findIndex((m) => m.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(teamMembers, oldIndex, newIndex).map((m, i) => ({
+      ...m,
+      display_order: i + 1,
+    }));
+
+    setTeamMembers(reordered);
+    persistOrder(reordered);
+  };
+
   const filteredMembers = teamMembers.filter(
     (member) =>
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,12 +149,16 @@ export default function TeamManagementPage() {
       member.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const isReorderable = !searchQuery;
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Team Members</h1>
-          <p className="text-gray-600 mt-1">Manage your team of designers</p>
+          <p className="text-gray-600 mt-1">
+            Drag to reorder. Use the eye icon to freeze or unfreeze a member.
+          </p>
         </div>
         <Link
           href="/admin/dashboard/team/new"
@@ -73,7 +170,7 @@ export default function TeamManagementPage() {
       </div>
 
       {/* Search */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -84,7 +181,25 @@ export default function TeamManagementPage() {
             className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
           />
         </div>
+        {searchQuery && (
+          <p className="text-xs text-gray-500 mt-2">
+            Drag-to-reorder is disabled while searching. Clear the search to reorder.
+          </p>
+        )}
       </div>
+
+      {/* Save indicator */}
+      {(savingOrder || orderError) && (
+        <div
+          className={`mb-4 px-4 py-2 rounded-lg text-sm ${
+            orderError
+              ? 'bg-red-50 border border-red-200 text-red-700'
+              : 'bg-blue-50 border border-blue-200 text-blue-700'
+          }`}
+        >
+          {orderError ?? 'Saving order...'}
+        </div>
+      )}
 
       {/* Team Members List */}
       {isLoading ? (
@@ -109,94 +224,28 @@ export default function TeamManagementPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900">Member</th>
-                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900 hidden sm:table-cell">Role</th>
-                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900 hidden md:table-cell">Location</th>
-                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900 hidden lg:table-cell">Tools</th>
-                  <th className="text-right px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredMembers.map((m) => m.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="divide-y divide-gray-200">
                 {filteredMembers.map((member) => (
-                  <tr key={member.id} className="hover:bg-gray-50">
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
-                          {member.portrait ? (
-                            <img
-                              src={member.portrait}
-                              alt={member.name}
-                              className="w-full h-full rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-sm font-bold text-gray-500">
-                              {member.name.split(' ').map((n) => n[0]).join('')}
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{member.name}</p>
-                          <p className="text-sm text-gray-500 sm:hidden">{member.role}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                      <span className="text-gray-600">{member.role}</span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
-                      <span className="text-gray-600">{member.location}</span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {member.tools.slice(0, 2).map((tool, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                          >
-                            {tool}
-                          </span>
-                        ))}
-                        {member.tools.length > 2 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                            +{member.tools.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/dashboard/team/${member.id}/portfolio`}
-                          className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Manage Portfolio"
-                        >
-                          <FolderOpen className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          href={`/admin/dashboard/team/${member.id}`}
-                          className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => setDeleteId(member.id)}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  <SortableMemberRow
+                    key={member.id}
+                    member={member}
+                    reorderable={isReorderable}
+                    onDelete={() => setDeleteId(member.id)}
+                    onToggleActive={() => handleToggleActive(member)}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </ul>
+            </SortableContext>
+          </DndContext>
         </div>
       )}
 
@@ -226,5 +275,132 @@ export default function TeamManagementPage() {
         </div>
       )}
     </div>
+  );
+}
+
+interface SortableMemberRowProps {
+  member: TeamMember;
+  reorderable: boolean;
+  onDelete: () => void;
+  onToggleActive: () => void;
+}
+
+function SortableMemberRow({
+  member,
+  reorderable,
+  onDelete,
+  onToggleActive,
+}: SortableMemberRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: member.id, disabled: !reorderable });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 px-4 sm:px-6 py-4 hover:bg-gray-50 ${
+        !member.is_active ? 'bg-gray-50' : ''
+      }`}
+    >
+      {/* Drag Handle */}
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        disabled={!reorderable}
+        className={`shrink-0 p-1 text-gray-400 hover:text-gray-700 transition-colors ${
+          reorderable ? 'cursor-grab active:cursor-grabbing' : 'cursor-not-allowed opacity-30'
+        }`}
+        title={reorderable ? 'Drag to reorder' : 'Clear search to reorder'}
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="w-5 h-5" />
+      </button>
+
+      {/* Avatar + Name */}
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+          {member.portrait ? (
+            <img
+              src={member.portrait}
+              alt={member.name}
+              className={`w-full h-full object-cover ${!member.is_active ? 'grayscale' : ''}`}
+            />
+          ) : (
+            <span className="text-sm font-bold text-gray-500">
+              {member.name.split(' ').map((n) => n[0]).join('')}
+            </span>
+          )}
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`font-medium truncate ${member.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
+              {member.name}
+            </p>
+            {!member.is_active && (
+              <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded-full font-medium">
+                Frozen
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 truncate">{member.role}</p>
+        </div>
+      </div>
+
+      {/* Location (hidden on small screens) */}
+      <div className="hidden md:block shrink-0 w-40">
+        <span className="text-sm text-gray-600 truncate">{member.location}</span>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          type="button"
+          onClick={onToggleActive}
+          className={`p-2 rounded-lg transition-colors ${
+            member.is_active
+              ? 'text-gray-500 hover:text-amber-600 hover:bg-amber-50'
+              : 'text-amber-600 hover:text-green-600 hover:bg-green-50'
+          }`}
+          title={member.is_active ? 'Freeze (hide from marketplace)' : 'Unfreeze (show in marketplace)'}
+        >
+          {member.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+        </button>
+        <Link
+          href={`/admin/dashboard/team/${member.id}/portfolio`}
+          className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+          title="Manage Portfolio"
+        >
+          <FolderOpen className="w-4 h-4" />
+        </Link>
+        <Link
+          href={`/admin/dashboard/team/${member.id}`}
+          className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+          title="Edit"
+        >
+          <Edit className="w-4 h-4" />
+        </Link>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          title="Delete"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </li>
   );
 }

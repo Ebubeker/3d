@@ -94,9 +94,20 @@ export default function NewTeamMemberPage() {
 
     try {
       const supabase = createClient();
+
+      // New members append to the end of the list
+      const { data: maxRow } = await supabase
+        .from('team_members')
+        .select('display_order')
+        .order('display_order', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const nextOrder = (maxRow?.display_order ?? 0) + 1;
+
       const { error } = await supabase
         .from('team_members')
-        .insert([formData]);
+        .insert([{ ...formData, display_order: nextOrder }]);
 
       if (error) {
         setError(error.message);

@@ -50,11 +50,12 @@ export default function TeamMemberPage() {
       try {
         const supabase = createClient();
 
-        // Fetch team member
+        // Fetch team member — frozen members are treated as not found
         const { data: memberData, error: memberError } = await supabase
           .from('team_members')
           .select('*')
           .eq('id', memberId)
+          .eq('is_active', true)
           .single();
 
         if (memberError || !memberData) {

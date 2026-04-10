@@ -29,6 +29,7 @@ function ContactForm() {
       const { data } = await supabase
         .from('team_members')
         .select('id, name, email')
+        .eq('is_active', true)
         .order('name');
 
       if (data) {

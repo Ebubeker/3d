@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS team_members (
   specialties TEXT[] DEFAULT '{}',
   tools TEXT[] DEFAULT '{}',
   years_experience INTEGER DEFAULT 0,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -24,6 +26,9 @@ CREATE TABLE IF NOT EXISTS team_members (
 -- Migration: Add email column if it doesn't exist
 -- Run this separately if table already exists:
 -- ALTER TABLE team_members ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+
+-- Migration: Add display_order + is_active if they don't exist
+-- See supabase/migrations/add_display_order_and_is_active.sql
 
 -- Portfolio Items Table
 CREATE TABLE IF NOT EXISTS portfolio_items (
@@ -44,6 +49,8 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_portfolio_team_member ON portfolio_items(team_member_id);
 CREATE INDEX IF NOT EXISTS idx_team_members_name ON team_members(name);
+CREATE INDEX IF NOT EXISTS idx_team_members_display_order ON team_members(display_order);
+CREATE INDEX IF NOT EXISTS idx_team_members_is_active ON team_members(is_active);
 
 -- Function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
