@@ -64,6 +64,25 @@ export function parseLinkEntry(url: string): LinkEntry | null {
   }
 }
 
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  cover_image: string | null;
+  category: string | null;
+  tags: string[];
+  status: 'draft' | 'published';
+  published_at: string | null;
+  reading_time_minutes: number | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -81,6 +100,11 @@ export type Database = {
         Row: PortfolioItem;
         Insert: Omit<PortfolioItem, 'id' | 'created_at'>;
         Update: Partial<Omit<PortfolioItem, 'id' | 'created_at'>>;
+      };
+      blog_posts: {
+        Row: BlogPost;
+        Insert: Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };

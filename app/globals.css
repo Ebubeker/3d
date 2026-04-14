@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Copperplate Gothic Light - Self-hosted font */
 /* Note: Add font files to /public/fonts/CopperplateGothicLight.woff2 and .woff */

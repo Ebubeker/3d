@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   Info,
-  ArrowRight
+  ArrowRight,
+  BookOpen
 } from 'lucide-react';
 
 export default function Header() {
@@ -41,6 +42,7 @@ export default function Header() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Solutions', href: '/solutions', icon: Box },
     { name: 'Team', href: '/team', icon: Users },
+    { name: 'Blog', href: '/blog', icon: BookOpen },
     { name: 'About', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Mail },
   ];

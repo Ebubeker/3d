@@ -46,11 +46,36 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
 -- Run this separately if table already exists:
 -- ALTER TABLE portfolio_items ADD COLUMN IF NOT EXISTS display_type VARCHAR(20) DEFAULT 'project';
 
+-- Blog Posts Table
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  slug VARCHAR(255) UNIQUE NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  cover_image TEXT,
+  category VARCHAR(100),
+  tags TEXT[] DEFAULT '{}',
+  status VARCHAR(20) NOT NULL DEFAULT 'draft',
+  published_at TIMESTAMP WITH TIME ZONE,
+  reading_time_minutes INTEGER,
+  meta_title VARCHAR(255),
+  meta_description TEXT,
+  og_image TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+-- See supabase/migrations/add_blog_posts.sql for RLS policies
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_portfolio_team_member ON portfolio_items(team_member_id);
 CREATE INDEX IF NOT EXISTS idx_team_members_name ON team_members(name);
 CREATE INDEX IF NOT EXISTS idx_team_members_display_order ON team_members(display_order);
 CREATE INDEX IF NOT EXISTS idx_team_members_is_active ON team_members(is_active);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON blog_posts(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_category ON blog_posts(category);
 
 -- Function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

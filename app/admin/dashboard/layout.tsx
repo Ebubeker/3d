@@ -10,7 +10,8 @@ import {
   LogOut,
   Menu,
   X,
-  FolderOpen
+  FolderOpen,
+  BookOpen
 } from 'lucide-react';
 
 export default function AdminDashboardLayout({
@@ -61,6 +62,7 @@ export default function AdminDashboardLayout({
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Team Members', href: '/admin/dashboard/team', icon: Users },
     { name: 'Portfolio', href: '/admin/dashboard/portfolio', icon: FolderOpen },
+    { name: 'Blog', href: '/admin/dashboard/blog', icon: BookOpen },
   ];
 
   return (
