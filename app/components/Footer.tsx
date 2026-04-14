@@ -37,7 +37,7 @@ export default function Footer() {
               />
             </Link>
             <p className="mt-3 sm:mt-4 text-gray-500 text-xs sm:text-sm max-w-xs">
-              Transforming fashion design with cutting-edge 3D technology and digital solutions.
+              Digitizing fashion, the good old-fashioned way.
             </p>
             {/* Social Icons */}
             <div className="flex gap-3 sm:gap-4 mt-4 sm:mt-6">
