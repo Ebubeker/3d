@@ -11,7 +11,8 @@ import { formatReadingTime } from '@/lib/blog/reading-time';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 const SITE_NAME = 'Virtuality Fashion';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtualityfashion.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -60,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = post.meta_title || post.title;
   const description = post.meta_description || post.excerpt || '';
-  const image = post.og_image || post.cover_image || undefined;
+  const image = post.og_image || post.cover_image || DEFAULT_OG_IMAGE;
   const url = `${SITE_URL}/blog/${post.slug}`;
 
   return {
@@ -75,7 +76,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       siteName: SITE_NAME,
-      images: image ? [{ url: image, alt: post.title }] : undefined,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
       publishedTime: post.published_at || undefined,
       modifiedTime: post.updated_at,
       authors: [SITE_NAME],
@@ -85,7 +93,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title,
       description,
-      images: image ? [image] : undefined,
+      images: [image],
     },
   };
 }
