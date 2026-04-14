@@ -1,76 +1,61 @@
-'use client';
-
-import { useEffect, useMemo, useState } from 'react';
+import type { Metadata } from 'next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import BlogPostCard from '../components/BlogPostCard';
-import { createClient } from '@/lib/supabase/client';
+import BlogListClient from './BlogListClient';
+import { createClient } from '@/lib/supabase/server';
 import { BlogPost } from '@/lib/supabase/types';
-import { Search, X } from 'lucide-react';
 
-const POSTS_PER_PAGE = 9;
+const SITE_NAME = 'Virtuality Fashion';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 
-export default function BlogListPage() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+const PAGE_TITLE = 'Blog | virtuality.fashion';
+const PAGE_DESCRIPTION =
+  'Practical insights on fashion product development, tech packs, virtual sampling, and working with on-demand teams.';
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('status', 'published')
-        .order('published_at', { ascending: false });
+export const metadata: Metadata = {
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
+  alternates: {
+    canonical: `${SITE_URL}/blog`,
+    types: {
+      'application/rss+xml': `${SITE_URL}/blog/rss.xml`,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    url: `${SITE_URL}/blog`,
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    siteName: SITE_NAME,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+  },
+};
 
-      if (error) {
-        console.error('Error fetching blog posts:', error);
-        setIsLoading(false);
-        return;
-      }
+// Force dynamic rendering so new posts show up immediately without a redeploy.
+export const dynamic = 'force-dynamic';
 
-      setPosts(data || []);
-      setIsLoading(false);
-    };
+async function getPublishedPosts(): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
 
-    fetchPosts();
-  }, []);
+  if (error) {
+    console.error('Error fetching blog posts:', error);
+    return [];
+  }
 
-  // Build category list from visible posts (fixed + any custom values seen)
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    posts.forEach((p) => {
-      if (p.category) set.add(p.category);
-    });
-    return Array.from(set).sort();
-  }, [posts]);
+  return (data as BlogPost[]) || [];
+}
 
-  // Filter by search + category
-  const filteredPosts = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    return posts.filter((post) => {
-      if (activeCategory && post.category !== activeCategory) return false;
-      if (!q) return true;
-      return (
-        post.title.toLowerCase().includes(q) ||
-        (post.excerpt || '').toLowerCase().includes(q)
-      );
-    });
-  }, [posts, searchQuery, activeCategory]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(1);
-  }, [searchQuery, activeCategory]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
-  const paginatedPosts = filteredPosts.slice(
-    (page - 1) * POSTS_PER_PAGE,
-    page * POSTS_PER_PAGE
-  );
+export default async function BlogListPage() {
+  const posts = await getPublishedPosts();
 
   return (
     <>
@@ -83,7 +68,7 @@ export default function BlogListPage() {
             Blog
           </h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl">
-            Insights, stories, and ideas from the world of 3D fashion design.
+            {PAGE_DESCRIPTION}
           </p>
         </div>
       </section>
@@ -91,102 +76,7 @@ export default function BlogListPage() {
       {/* Content */}
       <section className="bg-gray-50 min-h-[60vh]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-14">
-          {/* Search + category filters */}
-          <div className="mb-8 space-y-4">
-            <div className="relative max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search posts..."
-                className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black bg-white"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
-                  aria-label="Clear search"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-
-            {categories.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setActiveCategory(null)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                    activeCategory === null
-                      ? 'bg-black text-white border-black'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-black'
-                  }`}
-                >
-                  All
-                </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                      activeCategory === cat
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-black'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Posts grid / states */}
-          {isLoading ? (
-            <div className="text-center py-16">
-              <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-gray-600">Loading posts...</p>
-            </div>
-          ) : filteredPosts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-              <p className="text-gray-600">
-                {posts.length === 0
-                  ? 'No blog posts published yet. Check back soon.'
-                  : 'No posts match your search.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paginatedPosts.map((post) => (
-                  <BlogPostCard key={post.id} post={post} />
-                ))}
-              </div>
-
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-10">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 border-2 border-gray-200 rounded-lg font-medium text-gray-700 hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-sm text-gray-600 px-4">
-                    Page {page} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="px-4 py-2 border-2 border-gray-200 rounded-lg font-medium text-gray-700 hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+          <BlogListClient posts={posts} />
         </div>
       </section>
 

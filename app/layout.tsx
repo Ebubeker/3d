@@ -37,7 +37,10 @@ export const metadata: Metadata = {
   publisher: "Virtuality Fashion",
   metadataBase: new URL("https://virtuality.fashion"),
   alternates: {
-    canonical: "https://virtuality.fashion"
+    canonical: "https://virtuality.fashion",
+    types: {
+      "application/rss+xml": "https://virtuality.fashion/blog/rss.xml"
+    }
   },
   icons: {
     icon: [
