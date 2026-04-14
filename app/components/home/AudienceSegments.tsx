@@ -39,7 +39,7 @@ export default function AudienceSegments() {
         "3D garment prototyping to reduce sampling iterations"
       ],
       cta: "Contact Sales",
-      ctaLink: "/join-team"
+      ctaLink: "/contact"
     }
   ];
 
