@@ -193,11 +193,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Cover image */}
         {post.cover_image && (
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-12 -mt-4">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 mt-8 flex justify-center">
             <img
               src={post.cover_image}
               alt={post.title}
-              className="w-full aspect-[16/9] object-cover rounded-2xl shadow-xl"
+              className="max-w-full max-h-[600px] rounded-2xl shadow-lg"
             />
           </div>
         )}
