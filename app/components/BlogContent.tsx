@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 interface BlogContentProps {
   html: string;
@@ -6,11 +6,12 @@ interface BlogContentProps {
 
 /**
  * Renders sanitized blog post HTML produced by TipTap.
- * Sanitizes on the server to prevent XSS from malicious content.
+ * Sanitizes on the server with sanitize-html (no jsdom dependency,
+ * unlike isomorphic-dompurify which fails on Vercel's serverless runtime).
  */
 export default function BlogContent({ html }: BlogContentProps) {
-  const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
+  const clean = sanitizeHtml(html, {
+    allowedTags: [
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'p', 'br', 'hr',
       'strong', 'em', 'u', 's', 'code', 'pre',
@@ -19,7 +20,25 @@ export default function BlogContent({ html }: BlogContentProps) {
       'a', 'img',
       'span', 'div',
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel'],
+    allowedAttributes: {
+      a: ['href', 'title', 'target', 'rel', 'class'],
+      img: ['src', 'alt', 'title', 'class'],
+      '*': ['class'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data'],
+    },
+    transformTags: {
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          ...attribs,
+          rel: 'noopener noreferrer',
+          target: attribs.target || '_blank',
+        },
+      }),
+    },
   });
 
   return (
