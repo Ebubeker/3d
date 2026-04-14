@@ -6,6 +6,7 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useRef, useState } from 'react';
+import { uploadMedia } from '@/lib/supabase/storage';
 import {
   Bold,
   Italic,
@@ -82,22 +83,18 @@ export default function TipTapEditor({
     const file = e.target.files?.[0];
     if (!file || !editor) return;
 
+    if (!file.type.startsWith('image/')) {
+      alert('Please choose an image file');
+      return;
+    }
+
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'blog');
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (data?.url) {
-        editor.chain().focus().setImage({ src: data.url }).run();
+      const result = await uploadMedia(file, 'blog');
+      if (result?.url) {
+        editor.chain().focus().setImage({ src: result.url }).run();
       } else {
-        alert(data?.error || 'Image upload failed');
+        alert('Image upload failed');
       }
     } catch (err) {
       console.error(err);

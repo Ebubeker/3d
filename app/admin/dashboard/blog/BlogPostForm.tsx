@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TipTapEditor from '@/app/components/TipTapEditor';
 import { createClient } from '@/lib/supabase/client';
+import { uploadMedia } from '@/lib/supabase/storage';
 import { BlogPost } from '@/lib/supabase/types';
 import { BLOG_CATEGORIES } from '@/lib/blog/categories';
 import { generateSlug, ensureUniqueSlug } from '@/lib/blog/slug';
@@ -112,17 +113,11 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
     setError('');
 
     try {
-      const body = new FormData();
-      body.append('file', file);
-      body.append('folder', 'blog');
-
-      const res = await fetch('/api/upload', { method: 'POST', body });
-      const data = await res.json();
-
-      if (data?.url) {
-        setFormData((prev) => ({ ...prev, [field]: data.url }));
+      const result = await uploadMedia(file, 'blog');
+      if (result?.url) {
+        setFormData((prev) => ({ ...prev, [field]: result.url }));
       } else {
-        setError(data?.error || 'Upload failed');
+        setError('Upload failed');
       }
     } catch {
       setError('Upload failed');

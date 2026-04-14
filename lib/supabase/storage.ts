@@ -7,7 +7,7 @@ export interface UploadResult {
 
 export async function uploadMedia(
   file: File,
-  folder: 'portraits' | 'portfolio'
+  folder: 'portraits' | 'portfolio' | 'blog' | string
 ): Promise<UploadResult | null> {
   try {
     const isVideo = file.type.startsWith('video/');
