@@ -148,7 +148,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       />
 
       {/* Hero */}
-      <article>
+      <article className="bg-white">
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-10 md:pt-40 md:pb-14">
             <Link
