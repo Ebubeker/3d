@@ -329,8 +329,11 @@ function SortableMemberRow({
         <GripVertical className="w-5 h-5" />
       </button>
 
-      {/* Avatar + Name */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      {/* Avatar + Name + Location — entire area is a link to the detail page */}
+      <Link
+        href={`/admin/dashboard/team/${member.id}`}
+        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+      >
         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
           {member.portrait ? (
             <img
@@ -344,7 +347,7 @@ function SortableMemberRow({
             </span>
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <p className={`font-medium truncate ${member.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
               {member.name}
@@ -357,12 +360,10 @@ function SortableMemberRow({
           </div>
           <p className="text-sm text-gray-500 truncate">{member.role}</p>
         </div>
-      </div>
-
-      {/* Location (hidden on small screens) */}
-      <div className="hidden md:block shrink-0 w-40">
-        <span className="text-sm text-gray-600 truncate">{member.location}</span>
-      </div>
+        <div className="hidden md:block shrink-0 w-40">
+          <span className="text-sm text-gray-600 truncate">{member.location}</span>
+        </div>
+      </Link>
 
       {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
