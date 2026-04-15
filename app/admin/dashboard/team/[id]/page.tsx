@@ -8,6 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 import { uploadMedia, getMediaType } from '@/lib/supabase/storage';
 import { TeamMember } from '@/lib/supabase/types';
 import { ArrowLeft, Plus, X, Upload, Loader2 } from 'lucide-react';
+import CredentialsPanel from './CredentialsPanel';
+import FilesPanel from './FilesPanel';
 
 export default function EditTeamMemberPage() {
   const router = useRouter();
@@ -175,6 +177,14 @@ export default function EditTeamMemberPage() {
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Team Member</h1>
         <p className="text-gray-600 mt-1">Update {formData.name}&apos;s profile</p>
+      </div>
+
+      <div className="max-w-2xl mb-6 space-y-6">
+        <CredentialsPanel
+          teamMemberId={id}
+          teamMemberEmail={formData.email || null}
+        />
+        <FilesPanel teamMemberId={id} />
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl">

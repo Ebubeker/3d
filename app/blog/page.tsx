@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import BlogListClient from './BlogListClient';
 import { createClient } from '@/lib/supabase/server';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 
 const SITE_NAME = 'Virtuality Fashion';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
@@ -38,11 +38,11 @@ export const metadata: Metadata = {
 // Force dynamic rendering so new posts show up immediately without a redeploy.
 export const dynamic = 'force-dynamic';
 
-async function getPublishedPosts(): Promise<BlogPost[]> {
+async function getPublishedPosts(): Promise<BlogPostWithAuthor[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('*')
+    .select('*, author:team_members(id, name, portrait, role)')
     .eq('status', 'published')
     .order('published_at', { ascending: false });
 
@@ -51,7 +51,35 @@ async function getPublishedPosts(): Promise<BlogPost[]> {
     return [];
   }
 
-  return (data as BlogPost[]) || [];
+  // Defensive fallback: if the embedded select returns null for author on
+  // any row that has an author_id, do a second batched query by id.
+  const posts = (data || []) as unknown as (BlogPost & {
+    author?: unknown;
+  })[];
+  const missing = posts.filter(
+    (p) => p.author_id && (!p.author || typeof p.author !== 'object')
+  );
+  if (missing.length > 0) {
+    const ids = Array.from(new Set(missing.map((p) => p.author_id as string)));
+    const { data: members } = await supabase
+      .from('team_members')
+      .select('id, name, portrait, role')
+      .in('id', ids);
+    const byId = new Map((members || []).map((m) => [m.id, m]));
+    for (const p of missing) {
+      (p as unknown as BlogPostWithAuthor).author =
+        byId.get(p.author_id as string) || null;
+    }
+  }
+  // Normalize every row to the final shape
+  return posts.map((p) => ({
+    ...(p as unknown as BlogPost),
+    author:
+      (p as unknown as BlogPostWithAuthor).author &&
+      typeof (p as unknown as BlogPostWithAuthor).author === 'object'
+        ? (p as unknown as BlogPostWithAuthor).author
+        : null,
+  }));
 }
 
 export default async function BlogListPage() {

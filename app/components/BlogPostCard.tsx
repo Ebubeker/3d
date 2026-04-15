@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 import { formatReadingTime } from '@/lib/blog/reading-time';
 import { Calendar, Clock } from 'lucide-react';
 
 interface BlogPostCardProps {
-  post: BlogPost;
+  post: BlogPost | BlogPostWithAuthor;
 }
 
 function formatDate(iso: string | null): string {
@@ -16,8 +16,15 @@ function formatDate(iso: string | null): string {
   });
 }
 
+function hasAuthor(
+  post: BlogPost | BlogPostWithAuthor
+): post is BlogPostWithAuthor {
+  return 'author' in post;
+}
+
 export default function BlogPostCard({ post }: BlogPostCardProps) {
   const dateStr = formatDate(post.published_at || post.created_at);
+  const author = hasAuthor(post) ? post.author : null;
 
   return (
     <Link
@@ -53,6 +60,26 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
           <p className="text-gray-600 text-sm line-clamp-3 mb-4">
             {post.excerpt}
           </p>
+        )}
+
+        {/* Author byline */}
+        {author && (
+          <div className="flex items-center gap-2 mb-3">
+            {author.portrait ? (
+              <img
+                src={author.portrait}
+                alt={author.name}
+                className="w-7 h-7 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-semibold">
+                {author.name.slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <span className="text-xs text-gray-700 font-medium truncate">
+              {author.name}
+            </span>
+          </div>
         )}
 
         <div className="mt-auto flex items-center gap-4 text-xs text-gray-500 pt-4 border-t border-gray-100">

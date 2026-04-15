@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPostWithAuthor } from '@/lib/supabase/types';
 
 const SITE_NAME = 'Virtuality Fashion';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
@@ -19,12 +19,12 @@ export async function GET() {
   const supabase = await createClient();
   const { data } = await supabase
     .from('blog_posts')
-    .select('*')
+    .select('*, author:team_members(id, name, portrait, role)')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(50);
 
-  const posts = (data as BlogPost[]) || [];
+  const posts = (data as unknown as BlogPostWithAuthor[]) || [];
   const lastBuildDate = new Date().toUTCString();
 
   const items = posts
@@ -35,11 +35,14 @@ export async function GET() {
         : new Date(post.created_at).toUTCString();
       const description = post.excerpt || '';
 
+      const creator = post.author?.name || SITE_NAME;
+
       return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <pubDate>${pubDate}</pubDate>
+      <dc:creator>${escapeXml(creator)}</dc:creator>
       <description>${escapeXml(description)}</description>
       ${post.category ? `<category>${escapeXml(post.category)}</category>` : ''}
     </item>`;
@@ -47,7 +50,7 @@ export async function GET() {
     .join('\n');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>${escapeXml(SITE_NAME)} Blog</title>
     <link>${SITE_URL}/blog</link>

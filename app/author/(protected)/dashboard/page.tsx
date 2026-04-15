@@ -2,15 +2,19 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
-import { BlogPost, BlogReviewStatus, TeamMember } from '@/lib/supabase/types';
-import { Plus, Edit, Trash2, Search, ExternalLink, Clock } from 'lucide-react';
+import { BlogPost, BlogReviewStatus } from '@/lib/supabase/types';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Clock,
+  AlertCircle,
+  Eye,
+  ExternalLink,
+} from 'lucide-react';
 
 type ReviewTab = 'all' | 'draft' | 'pending_review' | 'published' | 'rejected';
-
-type PostWithAuthor = BlogPost & {
-  author: Pick<TeamMember, 'id' | 'name' | 'portrait'> | null;
-};
 
 const REVIEW_BADGE_STYLE: Record<BlogReviewStatus, string> = {
   draft: 'bg-amber-100 text-amber-700',
@@ -26,46 +30,51 @@ const REVIEW_LABEL: Record<BlogReviewStatus, string> = {
   rejected: 'rejected',
 };
 
-export default function BlogManagementPage() {
-  const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+export default function AuthorDashboardPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [reviewTab, setReviewTab] = useState<ReviewTab>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
   const fetchPosts = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*, author:team_members!blog_posts_author_id_fkey(id, name, portrait)')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching blog posts:', error);
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/author/posts', { cache: 'no-store' });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to load posts');
+      }
+      setPosts((json.posts || []) as BlogPost[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load posts');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    setPosts((data || []) as PostWithAuthor[]);
-    setIsLoading(false);
   };
 
   const handleDelete = async (id: string) => {
-    const supabase = createClient();
-    const { error } = await supabase.from('blog_posts').delete().eq('id', id);
-
-    if (error) {
-      console.error('Error deleting post:', error);
-      alert('Failed to delete post');
-      return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/author/posts/${id}`, { method: 'DELETE' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to delete post');
+      }
+      setPosts((prev) => prev.filter((p) => p.id !== id));
+      setDeleteId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete post');
+    } finally {
+      setIsDeleting(false);
     }
-
-    setPosts(posts.filter((p) => p.id !== id));
-    setDeleteId(null);
   };
 
   const counts = useMemo(() => {
@@ -98,27 +107,58 @@ export default function BlogManagementPage() {
 
   const tabs: { id: ReviewTab; label: string }[] = [
     { id: 'all', label: 'All' },
-    { id: 'pending_review', label: 'Pending Review' },
-    { id: 'published', label: 'Published' },
     { id: 'draft', label: 'Drafts' },
-    { id: 'rejected', label: 'Rejected' },
+    { id: 'rejected', label: 'Needs Revision' },
+    { id: 'pending_review', label: 'Pending' },
+    { id: 'published', label: 'Published' },
   ];
+
+  const rejectedCount = counts.rejected;
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Blog Posts</h1>
-          <p className="text-gray-600 mt-1">Write, review, and publish blog content</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Posts</h1>
+          <p className="text-gray-600 mt-1">
+            Write drafts, submit them for review, and track your published work.
+          </p>
         </div>
         <Link
-          href="/admin/dashboard/blog/new"
+          href="/author/posts/new"
           className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          New Post
+          Write New
         </Link>
       </div>
+
+      {/* Global revision nudge */}
+      {rejectedCount > 0 && reviewTab !== 'rejected' && (
+        <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-red-900">
+              {rejectedCount === 1
+                ? 'One of your posts needs revision.'
+                : `${rejectedCount} of your posts need revision.`}
+            </p>
+            <button
+              type="button"
+              onClick={() => setReviewTab('rejected')}
+              className="text-sm text-red-700 underline hover:text-red-900 mt-1"
+            >
+              View posts that need revision →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Search + review tabs */}
       <div className="mb-6 space-y-4">
@@ -128,7 +168,7 @@ export default function BlogManagementPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by title or category..."
+            placeholder="Search your posts..."
             className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black"
           />
         </div>
@@ -136,7 +176,7 @@ export default function BlogManagementPage() {
         <div className="flex gap-2 flex-wrap">
           {tabs.map((tab) => {
             const count = counts[tab.id];
-            const isPending = tab.id === 'pending_review';
+            const isRejected = tab.id === 'rejected';
             return (
               <button
                 key={tab.id}
@@ -152,8 +192,8 @@ export default function BlogManagementPage() {
                   className={`inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1.5 rounded-full text-xs font-semibold ${
                     reviewTab === tab.id
                       ? 'bg-white text-black'
-                      : isPending && count > 0
-                        ? 'bg-blue-500 text-white'
+                      : isRejected && count > 0
+                        ? 'bg-red-500 text-white'
                         : 'bg-gray-100 text-gray-600'
                   }`}
                 >
@@ -175,12 +215,12 @@ export default function BlogManagementPage() {
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
           <p className="text-gray-600 mb-4">
             {posts.length === 0
-              ? 'No blog posts yet.'
+              ? "You haven't written any posts yet."
               : 'No posts match your filters.'}
           </p>
           {posts.length === 0 && (
             <Link
-              href="/admin/dashboard/blog/new"
+              href="/author/posts/new"
               className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -193,10 +233,12 @@ export default function BlogManagementPage() {
           <ul className="divide-y divide-gray-200">
             {filteredPosts.map((post) => {
               const rs = (post.review_status || 'draft') as BlogReviewStatus;
+              const canEdit = rs === 'draft' || rs === 'rejected';
+              const canDelete = rs !== 'published';
               return (
                 <li
                   key={post.id}
-                  className="flex items-center gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50"
+                  className="flex items-start gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50"
                 >
                   {/* Cover thumb */}
                   <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
@@ -216,7 +258,9 @@ export default function BlogManagementPage() {
                   {/* Body */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <p className="font-medium text-gray-900 truncate">{post.title}</p>
+                      <p className="font-medium text-gray-900 truncate">
+                        {post.title || 'Untitled'}
+                      </p>
                       <span
                         className={`px-2 py-0.5 text-xs rounded-full font-medium capitalize ${REVIEW_BADGE_STYLE[rs]}`}
                       >
@@ -227,23 +271,17 @@ export default function BlogManagementPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
-                      {post.author ? (
-                        <span className="flex items-center gap-1.5">
-                          {post.author.portrait && (
-                            <img
-                              src={post.author.portrait}
-                              alt=""
-                              className="w-4 h-4 rounded-full object-cover"
-                            />
-                          )}
-                          {post.author.name}
-                        </span>
-                      ) : (
-                        <span className="italic">No author</span>
-                      )}
                       {post.category && <span>{post.category}</span>}
                       <span>/{post.slug}</span>
                     </div>
+                    {rs === 'rejected' && post.rejection_reason && (
+                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800">
+                        <span className="font-semibold">Admin note:</span>{' '}
+                        <span className="whitespace-pre-wrap">
+                          {post.rejection_reason}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions */}
@@ -259,23 +297,29 @@ export default function BlogManagementPage() {
                       </Link>
                     )}
                     <Link
-                      href={`/admin/dashboard/blog/${post.id}`}
+                      href={`/author/posts/${post.id}`}
                       className={`p-2 rounded-lg transition-colors ${
-                        rs === 'pending_review'
-                          ? 'text-blue-600 hover:bg-blue-50'
+                        rs === 'rejected'
+                          ? 'text-red-600 hover:bg-red-50'
                           : 'text-gray-500 hover:text-black hover:bg-gray-100'
                       }`}
-                      title={rs === 'pending_review' ? 'Review' : 'Edit'}
+                      title={canEdit ? 'Edit' : 'View'}
                     >
-                      <Edit className="w-4 h-4" />
+                      {canEdit ? (
+                        <Edit className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </Link>
-                    <button
-                      onClick={() => setDeleteId(post.id)}
-                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={() => setDeleteId(post.id)}
+                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </li>
               );
@@ -295,15 +339,17 @@ export default function BlogManagementPage() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteId(null)}
-                className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-lg font-medium hover:border-gray-300 transition-colors"
+                disabled={isDeleting}
+                className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-lg font-medium hover:border-gray-300 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteId)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

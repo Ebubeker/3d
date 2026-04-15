@@ -12,8 +12,26 @@ export interface TeamMember {
   years_experience: number;
   display_order: number;
   is_active: boolean;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface TeamCredential {
+  id: string;
+  team_member_id: string;
+  email: string;
+  password_plaintext: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type UserRole = 'admin' | 'author';
+
+export interface UserRoleRow {
+  user_id: string;
+  role: UserRole;
+  created_at: string;
 }
 
 export interface PortfolioItem {
@@ -64,6 +82,12 @@ export function parseLinkEntry(url: string): LinkEntry | null {
   }
 }
 
+export type BlogReviewStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected';
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -79,13 +103,44 @@ export interface BlogPost {
   meta_title: string | null;
   meta_description: string | null;
   og_image: string | null;
+  author_id: string | null;
+  review_status: BlogReviewStatus;
+  rejection_reason: string | null;
   created_at: string;
   updated_at: string;
 }
 
+/** Post with its author joined from team_members. Author may be null for
+ *  legacy posts or admin-authored posts where no team member was linked. */
+export type BlogPostWithAuthor = BlogPost & {
+  author: Pick<TeamMember, 'id' | 'name' | 'portrait' | 'role'> | null;
+};
+
 export interface AdminUser {
   id: string;
   email: string;
+}
+
+export type TeamMemberFileCategory =
+  | 'contract'
+  | 'invoice'
+  | 'tax'
+  | 'payment'
+  | 'other';
+
+export interface TeamMemberFile {
+  id: string;
+  team_member_id: string;
+  file_name: string;
+  storage_path: string;
+  file_size: number;
+  mime_type: string;
+  label: string | null;
+  category: TeamMemberFileCategory;
+  notes: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export type Database = {
@@ -105,6 +160,21 @@ export type Database = {
         Row: BlogPost;
         Insert: Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      team_credentials: {
+        Row: TeamCredential;
+        Insert: Omit<TeamCredential, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<TeamCredential, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      user_roles: {
+        Row: UserRoleRow;
+        Insert: Omit<UserRoleRow, 'created_at'>;
+        Update: Partial<Omit<UserRoleRow, 'user_id' | 'created_at'>>;
+      };
+      team_member_files: {
+        Row: TeamMemberFile;
+        Insert: Omit<TeamMemberFile, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<TeamMemberFile, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };

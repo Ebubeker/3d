@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import BlogContent from '../../components/BlogContent';
 import BlogPostCard from '../../components/BlogPostCard';
 import { createClient } from '@/lib/supabase/server';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 import { formatReadingTime } from '@/lib/blog/reading-time';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
@@ -18,24 +18,61 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-async function getPost(slug: string): Promise<BlogPost | null> {
+// Defensive: if the PostgREST embedded select ever fails to resolve the FK
+// (wrong constraint name, permissions, etc.) we fall back to an explicit
+// second query using author_id. Either way the UI gets a populated author.
+async function attachAuthors<T extends BlogPost & { author?: unknown }>(
+  posts: T[]
+): Promise<BlogPostWithAuthor[]> {
+  const supabase = await createClient();
+  const missing = posts.filter(
+    (p) => p.author_id && (!p.author || typeof p.author !== 'object')
+  );
+  if (missing.length > 0) {
+    const ids = Array.from(new Set(missing.map((p) => p.author_id as string)));
+    const { data: members } = await supabase
+      .from('team_members')
+      .select('id, name, portrait, role')
+      .in('id', ids);
+    const byId = new Map((members || []).map((m) => [m.id, m]));
+    for (const p of missing) {
+      (p as unknown as BlogPostWithAuthor).author =
+        byId.get(p.author_id as string) || null;
+    }
+  }
+  // Normalize the shape: ensure every post has an `author` key (null if none)
+  return posts.map((p) => ({
+    ...(p as unknown as BlogPost),
+    author:
+      (p as unknown as BlogPostWithAuthor).author &&
+      typeof (p as unknown as BlogPostWithAuthor).author === 'object'
+        ? (p as unknown as BlogPostWithAuthor).author
+        : null,
+  }));
+}
+
+async function getPost(slug: string): Promise<BlogPostWithAuthor | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('*')
+    .select('*, author:team_members(id, name, portrait, role)')
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as BlogPost;
+  const [withAuthor] = await attachAuthors([data as unknown as BlogPost]);
+  return withAuthor;
 }
 
-async function getRelatedPosts(post: BlogPost, limit = 3): Promise<BlogPost[]> {
+async function getRelatedPosts(
+  post: BlogPost,
+  limit = 3
+): Promise<BlogPostWithAuthor[]> {
   const supabase = await createClient();
   let query = supabase
     .from('blog_posts')
-    .select('*')
+    .select('*, author:team_members(id, name, portrait, role)')
     .eq('status', 'published')
     .neq('id', post.id)
     .order('published_at', { ascending: false })
@@ -46,7 +83,7 @@ async function getRelatedPosts(post: BlogPost, limit = 3): Promise<BlogPost[]> {
   }
 
   const { data } = await query;
-  return (data as BlogPost[]) || [];
+  return attachAuthors((data || []) as unknown as BlogPost[]);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -86,7 +123,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       publishedTime: post.published_at || undefined,
       modifiedTime: post.updated_at,
-      authors: [SITE_NAME],
+      authors: [post.author?.name || SITE_NAME],
       tags: post.tags || undefined,
     },
     twitter: {
@@ -119,7 +156,9 @@ export default async function BlogPostPage({ params }: PageProps) {
   const url = `${SITE_URL}/blog/${post.slug}`;
   const image = post.og_image || post.cover_image;
 
-  // JSON-LD BlogPosting schema for Google rich results
+  // JSON-LD BlogPosting schema for Google rich results. When a team member
+  // authored the post, attribute them as a Person; otherwise fall back to the
+  // organization byline.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -128,11 +167,23 @@ export default async function BlogPostPage({ params }: PageProps) {
     image: image ? [image] : undefined,
     datePublished: post.published_at,
     dateModified: post.updated_at,
-    author: {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
+    author: post.author
+      ? {
+          '@type': 'Person',
+          name: post.author.name,
+          image: post.author.portrait || undefined,
+          jobTitle: post.author.role || undefined,
+          worksFor: {
+            '@type': 'Organization',
+            name: SITE_NAME,
+            url: SITE_URL,
+          },
+        }
+      : {
+          '@type': 'Organization',
+          name: SITE_NAME,
+          url: SITE_URL,
+        },
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
@@ -183,14 +234,40 @@ export default async function BlogPostPage({ params }: PageProps) {
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span>{SITE_NAME}</span>
-              <span>•</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-gray-500">
+              {post.author ? (
+                <span className="flex items-center gap-2">
+                  {post.author.portrait ? (
+                    <img
+                      src={post.author.portrait}
+                      alt={post.author.name}
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm font-semibold">
+                      {post.author.name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="flex flex-col leading-tight">
+                    <span className="text-gray-900 font-medium">
+                      {post.author.name}
+                    </span>
+                    {post.author.role && (
+                      <span className="text-xs text-gray-500">
+                        {post.author.role}
+                      </span>
+                    )}
+                  </span>
+                </span>
+              ) : (
+                <span>{SITE_NAME}</span>
+              )}
+              <span className="hidden sm:inline">•</span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.published_at)}
               </span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
                 {formatReadingTime(post.reading_time_minutes)}

@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import BlogPostCard from '../components/BlogPostCard';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPostWithAuthor } from '@/lib/supabase/types';
 import { Search, X } from 'lucide-react';
 
 const POSTS_PER_PAGE = 9;
 
 interface BlogListClientProps {
-  posts: BlogPost[];
+  posts: BlogPostWithAuthor[];
 }
 
 export default function BlogListClient({ posts }: BlogListClientProps) {

@@ -105,16 +105,40 @@ export default function NewTeamMemberPage() {
 
       const nextOrder = (maxRow?.display_order ?? 0) + 1;
 
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('team_members')
-        .insert([{ ...formData, display_order: nextOrder }]);
+        .insert([{ ...formData, display_order: nextOrder }])
+        .select('id')
+        .single();
 
-      if (error) {
-        setError(error.message);
+      if (error || !inserted) {
+        setError(error?.message || 'Failed to create team member');
         return;
       }
 
-      router.push('/admin/dashboard/team');
+      // Auto-provision author login if an email was provided. This fires
+      // the /api/admin/credentials endpoint which creates the Supabase Auth
+      // user, generates a password, and mirrors it into team_credentials.
+      if (formData.email) {
+        try {
+          const res = await fetch('/api/admin/credentials', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamMemberId: inserted.id }),
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            console.warn('Credential provisioning failed:', body.error);
+            // Don't block — admin can retry from the edit page's credentials panel.
+          }
+        } catch (provErr) {
+          console.warn('Credential provisioning network error:', provErr);
+        }
+      }
+
+      // Redirect to the edit page so the admin immediately sees the
+      // generated credentials in the CredentialsPanel.
+      router.push(`/admin/dashboard/team/${inserted.id}`);
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {

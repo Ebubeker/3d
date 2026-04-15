@@ -6,7 +6,7 @@ import Link from 'next/link';
 import TipTapEditor from '@/app/components/TipTapEditor';
 import { createClient } from '@/lib/supabase/client';
 import { uploadMedia } from '@/lib/supabase/storage';
-import { BlogPost } from '@/lib/supabase/types';
+import { BlogPost, TeamMember } from '@/lib/supabase/types';
 import { BLOG_CATEGORIES } from '@/lib/blog/categories';
 import { generateSlug, ensureUniqueSlug } from '@/lib/blog/slug';
 import { calculateReadingTime } from '@/lib/blog/reading-time';
@@ -18,6 +18,9 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
+  Check,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 
 interface BlogPostFormProps {
@@ -82,8 +85,56 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
     return !BLOG_CATEGORIES.includes(initialPost.category as never);
   });
 
+  // Review workflow state
+  const [author, setAuthor] = useState<Pick<TeamMember, 'id' | 'name' | 'portrait'> | null>(null);
+  const [reviewStatus, setReviewStatus] = useState(initialPost?.review_status || 'draft');
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectMessage, setRejectMessage] = useState('');
+  const [isReviewing, setIsReviewing] = useState(false);
+
+  // When creating a brand-new post, if the current admin is also linked to a
+  // team_members row, default the new post's author_id to theirs. That way
+  // admin-authored posts still get a proper byline on the public blog.
+  const [currentAdminTeamMemberId, setCurrentAdminTeamMemberId] = useState<
+    string | null
+  >(null);
+
   const coverInputRef = useRef<HTMLInputElement>(null);
   const ogInputRef = useRef<HTMLInputElement>(null);
+
+  // Load author info when editing a post that has an author_id
+  useEffect(() => {
+    if (!initialPost?.author_id) return;
+    const loadAuthor = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('team_members')
+        .select('id, name, portrait')
+        .eq('id', initialPost.author_id!)
+        .maybeSingle();
+      if (data) setAuthor(data as Pick<TeamMember, 'id' | 'name' | 'portrait'>);
+    };
+    loadAuthor();
+  }, [initialPost?.author_id]);
+
+  // Resolve the current admin's linked team_members row (if any) for create mode
+  useEffect(() => {
+    if (mode !== 'create') return;
+    const loadAdminTeamMember = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('team_members')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (data) setCurrentAdminTeamMemberId(data.id);
+    };
+    loadAdminTeamMember();
+  }, [mode]);
 
   // Auto-generate slug from title when creating and slug wasn't manually edited
   useEffect(() => {
@@ -172,6 +223,12 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
             : now
           : null;
 
+      // Admin-authored edits skip the review workflow (decision #2).
+      // Publishing sets review_status='published', saving as draft sets it
+      // to 'draft' and clears any prior rejection reason.
+      const newReviewStatus =
+        publishStatus === 'published' ? 'published' : 'draft';
+
       const payload = {
         title: formData.title.trim(),
         slug: uniqueSlug,
@@ -186,6 +243,8 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
         meta_title: formData.meta_title.trim() || null,
         meta_description: formData.meta_description.trim() || null,
         og_image: formData.og_image || null,
+        review_status: newReviewStatus,
+        rejection_reason: null,
       };
 
       if (mode === 'edit' && initialPost) {
@@ -195,9 +254,16 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           .eq('id', initialPost.id);
         if (updateError) throw updateError;
       } else {
+        // On create, attach the admin's team_members row as author_id when
+        // available. Posts created by admins who aren't team members keep
+        // author_id = null and fall back to the site-wide byline.
+        const insertPayload: Record<string, unknown> = { ...payload };
+        if (currentAdminTeamMemberId) {
+          insertPayload.author_id = currentAdminTeamMemberId;
+        }
         const { error: insertError } = await supabase
           .from('blog_posts')
-          .insert([payload]);
+          .insert([insertPayload]);
         if (insertError) throw insertError;
       }
 
@@ -208,6 +274,65 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
       setError(message);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Approve a pending-review post: flip review_status + status to published.
+  // Uses the currently-saved content — does NOT save unsaved form edits.
+  const handleApprove = async () => {
+    if (!initialPost) return;
+    setIsReviewing(true);
+    setError('');
+    try {
+      const supabase = createClient();
+      const now = new Date().toISOString();
+      const publishedAt = initialPost.published_at || now;
+      const { error: err } = await supabase
+        .from('blog_posts')
+        .update({
+          status: 'published',
+          review_status: 'published',
+          published_at: publishedAt,
+          rejection_reason: null,
+        })
+        .eq('id', initialPost.id);
+      if (err) throw err;
+      router.push('/admin/dashboard/blog');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to approve post');
+    } finally {
+      setIsReviewing(false);
+    }
+  };
+
+  // Reject a pending-review post with a message the author will see.
+  const handleReject = async () => {
+    if (!initialPost) return;
+    if (!rejectMessage.trim()) {
+      setError('Please include a message for the author');
+      return;
+    }
+    setIsReviewing(true);
+    setError('');
+    try {
+      const supabase = createClient();
+      const { error: err } = await supabase
+        .from('blog_posts')
+        .update({
+          status: 'draft',
+          review_status: 'rejected',
+          rejection_reason: rejectMessage.trim(),
+        })
+        .eq('id', initialPost.id);
+      if (err) throw err;
+      setRejectOpen(false);
+      router.push('/admin/dashboard/blog');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reject post');
+    } finally {
+      setIsReviewing(false);
     }
   };
 
@@ -231,6 +356,86 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           {error}
         </div>
       )}
+
+      {/* Review banner — shown only when an author submitted for review
+          or when a previously rejected post is being viewed. */}
+      {mode === 'edit' && reviewStatus === 'pending_review' && (
+        <div className="mb-6 p-5 bg-blue-50 border-2 border-blue-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-blue-900">Pending Review</p>
+              <p className="text-sm text-blue-800 mt-1">
+                {author ? (
+                  <>
+                    Submitted by{' '}
+                    <span className="inline-flex items-center gap-1.5 font-medium">
+                      {author.portrait && (
+                        <img
+                          src={author.portrait}
+                          alt=""
+                          className="w-4 h-4 rounded-full object-cover"
+                        />
+                      )}
+                      {author.name}
+                    </span>
+                    . Approve to publish, or reject with a message so they can
+                    revise.
+                  </>
+                ) : (
+                  <>
+                    An author submitted this post for review. Approve to publish,
+                    or reject with a message so they can revise.
+                  </>
+                )}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={handleApprove}
+                  disabled={isReviewing || isSaving}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  {isReviewing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  Approve &amp; Publish
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRejectOpen(true)}
+                  disabled={isReviewing || isSaving}
+                  className="flex items-center gap-2 px-4 py-2 border-2 border-red-300 text-red-700 rounded-lg font-medium text-sm hover:bg-red-50 disabled:opacity-50 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  Reject with Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mode === 'edit' &&
+        reviewStatus === 'rejected' &&
+        initialPost?.rejection_reason && (
+          <div className="mb-6 p-5 bg-red-50 border-2 border-red-200 rounded-xl">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-red-900">Previously Rejected</p>
+                <p className="text-sm text-red-800 mt-1 whitespace-pre-wrap">
+                  {initialPost.rejection_reason}
+                </p>
+                <p className="text-xs text-red-700 mt-2">
+                  Saving this post as a draft will clear the rejection note.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
       <form
         onSubmit={(e) => {
@@ -571,6 +776,49 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           </button>
         </div>
       </form>
+
+      {/* Reject modal */}
+      {rejectOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Reject Post
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Explain what needs to change. The author will see this message on
+              their dashboard and can revise the post.
+            </p>
+            <textarea
+              value={rejectMessage}
+              onChange={(e) => setRejectMessage(e.target.value)}
+              placeholder="e.g., Please tighten the intro and add sources for the stats in section 2."
+              rows={5}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-black text-sm resize-none mb-4"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setRejectOpen(false);
+                  setRejectMessage('');
+                }}
+                className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-lg font-medium hover:border-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleReject}
+                disabled={isReviewing || !rejectMessage.trim()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+              >
+                {isReviewing && <Loader2 className="w-4 h-4 animate-spin" />}
+                Reject &amp; Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

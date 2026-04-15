@@ -5,16 +5,20 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import {
-  Users,
   LayoutDashboard,
   LogOut,
   Menu,
-  X,
-  FolderOpen,
-  BookOpen
+  PenSquare,
 } from 'lucide-react';
 
-export default function AdminDashboardLayout({
+interface AuthorContext {
+  email: string;
+  teamMemberId: string;
+  name: string;
+  portrait: string | null;
+}
+
+export default function AuthorProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -22,33 +26,54 @@ export default function AdminDashboardLayout({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [author, setAuthor] = useState<AuthorContext | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/admin');
+        router.push('/author');
         return;
       }
 
-      // Non-admins (authors) must not be able to load the admin dashboard
-      // even if they know the URL. Check their role and send them to the
-      // author portal if they aren't an admin.
+      // If the caller is an admin, bounce them to the admin dashboard rather
+      // than signing them out when their team_members lookup fails.
       const { data: roleRow } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!roleRow || roleRow.role !== 'admin') {
-        router.push('/author/dashboard');
+      if (roleRow?.role === 'admin') {
+        router.push('/admin/dashboard');
         return;
       }
 
-      setUserEmail(user.email || '');
+      // Confirm the user is linked to a team_members row. If not, they
+      // should not be in the author portal at all.
+      const { data: member } = await supabase
+        .from('team_members')
+        .select('id, name, portrait')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!member) {
+        // Not an author — sign them out and send to login.
+        await supabase.auth.signOut();
+        router.push('/author');
+        return;
+      }
+
+      setAuthor({
+        email: user.email || '',
+        teamMemberId: member.id,
+        name: member.name,
+        portrait: member.portrait,
+      });
       setIsLoading(false);
     };
 
@@ -58,10 +83,10 @@ export default function AdminDashboardLayout({
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/admin');
+    router.push('/author');
   };
 
-  if (isLoading) {
+  if (isLoading || !author) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -73,10 +98,8 @@ export default function AdminDashboardLayout({
   }
 
   const navItems = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Team Members', href: '/admin/dashboard/team', icon: Users },
-    { name: 'Portfolio', href: '/admin/dashboard/portfolio', icon: FolderOpen },
-    { name: 'Blog', href: '/admin/dashboard/blog', icon: BookOpen },
+    { name: 'My Posts', href: '/author/dashboard', icon: LayoutDashboard },
+    { name: 'Write New', href: '/author/posts/new', icon: PenSquare },
   ];
 
   return (
@@ -103,7 +126,7 @@ export default function AdminDashboardLayout({
               alt="Virtuality Fashion"
               className="h-8"
             />
-            <p className="text-xs text-gray-500 mt-2">Admin Panel</p>
+            <p className="text-xs text-gray-500 mt-2">Author Portal</p>
           </div>
 
           {/* Navigation */}
@@ -126,7 +149,25 @@ export default function AdminDashboardLayout({
 
           {/* User Info & Logout */}
           <div className="p-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3 truncate">{userEmail}</p>
+            <div className="flex items-center gap-3 mb-3">
+              {author.portrait ? (
+                <img
+                  src={author.portrait}
+                  alt={author.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm font-semibold">
+                  {author.name.slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {author.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{author.email}</p>
+              </div>
+            </div>
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -150,19 +191,17 @@ export default function AdminDashboardLayout({
           </button>
           <div className="flex items-center gap-4">
             <Link
-              href="/"
+              href="/blog"
               target="_blank"
               className="text-sm text-gray-600 hover:text-black"
             >
-              View Site →
+              View Blog →
             </Link>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
+        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
