@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { requireAdmin } from '@/lib/auth/admin';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendTeamWelcomeEmail } from '@/lib/email/team-welcome';
 
 export const dynamic = 'force-dynamic';
 
@@ -137,6 +138,11 @@ async function provisionCredentials(request: NextRequest) {
   const password = generatePassword();
   let userId: string | null = member.user_id ?? null;
 
+  // Track whether the member is getting a brand-new account or having
+  // their existing one reset. This drives the welcome-vs-reset email
+  // copy at the bottom of the handler.
+  let isReset = userId !== null;
+
   if (!userId) {
     // No linked auth user yet — try to create one
     const { data: createData, error: createErr } =
@@ -152,6 +158,9 @@ async function provisionCredentials(request: NextRequest) {
       if (msg.includes('already') || msg.includes('registered')) {
         // An auth user with this email already exists — reuse it and
         // overwrite its password so the mirror table stays in sync.
+        // From the member's perspective this is effectively a reset,
+        // not a fresh welcome.
+        isReset = true;
         const existing = await findUserByEmail(admin, member.email);
         if (!existing) {
           return NextResponse.json(
@@ -228,9 +237,21 @@ async function provisionCredentials(request: NextRequest) {
     }
   }
 
+  // Fire the welcome / reset email. Failures are logged inside the helper
+  // and never fail the credentials response — the admin still needs the
+  // returned password even if the email bounced.
+  const emailResult = await sendTeamWelcomeEmail({
+    name: member.name,
+    email: member.email,
+    password,
+    isReset,
+  });
+
   return NextResponse.json({
     ok: true,
     email: member.email,
     password,
+    emailSent: emailResult.ok,
+    emailError: emailResult.ok ? undefined : emailResult.error,
   });
 }

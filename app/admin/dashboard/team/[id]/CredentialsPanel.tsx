@@ -25,6 +25,9 @@ export default function CredentialsPanel({
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [emailStatus, setEmailStatus] = useState<
+    { sent: boolean; detail?: string } | null
+  >(null);
 
   const fetchCredential = async () => {
     setIsLoading(true);
@@ -69,7 +72,13 @@ export default function CredentialsPanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ teamMemberId }),
       });
-      let body: { error?: string; email?: string; password?: string } = {};
+      let body: {
+        error?: string;
+        email?: string;
+        password?: string;
+        emailSent?: boolean;
+        emailError?: string;
+      } = {};
       try {
         body = await res.json();
       } catch {
@@ -92,6 +101,10 @@ export default function CredentialsPanel({
         updated_at: new Date().toISOString(),
       });
       setShowPassword(true);
+      setEmailStatus({
+        sent: !!body.emailSent,
+        detail: body.emailError,
+      });
     } catch (err) {
       setError(
         err instanceof Error
@@ -146,6 +159,19 @@ export default function CredentialsPanel({
           {error}
         </div>
       )}
+
+      {emailStatus &&
+        (emailStatus.sent ? (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+            Login details were emailed to the team member.
+          </div>
+        ) : (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            Credentials saved, but the email could not be sent
+            {emailStatus.detail ? `: ${emailStatus.detail}` : '.'} Share the
+            password below manually.
+          </div>
+        ))}
 
       {isLoading ? (
         <div className="flex items-center gap-2 text-gray-500 text-sm">
