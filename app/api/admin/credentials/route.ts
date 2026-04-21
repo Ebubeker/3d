@@ -141,7 +141,13 @@ async function provisionCredentials(request: NextRequest) {
   // Track whether the member is getting a brand-new account or having
   // their existing one reset. This drives the welcome-vs-reset email
   // copy at the bottom of the handler.
-  let isReset = userId !== null;
+  //
+  // The signal is whether THIS team_member row was previously linked to
+  // an auth user, NOT whether an auth user happens to exist for the
+  // email address. An orphaned auth user from prior testing or an old
+  // backfill shouldn't downgrade a fresh team_member's first email from
+  // "welcome" to "reset" — they've never used this portal before.
+  const isReset = userId !== null;
 
   if (!userId) {
     // No linked auth user yet — try to create one
@@ -158,9 +164,6 @@ async function provisionCredentials(request: NextRequest) {
       if (msg.includes('already') || msg.includes('registered')) {
         // An auth user with this email already exists — reuse it and
         // overwrite its password so the mirror table stays in sync.
-        // From the member's perspective this is effectively a reset,
-        // not a fresh welcome.
-        isReset = true;
         const existing = await findUserByEmail(admin, member.email);
         if (!existing) {
           return NextResponse.json(
