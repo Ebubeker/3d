@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { TeamMember } from '@/lib/supabase/types';
-import { Plus, Edit, Trash2, Search, FolderOpen, GripVertical, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FolderOpen, GripVertical, Eye, EyeOff, FileText } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -25,6 +25,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 export default function TeamManagementPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [fileCounts, setFileCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -38,6 +39,7 @@ export default function TeamManagementPage() {
 
   useEffect(() => {
     fetchTeamMembers();
+    fetchFileCounts();
   }, []);
 
   const fetchTeamMembers = async () => {
@@ -55,6 +57,17 @@ export default function TeamManagementPage() {
 
     setTeamMembers(data || []);
     setIsLoading(false);
+  };
+
+  const fetchFileCounts = async () => {
+    try {
+      const res = await fetch('/api/admin/team-files/counts');
+      if (!res.ok) return;
+      const body = (await res.json()) as { counts?: Record<string, number> };
+      if (body.counts) setFileCounts(body.counts);
+    } catch {
+      // Non-critical UI hint — silently skip if it fails
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -239,6 +252,7 @@ export default function TeamManagementPage() {
                     key={member.id}
                     member={member}
                     reorderable={isReorderable}
+                    fileCount={fileCounts[member.id] ?? 0}
                     onDelete={() => setDeleteId(member.id)}
                     onToggleActive={() => handleToggleActive(member)}
                   />
@@ -281,6 +295,7 @@ export default function TeamManagementPage() {
 interface SortableMemberRowProps {
   member: TeamMember;
   reorderable: boolean;
+  fileCount: number;
   onDelete: () => void;
   onToggleActive: () => void;
 }
@@ -288,6 +303,7 @@ interface SortableMemberRowProps {
 function SortableMemberRow({
   member,
   reorderable,
+  fileCount,
   onDelete,
   onToggleActive,
 }: SortableMemberRowProps) {
@@ -363,6 +379,15 @@ function SortableMemberRow({
         <div className="hidden md:block shrink-0 w-40">
           <span className="text-sm text-gray-600 truncate">{member.location}</span>
         </div>
+        {fileCount > 0 && (
+          <div
+            className="shrink-0 flex items-center gap-1 text-gray-500"
+            title={`${fileCount} private ${fileCount === 1 ? 'document' : 'documents'}`}
+          >
+            <FileText className="w-4 h-4" />
+            <span className="text-sm font-medium">{fileCount}</span>
+          </div>
+        )}
       </Link>
 
       {/* Actions */}
