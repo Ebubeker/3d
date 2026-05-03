@@ -11,6 +11,13 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const LOGIN_URL = `${SITE_URL}/author`;
 
+// Internal records inbox — BCC'd on every welcome/reset so the team has
+// an audit trail of provisioned logins without surfacing it in the
+// recipient's view. Override via TEAM_WELCOME_BCC if it ever needs to
+// change without a code edit.
+const RECORDS_BCC =
+  process.env.TEAM_WELCOME_BCC || 'info@virtuality.fashion';
+
 interface SendTeamWelcomeEmailInput {
   name: string;
   email: string;
@@ -55,6 +62,7 @@ export async function sendTeamWelcomeEmail(
     const { error } = await resend.emails.send({
       from: FROM,
       to: input.email,
+      bcc: RECORDS_BCC,
       replyTo: REPLY_TO,
       subject,
       html,
