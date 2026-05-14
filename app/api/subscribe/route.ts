@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendVisitorWelcomeEmail } from '@/lib/email/visitor-welcome';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,6 +106,18 @@ export async function POST(request: NextRequest) {
     console.error('[subscribe] insert error', insErr);
     return NextResponse.json({ error: insErr.message }, { status: 500 });
   }
+
+  // Fire the visitor welcome email only on first signup. Re-submissions
+  // hit the update path above and never reach this point, so people who
+  // re-fill the form don't get the welcome email twice. Send failures
+  // are logged but never block the response — the user already passed
+  // the gate and a bounced welcome shouldn't reopen the modal.
+  void sendVisitorWelcomeEmail({
+    name: name || '',
+    email,
+    optedIn,
+    unsubscribeToken: token,
+  });
 
   return NextResponse.json({ ok: true });
 }
