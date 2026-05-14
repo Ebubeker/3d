@@ -247,7 +247,7 @@ async function provisionCredentials(request: NextRequest) {
     name: member.name,
     email: member.email,
     password,
-    isReset,
+    mode: isReset ? 'reset' : 'welcome',
   });
 
   return NextResponse.json({

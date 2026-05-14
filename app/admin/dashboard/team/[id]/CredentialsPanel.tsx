@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Eye, EyeOff, KeyRound, Loader2, RefreshCw, Copy, Check } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Loader2, RefreshCw, Copy, Check, Mail } from 'lucide-react';
 
 interface Credential {
   team_member_id: string;
@@ -22,10 +22,14 @@ export default function CredentialsPanel({
   const [credential, setCredential] = useState<Credential | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProvisioning, setIsProvisioning] = useState(false);
+  const [isSendingInstructions, setIsSendingInstructions] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   const [emailStatus, setEmailStatus] = useState<
+    { sent: boolean; detail?: string } | null
+  >(null);
+  const [instructionsStatus, setInstructionsStatus] = useState<
     { sent: boolean; detail?: string } | null
   >(null);
 
@@ -127,6 +131,44 @@ export default function CredentialsPanel({
     }
   };
 
+  const sendInstructions = async () => {
+    setIsSendingInstructions(true);
+    setError('');
+    setInstructionsStatus(null);
+    try {
+      const res = await fetch('/api/admin/credentials/send-instructions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamMemberId }),
+      });
+      let body: { error?: string; email?: string; ok?: boolean } = {};
+      try {
+        body = await res.json();
+      } catch {
+        setError(
+          `Server returned ${res.status} ${res.statusText || 'error'} with no JSON body. Check the server logs.`
+        );
+        return;
+      }
+      if (!res.ok) {
+        setInstructionsStatus({
+          sent: false,
+          detail: body.error,
+        });
+        return;
+      }
+      setInstructionsStatus({ sent: true });
+    } catch (err) {
+      setInstructionsStatus({
+        sent: false,
+        detail:
+          err instanceof Error ? err.message : 'Network error sending email',
+      });
+    } finally {
+      setIsSendingInstructions(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
@@ -170,6 +212,21 @@ export default function CredentialsPanel({
             Credentials saved, but the email could not be sent
             {emailStatus.detail ? `: ${emailStatus.detail}` : '.'} Share the
             password below manually.
+          </div>
+        ))}
+
+      {instructionsStatus &&
+        (instructionsStatus.sent ? (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+            Instructions emailed to the team member with their existing
+            credentials.
+          </div>
+        ) : (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            Could not send instructions
+            {instructionsStatus.detail
+              ? `: ${instructionsStatus.detail}`
+              : '.'}
           </div>
         ))}
 
@@ -230,19 +287,35 @@ export default function CredentialsPanel({
               </div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => provision(true)}
-            disabled={isProvisioning || !teamMemberEmail}
-            className="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isProvisioning ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
-            )}
-            Reset Password
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={sendInstructions}
+              disabled={isSendingInstructions || isProvisioning}
+              title="Email these credentials plus a step-by-step blog walkthrough"
+              className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSendingInstructions ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4" />
+              )}
+              Email Instructions
+            </button>
+            <button
+              type="button"
+              onClick={() => provision(true)}
+              disabled={isProvisioning || isSendingInstructions || !teamMemberEmail}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProvisioning ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )}
+              Reset Password
+            </button>
+          </div>
         </div>
       ) : (
         <div>

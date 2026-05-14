@@ -11,20 +11,31 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const LOGIN_URL = `${SITE_URL}/author`;
 
-// Internal records inbox — BCC'd on every welcome/reset so the team has
-// an audit trail of provisioned logins without surfacing it in the
-// recipient's view. Override via TEAM_WELCOME_BCC if it ever needs to
-// change without a code edit.
+// Internal records inbox — BCC'd on every welcome/reset/instructions so
+// the team has an audit trail of provisioned logins without surfacing it
+// in the recipient's view. Override via TEAM_WELCOME_BCC if it ever
+// needs to change without a code edit.
 const RECORDS_BCC =
   process.env.TEAM_WELCOME_BCC || 'info@virtuality.fashion';
+
+/**
+ * Email variants:
+ *   - 'welcome'      Fired automatically when an admin creates a new team
+ *                    member with an email. First-time intro copy.
+ *   - 'reset'        Fired automatically when an admin clicks "Reset
+ *                    Password" on an existing member.
+ *   - 'instructions' Fired manually from the credentials panel when the
+ *                    admin wants to nudge a team member to start writing.
+ *                    Re-sends the EXISTING credentials with a detailed
+ *                    step-by-step blog walkthrough.
+ */
+export type TeamWelcomeMode = 'welcome' | 'reset' | 'instructions';
 
 interface SendTeamWelcomeEmailInput {
   name: string;
   email: string;
   password: string;
-  /** True when the admin is resetting an existing account, false for a
-   *  brand-new member. Swaps subject line and headline copy. */
-  isReset: boolean;
+  mode: TeamWelcomeMode;
 }
 
 interface SendResult {
@@ -33,7 +44,7 @@ interface SendResult {
 }
 
 /**
- * Send the team-member onboarding or password-reset email.
+ * Send the team-member onboarding, reset, or instructions email.
  *
  * Never throws — failures are returned as { ok: false, error }. Call sites
  * should log but not fail the enclosing request, so a bounced email never
@@ -52,10 +63,7 @@ export async function sendTeamWelcomeEmail(
 
   const resend = new Resend(apiKey);
 
-  const subject = input.isReset
-    ? 'Your Virtuality Fashion portal password was reset'
-    : 'Welcome to Virtuality Fashion — your team portal login';
-
+  const subject = subjectFor(input.mode);
   const html = renderEmailHtml(input);
 
   try {
@@ -82,6 +90,46 @@ export async function sendTeamWelcomeEmail(
 }
 
 // ---------------------------------------------------------------------------
+// Copy variants
+// ---------------------------------------------------------------------------
+
+function subjectFor(mode: TeamWelcomeMode): string {
+  switch (mode) {
+    case 'reset':
+      return 'Your Virtuality Fashion portal password was reset';
+    case 'instructions':
+      return 'How to publish your first blog post on Virtuality Fashion';
+    case 'welcome':
+    default:
+      return 'Welcome to Virtuality Fashion — your team portal login';
+  }
+}
+
+function headlineFor(mode: TeamWelcomeMode): string {
+  switch (mode) {
+    case 'reset':
+      return 'Your password was reset';
+    case 'instructions':
+      return 'Ready to publish your first post?';
+    case 'welcome':
+    default:
+      return 'Welcome to the team';
+  }
+}
+
+function introFor(mode: TeamWelcomeMode): string {
+  switch (mode) {
+    case 'reset':
+      return 'An admin has reset your Virtuality Fashion portal password. Your new credentials are below — use them to sign in again.';
+    case 'instructions':
+      return 'Here is everything you need to get your first blog post live on the Virtuality Fashion blog. Your sign-in details are below, followed by a short step-by-step guide.';
+    case 'welcome':
+    default:
+      return 'You’ve been added to the Virtuality Fashion team portal. From there you can draft blog posts and submit them for admin review. Your sign-in details are below.';
+  }
+}
+
+// ---------------------------------------------------------------------------
 // HTML template
 // ---------------------------------------------------------------------------
 //
@@ -98,23 +146,8 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
-  const firstName = input.name.split(' ')[0] || input.name;
-  const nameSafe = escapeHtml(firstName);
-  const emailSafe = escapeHtml(input.email);
-  const passwordSafe = escapeHtml(input.password);
-
-  const headline = input.isReset
-    ? 'Your password was reset'
-    : 'Welcome to the team';
-
-  const intro = input.isReset
-    ? `An admin has reset your Virtuality Fashion portal password. Your new credentials are below — use them to sign in again.`
-    : `You\u2019ve been added to the Virtuality Fashion team portal. From there you can draft blog posts and submit them for admin review. Your sign-in details are below.`;
-
-  const whatYouCanDoBlock = input.isReset
-    ? ''
-    : `
+function whatYouCanDoBlock(): string {
+  return `
       <tr>
         <td style="padding: 0 32px 8px 32px;">
           <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #111827;">
@@ -122,13 +155,61 @@ function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
           </h2>
           <ul style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.6;">
             <li>Draft blog posts with a rich editor, cover images, and tags</li>
-            <li>Submit posts for admin review when you\u2019re ready</li>
+            <li>Submit posts for admin review when you’re ready</li>
             <li>See approved posts published live on the blog with your byline</li>
-            <li>Revise rejected drafts with the admin\u2019s feedback inline</li>
+            <li>Revise rejected drafts with the admin’s feedback inline</li>
           </ul>
         </td>
       </tr>
     `;
+}
+
+function stepByStepBlock(): string {
+  // Numbered list of how to go from logged-in to published.
+  return `
+      <tr>
+        <td style="padding: 0 32px 8px 32px;">
+          <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #111827;">
+            How to publish your first post
+          </h2>
+          <ol style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.7;">
+            <li>Click <strong>Sign in to the portal</strong> above and enter the email and password from this message.</li>
+            <li>On the dashboard, click <strong>New Post</strong> to start a draft.</li>
+            <li>Add a <strong>title</strong>, a short <strong>excerpt</strong>, and a <strong>cover image</strong> (anything tall and visual works).</li>
+            <li>Write your content in the editor — you can use headings, lists, links, images, and quotes.</li>
+            <li>Pick a <strong>category</strong> and a few <strong>tags</strong> so readers can find it.</li>
+            <li>Click <strong>Save Draft</strong> anytime to come back later, or <strong>Submit for Review</strong> when it’s ready.</li>
+            <li>An admin will review and either publish your post or send it back with feedback you can act on.</li>
+            <li>Once published, your post goes live on the blog with your name and photo as the byline.</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 32px 8px 32px;">
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #6b7280;">
+            Tip: aim for 600–1,000 words on a single topic. Real examples and screenshots from your own work always perform best.
+          </p>
+        </td>
+      </tr>
+    `;
+}
+
+function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
+  const firstName = input.name.split(' ')[0] || input.name;
+  const nameSafe = escapeHtml(firstName);
+  const emailSafe = escapeHtml(input.email);
+  const passwordSafe = escapeHtml(input.password);
+
+  const headline = headlineFor(input.mode);
+  const intro = introFor(input.mode);
+
+  // Content block under the CTA varies by mode:
+  //   welcome      => bullet list of portal capabilities
+  //   reset        => nothing (keep the email short and focused)
+  //   instructions => numbered step-by-step guide
+  let contentBlock = '';
+  if (input.mode === 'welcome') contentBlock = whatYouCanDoBlock();
+  else if (input.mode === 'instructions') contentBlock = stepByStepBlock();
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -187,7 +268,7 @@ function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
                   </tr>
                 </table>
                 <p style="margin: 12px 0 24px 0; font-size: 13px; line-height: 1.5; color: #6b7280;">
-                  Keep this email somewhere safe or save the password in your browser. If you lose it, reply and we\u2019ll reset it for you.
+                  Keep this email somewhere safe or save the password in your browser. If you lose it, reply and we’ll reset it for you.
                 </p>
               </td>
             </tr>
@@ -202,11 +283,11 @@ function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
                 </div>
               </td>
             </tr>
-            ${whatYouCanDoBlock}
+            ${contentBlock}
             <tr>
               <td style="padding: 20px 32px 32px 32px; border-top: 1px solid #f3f4f6;">
                 <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #9ca3af;">
-                  You\u2019re getting this email because an admin added you to the Virtuality Fashion team portal. If this wasn\u2019t expected, just reply to this message and we\u2019ll take a look.
+                  You’re getting this email because an admin sent you the Virtuality Fashion team portal details. If this wasn’t expected, just reply to this message and we’ll take a look.
                 </p>
               </td>
             </tr>
