@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   FolderOpen,
-  BookOpen
+  BookOpen,
+  Mail
 } from 'lucide-react';
 
 export default function AdminDashboardLayout({
@@ -77,6 +78,7 @@ export default function AdminDashboardLayout({
     { name: 'Team Members', href: '/admin/dashboard/team', icon: Users },
     { name: 'Portfolio', href: '/admin/dashboard/portfolio', icon: FolderOpen },
     { name: 'Blog', href: '/admin/dashboard/blog', icon: BookOpen },
+    { name: 'Subscribers', href: '/admin/dashboard/subscribers', icon: Mail },
   ];
 
   return (

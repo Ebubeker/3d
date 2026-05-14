@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import EnterpriseForm from '../components/EnterpriseForm';
+import UnlockGateModal from './UnlockGateModal';
 import { MapPin, Globe, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getMediaUrls, isLinkEntry, parseLinkEntry } from '@/lib/supabase/types';
@@ -76,6 +77,7 @@ const staticTeamMembers: TeamMember[] = [
 export default function TeamPage() {
   const [hasAccess, setHasAccess] = useState(false);
   const [showEnterpriseForm, setShowEnterpriseForm] = useState(false);
+  const [showGate, setShowGate] = useState(false);
   const [expandedBio, setExpandedBio] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(staticTeamMembers);
   const [isLoadingTeam, setIsLoadingTeam] = useState(true);
@@ -198,10 +200,11 @@ export default function TeamPage() {
         const result = await response.json();
 
         if (result.success) {
-          localStorage.setItem('teamAccess', 'granted');
+          // Don't unlock yet — show the two-step T&C + email opt-in gate
+          // first. The gate decides when to flip hasAccess via the
+          // onComplete callback, after the subscription row is written.
           localStorage.setItem('clientData', JSON.stringify(formData));
-          setHasAccess(true);
-          setSubmitted(true);
+          setShowGate(true);
         } else {
           console.error("Email Error:", result);
           setErrors({ form: 'Something went wrong. Please try again.' });
@@ -675,6 +678,20 @@ export default function TeamPage() {
       <EnterpriseForm
         isOpen={showEnterpriseForm}
         onClose={() => setShowEnterpriseForm(false)}
+      />
+      <UnlockGateModal
+        isOpen={showGate}
+        subscriber={{
+          email: formData.email,
+          name: formData.name,
+          company: formData.company,
+        }}
+        onComplete={() => {
+          localStorage.setItem('teamAccess', 'granted');
+          setHasAccess(true);
+          setSubmitted(true);
+          setShowGate(false);
+        }}
       />
     </>
   );
