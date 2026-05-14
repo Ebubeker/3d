@@ -48,6 +48,34 @@ export async function POST(request: NextRequest) {
   }
 
   if (!existing) {
+    // TEMP diagnostic — figure out why a token from a real welcome
+    // email is missing from the production table. Logs:
+    //   - first 8 chars of the incoming token (safe to log)
+    //   - total rows in the table (is it empty entirely?)
+    //   - whether ANY row has a token starting with the same prefix
+    //     (catches transcription / encoding mangling vs total absence)
+    // Remove once the cause is confirmed.
+    const tokenPrefix = token.slice(0, 8);
+    const [{ count: totalCount }, { data: prefixMatches }] = await Promise.all([
+      admin
+        .from('email_subscriptions')
+        .select('id', { count: 'exact', head: true }),
+      admin
+        .from('email_subscriptions')
+        .select('id, unsubscribe_token, created_at')
+        .ilike('unsubscribe_token', `${tokenPrefix}%`)
+        .limit(5),
+    ]);
+    console.warn('[unsubscribe] 404 diagnostic', {
+      tokenLength: token.length,
+      tokenPrefix,
+      totalRows: totalCount ?? null,
+      prefixMatchCount: prefixMatches?.length ?? 0,
+      prefixMatchTokens: (prefixMatches || []).map((r) =>
+        (r.unsubscribe_token || '').slice(0, 12)
+      ),
+    });
+
     return NextResponse.json(
       { error: 'Unsubscribe link is invalid or has expired' },
       { status: 404 }
