@@ -109,10 +109,16 @@ export async function POST(request: NextRequest) {
 
   // Fire the visitor welcome email only on first signup. Re-submissions
   // hit the update path above and never reach this point, so people who
-  // re-fill the form don't get the welcome email twice. Send failures
-  // are logged but never block the response — the user already passed
-  // the gate and a bounced welcome shouldn't reopen the modal.
-  void sendVisitorWelcomeEmail({
+  // re-fill the form don't get the welcome email twice.
+  //
+  // We await rather than fire-and-forget because Next.js disposes the
+  // route handler's execution context once the response returns, which
+  // aborts any in-flight fetch — Resend then surfaces it as
+  // "Unable to fetch data. The request could not be resolved." Send
+  // failures (network, Resend rejection) are logged but never fail the
+  // response: the user already passed the gate, and a bounced welcome
+  // shouldn't reopen the modal.
+  await sendVisitorWelcomeEmail({
     name: name || '',
     email,
     optedIn,
