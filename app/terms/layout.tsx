@@ -1,0 +1,27 @@
+import type { Metadata } from "next";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Virtuality Fashion",
+  description:
+    "The terms and conditions that govern your use of Virtuality Fashion's website and services. Please read carefully before submitting a project or joining our team.",
+  alternates: {
+    canonical: `${SITE_URL}/terms`,
+  },
+  openGraph: {
+    title: "Terms of Service | Virtuality Fashion",
+    description:
+      "The terms and conditions that govern your use of Virtuality Fashion's website and services.",
+    url: `${SITE_URL}/terms`,
+  },
+};
+
+export default function TermsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}

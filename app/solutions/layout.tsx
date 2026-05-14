@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { solutionsGraph } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "How It Works | Virtual Sampling & Digital Fashion Services",
@@ -30,5 +31,13 @@ export default function SolutionsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(solutionsGraph()) }}
+      />
+      {children}
+    </>
+  );
 }

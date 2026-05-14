@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { siteGraph } from "@/lib/seo/schema";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -122,6 +123,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="theme-color" content="#000000" />
+
+        {/* Site-wide JSON-LD: Organization + WebSite. Page-specific schema
+            (Service on /solutions, BlogPosting on individual posts) is added
+            in the relevant layouts and references this Organization by @id. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteGraph()) }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
