@@ -14,12 +14,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!expert) {
     return {
-      title: "Expert | Virtuality Fashion",
+      title: "Expert | virtuality.fashion",
       robots: { index: false, follow: true },
     };
   }
 
-  const title = `${expert.name} | ${expert.title} | Virtuality Fashion`;
+  const title = `${expert.name} | ${expert.title} | virtuality.fashion`;
   const rawDescription = expert.bio || "";
   const description =
     rawDescription.length > 155

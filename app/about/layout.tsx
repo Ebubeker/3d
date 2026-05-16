@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Us | Digital Fashion Pioneers Since 2015",
-  description: "Virtuality Fashion was founded in 2015 by fashion tech veterans. We pioneered 3D as a Service (3DaaS), helping brands adopt virtual sampling without building in-house operations. Thousands of digitized garments, hundreds of global projects.",
+  description: "virtuality.fashion was founded in 2015 by fashion tech veterans. We pioneered 3D as a Service (3DaaS), helping brands adopt virtual sampling without building in-house operations. Thousands of digitized garments, hundreds of global projects.",
   keywords: [
-    "about Virtuality Fashion",
+    "about virtuality.fashion",
     "3D fashion company",
     "digital fashion pioneers",
     "3DaaS provider",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "About Us | Digital Fashion Pioneers Since 2015",
-    description: "Virtuality Fashion was founded in 2015 by fashion tech veterans. Pioneers in 3D as a Service (3DaaS).",
+    description: "virtuality.fashion was founded in 2015 by fashion tech veterans. Pioneers in 3D as a Service (3DaaS).",
     url: "https://virtuality.fashion/about",
   },
   alternates: {

@@ -4,9 +4,9 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Projects & Case Studies | Virtuality Fashion",
+  title: "Projects & Case Studies | virtuality.fashion",
   description:
-    "Explore Virtuality Fashion case studies: 3D virtual sampling, tech pack creation, and digital fashion development projects delivered for global brands.",
+    "Explore virtuality.fashion case studies: 3D virtual sampling, tech pack creation, and digital fashion development projects delivered for global brands.",
   keywords: [
     "fashion case studies",
     "3D sampling case studies",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/projects`,
   },
   openGraph: {
-    title: "Projects & Case Studies | Virtuality Fashion",
+    title: "Projects & Case Studies | virtuality.fashion",
     description:
       "Case studies of virtual sampling, tech pack creation, and 3D fashion development delivered for global brands.",
     url: `${SITE_URL}/projects`,

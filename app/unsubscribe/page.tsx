@@ -76,12 +76,12 @@ function UnsubscribeContent() {
               {email ? (
                 <>
                   <span className="font-semibold">{email}</span> will no longer
-                  receive marketing or update emails from Virtuality Fashion.
+                  receive marketing or update emails from virtuality.fashion.
                 </>
               ) : (
                 <>
                   Your email will no longer receive marketing or update emails
-                  from Virtuality Fashion.
+                  from virtuality.fashion.
                 </>
               )}
             </p>

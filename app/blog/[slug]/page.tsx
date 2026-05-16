@@ -10,7 +10,7 @@ import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 import { formatReadingTime } from '@/lib/blog/reading-time';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
-const SITE_NAME = 'Virtuality Fashion';
+const SITE_NAME = 'virtuality.fashion';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
 

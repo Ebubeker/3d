@@ -10,7 +10,7 @@ import JoinTeamSection from './components/home/JoinTeamSection';
 import CTASection from './components/home/CTASection';
 
 export const metadata: Metadata = {
-  title: "Virtual Sampling & Tech Pack Services | Virtuality Fashion",
+  title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
   description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Virtual sampling, tech packs, CLO3D & Browzwear services. Reduce samples by 70%, cut development time in half.",
   keywords: [
     "virtual sampling services",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "fashion tech talent"
   ],
   openGraph: {
-    title: "Virtual Sampling & Tech Pack Services | Virtuality Fashion",
+    title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers. Reduce samples by 70%, cut development time in half.",
     url: "https://virtuality.fashion",
   },

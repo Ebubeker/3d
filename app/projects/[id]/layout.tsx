@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // aren't included in the sitemap. Marking noindex so Google doesn't
 // surface them until they're powered by real project records.
 export const metadata: Metadata = {
-  title: "Project Details | Virtuality Fashion",
+  title: "Project Details | virtuality.fashion",
   robots: { index: false, follow: true },
 };
 

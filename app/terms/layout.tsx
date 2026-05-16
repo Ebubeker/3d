@@ -4,16 +4,16 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Virtuality Fashion",
+  title: "Terms of Service | virtuality.fashion",
   description:
-    "The terms and conditions that govern your use of Virtuality Fashion's website and services. Please read carefully before submitting a project or joining our team.",
+    "The terms and conditions that govern your use of virtuality.fashion's website and services. Please read carefully before submitting a project or joining our team.",
   alternates: {
     canonical: `${SITE_URL}/terms`,
   },
   openGraph: {
-    title: "Terms of Service | Virtuality Fashion",
+    title: "Terms of Service | virtuality.fashion",
     description:
-      "The terms and conditions that govern your use of Virtuality Fashion's website and services.",
+      "The terms and conditions that govern your use of virtuality.fashion's website and services.",
     url: `${SITE_URL}/terms`,
   },
 };

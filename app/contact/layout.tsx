@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
-  description: "Ready to reduce physical samples and accelerate your fashion development? Contact Virtuality Fashion for virtual sampling, tech pack creation, and 3D design services. Get a response within 24 hours.",
+  description: "Ready to reduce physical samples and accelerate your fashion development? Contact virtuality.fashion for virtual sampling, tech pack creation, and 3D design services. Get a response within 24 hours.",
   keywords: [
-    "contact Virtuality Fashion",
+    "contact virtuality.fashion",
     "virtual sampling quote",
     "tech pack services quote",
     "3D fashion design inquiry",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
-    description: "Contact Virtuality Fashion for virtual sampling, tech pack creation, and 3D design services.",
+    description: "Contact virtuality.fashion for virtual sampling, tech pack creation, and 3D design services.",
     url: "https://virtuality.fashion/contact",
   },
   alternates: {

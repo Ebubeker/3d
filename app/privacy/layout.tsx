@@ -4,16 +4,16 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Virtuality Fashion",
+  title: "Privacy Policy | virtuality.fashion",
   description:
-    "How Virtuality Fashion collects, uses, and protects your personal information. Read our privacy policy for full details on data handling, retention, and your rights.",
+    "How virtuality.fashion collects, uses, and protects your personal information. Read our privacy policy for full details on data handling, retention, and your rights.",
   alternates: {
     canonical: `${SITE_URL}/privacy`,
   },
   openGraph: {
-    title: "Privacy Policy | Virtuality Fashion",
+    title: "Privacy Policy | virtuality.fashion",
     description:
-      "How Virtuality Fashion collects, uses, and protects your personal information.",
+      "How virtuality.fashion collects, uses, and protects your personal information.",
     url: `${SITE_URL}/privacy`,
   },
 };

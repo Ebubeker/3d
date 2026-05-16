@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Our Team | Vetted 3D & Technical Design Experts",
-  description: "Browse Virtuality Fashion's curated team of vetted 3D designers and technical developers. Find CLO3D experts, Browzwear specialists, and tech pack professionals ready to help your brand reduce samples and accelerate development.",
+  description: "Browse virtuality.fashion's curated team of vetted 3D designers and technical developers. Find CLO3D experts, Browzwear specialists, and tech pack professionals ready to help your brand reduce samples and accelerate development.",
   keywords: [
     "3D design team",
     "CLO3D experts",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Our Team | Vetted 3D & Technical Design Experts",
-    description: "Browse Virtuality Fashion's curated team of vetted 3D designers and technical developers.",
+    description: "Browse virtuality.fashion's curated team of vetted 3D designers and technical developers.",
     url: "https://virtuality.fashion/team",
   },
   alternates: {

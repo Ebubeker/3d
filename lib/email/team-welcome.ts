@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 // Sender / reply-to. Mirror the settings used by /api/send-email so the
 // domain reputation stays consistent and replies land in the same inbox
 // the rest of the site points at.
-const FROM = 'Virtuality Fashion <amnon@virtuality.fashion>';
+const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
 const REPLY_TO =
   process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
 
@@ -96,12 +96,12 @@ export async function sendTeamWelcomeEmail(
 function subjectFor(mode: TeamWelcomeMode): string {
   switch (mode) {
     case 'reset':
-      return 'Your Virtuality Fashion portal password was reset';
+      return 'Your virtuality.fashion portal password was reset';
     case 'instructions':
-      return 'How to publish your first blog post on Virtuality Fashion';
+      return 'How to publish your first blog post on virtuality.fashion';
     case 'welcome':
     default:
-      return 'Welcome to Virtuality Fashion — your team portal login';
+      return 'Welcome to virtuality.fashion — your team portal login';
   }
 }
 
@@ -120,12 +120,12 @@ function headlineFor(mode: TeamWelcomeMode): string {
 function introFor(mode: TeamWelcomeMode): string {
   switch (mode) {
     case 'reset':
-      return 'An admin has reset your Virtuality Fashion portal password. Your new credentials are below — use them to sign in again.';
+      return 'An admin has reset your virtuality.fashion portal password. Your new credentials are below — use them to sign in again.';
     case 'instructions':
-      return 'Here is everything you need to get your first blog post live on the Virtuality Fashion blog. Your sign-in details are below, followed by a short step-by-step guide.';
+      return 'Here is everything you need to get your first blog post live on the virtuality.fashion blog. Your sign-in details are below, followed by a short step-by-step guide.';
     case 'welcome':
     default:
-      return 'You’ve been added to the Virtuality Fashion team portal. From there you can draft blog posts and submit them for admin review. Your sign-in details are below.';
+      return 'You’ve been added to the virtuality.fashion team portal. From there you can draft blog posts and submit them for admin review. Your sign-in details are below.';
   }
 }
 
@@ -226,7 +226,7 @@ function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
             <tr>
               <td style="padding: 32px 32px 0 32px;">
                 <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280;">
-                  Virtuality Fashion
+                  virtuality.fashion
                 </div>
                 <h1 style="margin: 16px 0 8px 0; font-size: 26px; font-weight: 700; color: #111827; line-height: 1.2;">
                   ${escapeHtml(headline)}
@@ -287,7 +287,7 @@ function renderEmailHtml(input: SendTeamWelcomeEmailInput): string {
             <tr>
               <td style="padding: 20px 32px 32px 32px; border-top: 1px solid #f3f4f6;">
                 <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #9ca3af;">
-                  You’re getting this email because an admin sent you the Virtuality Fashion team portal details. If this wasn’t expected, just reply to this message and we’ll take a look.
+                  You’re getting this email because an admin sent you the virtuality.fashion team portal details. If this wasn’t expected, just reply to this message and we’ll take a look.
                 </p>
               </td>
             </tr>

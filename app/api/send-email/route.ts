@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Build email content based on form type
-    let emailSubject = subject || 'New Contact Form Submission - Virtuality Fashion';
+    let emailSubject = subject || 'New Contact Form Submission - virtuality.fashion';
     let htmlContent = '';
 
     if (formType === 'contact') {
       emailSubject = designer
-        ? `Quote Request for ${designer} - Virtuality Fashion`
-        : 'New Contact Form Submission - Virtuality Fashion';
+        ? `Quote Request for ${designer} - virtuality.fashion`
+        : 'New Contact Form Submission - virtuality.fashion';
 
       htmlContent = `
         <h2>New Contact Form Submission</h2>
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         <p>${message?.replace(/\n/g, '<br>')}</p>
       `;
     } else if (formType === 'join-team') {
-      emailSubject = `New Team Application - Virtuality Fashion`;
+      emailSubject = `New Team Application - virtuality.fashion`;
 
       const portfolioLinks = notes ? notes.split('\n').filter((l: string) => l.trim()) : [];
       const portfolioHtml = portfolioLinks.length > 0
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         ${message ? `<h3>Message:</h3><p>${message.replace(/\n/g, '<br>')}</p>` : ''}
       `;
     } else if (formType === 'enterprise') {
-      emailSubject = 'Enterprise Quote Request - Virtuality Fashion';
+      emailSubject = 'Enterprise Quote Request - virtuality.fashion';
 
       htmlContent = `
         <h2>Enterprise Quote Request</h2>
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Virtuality Fashion <amnon@virtuality.fashion>',
+      from: 'virtuality.fashion <amnon@virtuality.fashion>',
       to: 'info@virtuality.fashion',
       ...(bccEmails.length > 0 && { bcc: bccEmails }),
       replyTo: email, // Reply goes to the person who submitted the form

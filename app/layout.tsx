@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Virtual Sampling & Tech Pack Services | Virtuality Fashion",
-    template: "%s | Virtuality Fashion"
+    default: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
+    template: "%s | virtuality.fashion"
   },
   description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Virtual sampling services, tech pack creation, CLO3D & Browzwear expertise. Reduce samples by 70%, cut development time in half, and lower costs without compromising quality.",
   keywords: [
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     "lower development costs",
     "sustainable fashion development"
   ],
-  authors: [{ name: "Virtuality Fashion" }],
-  creator: "Virtuality Fashion",
-  publisher: "Virtuality Fashion",
+  authors: [{ name: "virtuality.fashion" }],
+  creator: "virtuality.fashion",
+  publisher: "virtuality.fashion",
   metadataBase: new URL("https://virtuality.fashion"),
   alternates: {
     canonical: "https://virtuality.fashion",
@@ -69,21 +69,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://virtuality.fashion",
-    siteName: "Virtuality Fashion",
-    title: "Virtual Sampling & Tech Pack Services | Virtuality Fashion",
+    siteName: "virtuality.fashion",
+    title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Reduce samples by 70%, cut development time in half.",
     images: [
       {
         url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Virtuality Fashion - Fashion Development Marketplace"
+        alt: "virtuality.fashion - Fashion Development Marketplace"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Virtual Sampling & Tech Pack Services | Virtuality Fashion",
+    title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers.",
     images: ["/images/og-image.jpg"]
   },

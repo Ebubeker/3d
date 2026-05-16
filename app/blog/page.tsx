@@ -5,7 +5,7 @@ import BlogListClient from './BlogListClient';
 import { createClient } from '@/lib/supabase/server';
 import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 
-const SITE_NAME = 'Virtuality Fashion';
+const SITE_NAME = 'virtuality.fashion';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 
 const PAGE_TITLE = 'Blog | virtuality.fashion';

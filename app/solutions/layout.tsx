@@ -3,7 +3,7 @@ import { solutionsGraph } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "How It Works | Virtual Sampling & Digital Fashion Services",
-  description: "Learn how Virtuality Fashion connects brands with expert 3D designers. From virtual sampling to tech pack creation, our vetted professionals deliver production-ready digital assets using CLO3D, Browzwear, and industry-standard tools.",
+  description: "Learn how virtuality.fashion connects brands with expert 3D designers. From virtual sampling to tech pack creation, our vetted professionals deliver production-ready digital assets using CLO3D, Browzwear, and industry-standard tools.",
   keywords: [
     "virtual sampling process",
     "digital fashion workflow",

@@ -123,7 +123,7 @@ export default function AuthorProtectedLayout({
           <div className="p-6 border-b border-gray-200">
             <img
               src="/images/logo.png"
-              alt="Virtuality Fashion"
+              alt="virtuality.fashion"
               className="h-8"
             />
             <p className="text-xs text-gray-500 mt-2">Author Portal</p>

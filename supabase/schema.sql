@@ -1,4 +1,4 @@
--- Supabase Schema for Virtuality Fashion Admin Panel
+-- Supabase Schema for virtuality.fashion Admin Panel
 -- Run this in your Supabase SQL Editor
 
 -- Enable UUID extension

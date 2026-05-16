@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 // (unlike /admin which is also blocked via robots.txt), so a noindex
 // directive here is the belt-and-braces protection.
 export const metadata: Metadata = {
-  title: "Author Portal | Virtuality Fashion",
+  title: "Author Portal | virtuality.fashion",
   robots: { index: false, follow: false },
 };
 

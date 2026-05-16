@@ -20,8 +20,7 @@ export function organizationNode(): Record<string, unknown> {
   return {
     '@type': 'Organization',
     '@id': ORGANIZATION_ID,
-    name: 'Virtuality Fashion',
-    alternateName: 'virtuality.fashion',
+    name: 'virtuality.fashion',
     url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
@@ -54,7 +53,7 @@ export function websiteNode(): Record<string, unknown> {
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
     url: SITE_URL,
-    name: 'Virtuality Fashion',
+    name: 'virtuality.fashion',
     description:
       'Virtual sampling and tech pack services for fashion brands.',
     publisher: { '@id': ORGANIZATION_ID },

@@ -60,7 +60,7 @@ export default function Header() {
         <Link href="/" className="relative z-50">
           <img
             src="/images/logo.png"
-            alt="Virtuality Fashion"
+            alt="virtuality.fashion"
             className="h-10 sm:h-11 md:h-12 w-auto"
           />
         </Link>

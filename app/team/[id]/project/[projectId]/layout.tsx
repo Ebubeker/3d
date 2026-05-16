@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // /team/[id]?project=... and aren't in the sitemap. Keeping them
 // noindex avoids duplicate-content signals.
 export const metadata: Metadata = {
-  title: "Team Project | Virtuality Fashion",
+  title: "Team Project | virtuality.fashion",
   robots: { index: false, follow: true },
 };
 

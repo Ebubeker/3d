@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 // Sender / reply-to mirror the team-welcome template so domain reputation
 // stays consistent and replies land in the same inbox.
-const FROM = 'Virtuality Fashion <amnon@virtuality.fashion>';
+const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
 const REPLY_TO = process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
 
 const SITE_URL =
@@ -61,7 +61,7 @@ export async function sendVisitorWelcomeEmail(
       to: input.email,
       bcc: RECORDS_BCC,
       replyTo: REPLY_TO,
-      subject: 'Welcome to Virtuality Fashion — your team access is unlocked',
+      subject: 'Welcome to virtuality.fashion — your team access is unlocked',
       html,
     });
     if (error) {
@@ -97,7 +97,7 @@ function unsubscribeFooter(token: string): string {
       <tr>
         <td style="padding: 16px 32px 32px 32px; border-top: 1px solid #f3f4f6;">
           <p style="margin: 0; font-size: 11px; line-height: 1.6; color: #9ca3af; text-align: center;">
-            You're receiving Virtuality Fashion updates because you opted in
+            You're receiving virtuality.fashion updates because you opted in
             when unlocking team access. Don't want these anymore?
             <a href="${url}" style="color: #6b7280; text-decoration: underline;">Unsubscribe instantly</a>.
           </p>
@@ -137,7 +137,7 @@ function renderEmailHtml(input: SendVisitorWelcomeInput): string {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Welcome to Virtuality Fashion</title>
+    <title>Welcome to virtuality.fashion</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f3f4f6; padding: 32px 16px;">
@@ -147,7 +147,7 @@ function renderEmailHtml(input: SendVisitorWelcomeInput): string {
             <tr>
               <td style="padding: 32px 32px 0 32px;">
                 <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280;">
-                  Virtuality Fashion
+                  virtuality.fashion
                 </div>
                 <h1 style="margin: 16px 0 8px 0; font-size: 26px; font-weight: 700; color: #111827; line-height: 1.2;">
                   You're in.
@@ -160,7 +160,7 @@ function renderEmailHtml(input: SendVisitorWelcomeInput): string {
                   Hi ${nameSafe},
                 </p>
                 <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #374151;">
-                  Thanks for unlocking access to the Virtuality Fashion team
+                  Thanks for unlocking access to the virtuality.fashion team
                   marketplace. You can now browse profiles, portfolios, and
                   past work from our vetted fashion technical designers, 3D
                   specialists, and patternmakers.
