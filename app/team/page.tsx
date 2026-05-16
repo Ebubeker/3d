@@ -89,7 +89,6 @@ export default function TeamPage() {
     volume: '',
     timeline: '',
     message: '',
-    consent: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -166,7 +165,6 @@ export default function TeamPage() {
     }
     if (!formData.company.trim()) newErrors.company = 'Company name is required';
     if (!formData.projectType) newErrors.projectType = 'Please select a project type';
-    if (!formData.consent) newErrors.consent = 'You must agree to the privacy policy';
 
     if (Object.keys(newErrors).length === 0) {
       try {
@@ -416,24 +414,6 @@ export default function TeamPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium resize-none focus:border-black focus:bg-white outline-none transition-colors text-black"
                     placeholder="Tell us more about your project..."
                   />
-                </div>
-
-                {/* Consent Checkbox */}
-                <div>
-                  <label className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      name="consent"
-                      checked={formData.consent}
-                      onChange={handleChange}
-                      className="mt-1"
-                    />
-                    <span className="text-sm text-gray-700">
-                      I agree to the processing of my personal data in accordance with the{' '}
-                      <a href="/privacy" className="text-black font-semibold underline">Privacy Policy</a> and consent to being contacted about my project.
-                    </span>
-                  </label>
-                  {errors.consent && <p className="text-red-600 text-sm mt-2">{errors.consent}</p>}
                 </div>
 
                 {/* Submit Button */}
