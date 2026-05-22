@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // /experts/[id] and aren't in the sitemap. Noindex until the route is
 // repurposed or its content is unique.
 export const metadata: Metadata = {
-  title: "Expert Project | virtuality.fashion",
+  title: "Expert Project",
   robots: { index: false, follow: true },
 };
 

@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Our Employees | virtuality.fashion",
+  title: "Our Employees",
   description:
     "Meet the in-house specialists behind virtuality.fashion. Vetted 3D designers, technical developers, and patternmakers delivering virtual sampling and tech pack services for leading fashion brands.",
   alternates: {

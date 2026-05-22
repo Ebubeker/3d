@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Apply to Join | Freelance with virtuality.fashion",
+  title: "Apply to Join Our Network",
   description:
     "Are you a 3D fashion designer, patternmaker, or technical developer? Apply to join our vetted network and work with leading fashion brands on virtual sampling and tech pack projects.",
   alternates: {

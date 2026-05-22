@@ -4,16 +4,21 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Join the Team | virtuality.fashion",
+  // `absolute` bypasses the root layout's "%s | virtuality.fashion" title
+  // template so the title renders exactly as specified, with no brand
+  // suffix appended.
+  title: {
+    absolute: "Join Our Team | Work With Leading Fashion Brands",
+  },
   description:
-    "Become part of virtuality.fashion's global team of 3D designers, patternmakers, and technical developers. Submit a short application and book an interview to start working with leading fashion brands.",
+    "Join virtuality.fashion's curated network of 3D designers, technical designers, and pattern makers. Remote work, quality projects, leading brands.",
   alternates: {
     canonical: `${SITE_URL}/join-team`,
   },
   openGraph: {
-    title: "Join the Team | virtuality.fashion",
+    title: "Join Our Team | Work With Leading Fashion Brands",
     description:
-      "Become part of virtuality.fashion's global team of 3D designers, patternmakers, and technical developers.",
+      "Join virtuality.fashion's curated network of 3D designers, technical designers, and pattern makers. Remote work, quality projects, leading brands.",
     url: `${SITE_URL}/join-team`,
   },
 };

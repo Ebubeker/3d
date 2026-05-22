@@ -21,12 +21,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!member) {
       return {
-        title: "Team Member | virtuality.fashion",
+        title: "Team Member",
         robots: { index: false, follow: true },
       };
     }
 
-    const title = `${member.name} | ${member.role} | virtuality.fashion`;
+    const title = `${member.name} | ${member.role}`;
     // Trim the bio to ~155 chars so it fits Google's snippet limit without
     // being truncated mid-word in the SERP.
     const rawDescription =
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   } catch {
     return {
-      title: "Team Member | virtuality.fashion",
+      title: "Team Member",
     };
   }
 }

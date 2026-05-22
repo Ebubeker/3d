@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Projects & Case Studies | virtuality.fashion",
+  title: "Projects & Case Studies",
   description:
     "Explore virtuality.fashion case studies: 3D virtual sampling, tech pack creation, and digital fashion development projects delivered for global brands.",
   keywords: [

@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Project Inquiry | Get a Custom Quote | virtuality.fashion",
+  title: "Project Inquiry | Get a Custom Quote",
   description:
     "Tell us about your fashion project and we'll put together a tailored quote for virtual sampling, tech pack creation, or 3D garment development. Response within 24 hours.",
   alternates: {

@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | virtuality.fashion",
+  title: "Cookie Policy",
   description:
     "Which cookies virtuality.fashion uses, what they're used for, and how you can manage or disable them in your browser.",
   alternates: {

@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | virtuality.fashion",
+  title: "Terms of Service",
   description:
     "The terms and conditions that govern your use of virtuality.fashion's website and services. Please read carefully before submitting a project or joining our team.",
   alternates: {
