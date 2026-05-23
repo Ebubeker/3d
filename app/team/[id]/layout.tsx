@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         : rawDescription;
 
     const url = `${SITE_URL}/team/${id}`;
-    const image = member.portrait || `${SITE_URL}/images/og-image.jpg`;
+    const image = member.portrait || `${SITE_URL}/opengraph-image`;
 
     return {
       title,

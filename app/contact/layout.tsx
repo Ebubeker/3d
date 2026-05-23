@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGES } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
     title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
     description: "Contact virtuality.fashion for virtual sampling, tech pack creation, and 3D design services.",
     url: "https://virtuality.fashion/contact",
+    images: OG_IMAGES,
   },
   alternates: {
     canonical: "https://virtuality.fashion/contact"

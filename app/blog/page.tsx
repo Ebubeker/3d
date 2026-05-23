@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import BlogListClient from './BlogListClient';
 import { createClient } from '@/lib/supabase/server';
 import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
+import { OG_IMAGES } from '@/lib/seo/schema';
 
 const SITE_NAME = 'virtuality.fashion';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     siteName: SITE_NAME,
+    images: OG_IMAGES,
   },
   twitter: {
     card: 'summary_large_image',

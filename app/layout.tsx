@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { siteGraph } from "@/lib/seo/schema";
+import { siteGraph, OG_IMAGES } from "@/lib/seo/schema";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -72,20 +72,13 @@ export const metadata: Metadata = {
     siteName: "virtuality.fashion",
     title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Reduce samples by 70%, cut development time in half.",
-    images: [
-      {
-        url: "/images/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "virtuality.fashion - Fashion Development Marketplace"
-      }
-    ]
+    images: OG_IMAGES
   },
   twitter: {
     card: "summary_large_image",
     title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers.",
-    images: ["/images/og-image.jpg"]
+    images: [OG_IMAGES[0].url]
   },
   robots: {
     index: true,

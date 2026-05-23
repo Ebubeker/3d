@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGES } from "@/lib/seo/schema";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
     description:
       "Join virtuality.fashion's curated network of 3D designers, technical designers, and pattern makers. Remote work, quality projects, leading brands.",
     url: `${SITE_URL}/join-team`,
+    images: OG_IMAGES,
   },
 };
 

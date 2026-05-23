@@ -11,6 +11,20 @@ const SITE_URL =
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
+// Single source of truth for the site's default Open Graph image. Points
+// at the dynamic generator at app/opengraph-image.tsx so we never have
+// to commit a static asset. Spread into every page layout's openGraph
+// block; Next.js does NOT merge openGraph between parent and child, so
+// each layout that defines its own openGraph must include this itself.
+export const OG_IMAGES = [
+  {
+    url: `${SITE_URL}/opengraph-image`,
+    width: 1200,
+    height: 630,
+    alt: 'virtuality.fashion — virtual sampling and tech pack services',
+  },
+];
+
 export interface JsonLdGraph {
   '@context': 'https://schema.org';
   '@graph': Record<string, unknown>[];

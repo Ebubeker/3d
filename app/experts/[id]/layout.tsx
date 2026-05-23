@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${SITE_URL}/experts/${id}`;
   const image = expert.photo
     ? `${SITE_URL}${expert.photo}`
-    : `${SITE_URL}/images/og-image.jpg`;
+    : `${SITE_URL}/opengraph-image`;
 
   return {
     title,

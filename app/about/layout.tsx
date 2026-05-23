@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGES } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "About Us | Digital Fashion Pioneers Since 2015",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
     title: "About Us | Digital Fashion Pioneers Since 2015",
     description: "virtuality.fashion was founded in 2015 by fashion tech veterans. Pioneers in 3D as a Service (3DaaS).",
     url: "https://virtuality.fashion/about",
+    images: OG_IMAGES,
   },
   alternates: {
     canonical: "https://virtuality.fashion/about"

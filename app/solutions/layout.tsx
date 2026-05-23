@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { solutionsGraph } from "@/lib/seo/schema";
+import { solutionsGraph, OG_IMAGES } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "How It Works | Virtual Sampling & Digital Fashion Services",
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     title: "How It Works | Virtual Sampling & Digital Fashion Services",
     description: "Learn how virtuality.fashion connects brands with expert 3D designers for virtual sampling and tech pack services.",
     url: "https://virtuality.fashion/solutions",
+    images: OG_IMAGES,
   },
   alternates: {
     canonical: "https://virtuality.fashion/solutions"
