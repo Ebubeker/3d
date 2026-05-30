@@ -191,3 +191,21 @@ html {
 .font-copperplate {
   font-family: var(--font-copperplate);
 }
+
+/* ---------------------------------------------------------------------------
+   Blog post body styling
+   Applied automatically to every post via the `.blog-content` wrapper in
+   app/components/BlogContent.tsx. No per-post markup or classes are required
+   when publishing — these rules target the rendered post HTML directly.
+   --------------------------------------------------------------------------- */
+
+/* Orange accent rule beneath the lede (first) paragraph of every post. */
+.blog-content > p:first-of-type {
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid #E8700A;
+}
+
+/* Orange vertical bar on blockquotes. */
+.blog-content blockquote {
+  border-left: 4px solid #E8700A;
+}
