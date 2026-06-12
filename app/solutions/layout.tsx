@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { solutionsGraph, OG_IMAGES } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "How It Works | Virtual Sampling & Digital Fashion Services",
@@ -19,11 +20,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: "How It Works | Virtual Sampling & Digital Fashion Services",
     description: "Learn how virtuality.fashion connects brands with expert 3D designers for virtual sampling and tech pack services.",
-    url: "https://virtuality.fashion/solutions",
+    url: `${SITE_URL}/solutions`,
     images: OG_IMAGES,
   },
+  // Without an explicit twitter block this page would inherit the root
+  // layout's homepage twitter:title/description.
+  twitter: {
+    card: "summary_large_image",
+    title: "How It Works | Virtual Sampling & Digital Fashion Services | virtuality.fashion",
+    description: "Learn how virtuality.fashion connects brands with expert 3D designers. From virtual sampling to tech pack creation, our vetted professionals deliver production-ready digital assets.",
+    images: [OG_IMAGES[0].url],
+  },
   alternates: {
-    canonical: "https://virtuality.fashion/solutions"
+    canonical: `${SITE_URL}/solutions`
   }
 };
 

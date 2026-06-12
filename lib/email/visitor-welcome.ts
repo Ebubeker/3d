@@ -1,12 +1,11 @@
 import { Resend } from 'resend';
+import { SITE_URL } from '../site';
 
 // Sender / reply-to mirror the team-welcome template so domain reputation
 // stays consistent and replies land in the same inbox.
 const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
 const REPLY_TO = process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const TEAM_URL = `${SITE_URL}/team`;
 
 // Internal records inbox — BCC'd so the team has an audit trail of who

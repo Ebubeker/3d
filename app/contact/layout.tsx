@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OG_IMAGES } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
@@ -19,11 +20,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contact Us | Get a Quote for Virtual Sampling & Tech Pack Services",
     description: "Contact virtuality.fashion for virtual sampling, tech pack creation, and 3D design services.",
-    url: "https://virtuality.fashion/contact",
+    url: `${SITE_URL}/contact`,
     images: OG_IMAGES,
   },
   alternates: {
-    canonical: "https://virtuality.fashion/contact"
+    canonical: `${SITE_URL}/contact`
   }
 };
 

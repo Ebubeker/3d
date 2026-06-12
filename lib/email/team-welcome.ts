@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { SITE_URL } from '../site';
 
 // Sender / reply-to. Mirror the settings used by /api/send-email so the
 // domain reputation stays consistent and replies land in the same inbox
@@ -7,8 +8,6 @@ const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
 const REPLY_TO =
   process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const LOGIN_URL = `${SITE_URL}/author`;
 
 // Internal records inbox — BCC'd on every welcome/reset/instructions so

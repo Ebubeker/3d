@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import experts from "@/data/experts.json";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://virtuality.fashion";
+import { SITE_URL } from "@/lib/site";
 
 interface Props {
   params: Promise<{ id: string }>;

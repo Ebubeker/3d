@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { BlogPost } from '@/lib/supabase/types';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
+import { SITE_URL } from '@/lib/site';
 
 // Rebuild the sitemap on every request so newly published blog posts
 // appear immediately without requiring a redeploy.

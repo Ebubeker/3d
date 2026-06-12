@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { BlogPostWithAuthor } from '@/lib/supabase/types';
+import { SITE_URL } from '@/lib/site';
 
 const SITE_NAME = 'virtuality.fashion';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const FEED_DESCRIPTION =
   'Insights, stories, and ideas from the world of 3D fashion design.';
 

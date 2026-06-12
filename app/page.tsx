@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site";
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HeroSection from './components/home/HeroSection';
@@ -26,10 +27,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers. Reduce samples by 70%, cut development time in half.",
-    url: "https://virtuality.fashion",
+    url: SITE_URL,
   },
   alternates: {
-    canonical: "https://virtuality.fashion"
+    canonical: SITE_URL
   }
 };
 

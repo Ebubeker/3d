@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { siteGraph, OG_IMAGES } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,11 +37,11 @@ export const metadata: Metadata = {
   authors: [{ name: "virtuality.fashion" }],
   creator: "virtuality.fashion",
   publisher: "virtuality.fashion",
-  metadataBase: new URL("https://virtuality.fashion"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: "https://virtuality.fashion",
+    canonical: SITE_URL,
     types: {
-      "application/rss+xml": "https://virtuality.fashion/blog/rss.xml"
+      "application/rss+xml": `${SITE_URL}/blog/rss.xml`
     }
   },
   icons: {
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://virtuality.fashion",
+    url: SITE_URL,
     siteName: "virtuality.fashion",
     title: "Virtual Sampling & Tech Pack Services | virtuality.fashion",
     description: "Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Reduce samples by 70%, cut development time in half.",

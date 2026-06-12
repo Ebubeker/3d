@@ -9,9 +9,9 @@ import { createClient } from '@/lib/supabase/server';
 import { BlogPost, BlogPostWithAuthor } from '@/lib/supabase/types';
 import { formatReadingTime } from '@/lib/blog/reading-time';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
+import { SITE_URL } from '@/lib/site';
 
 const SITE_NAME = 'virtuality.fashion';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image`;
 
 interface PageProps {

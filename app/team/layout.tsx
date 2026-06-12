@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OG_IMAGES } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Our Team | Vetted 3D & Technical Design Experts",
@@ -17,11 +18,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Our Team | Vetted 3D & Technical Design Experts",
     description: "Browse virtuality.fashion's curated team of vetted 3D designers and technical developers.",
-    url: "https://virtuality.fashion/team",
+    url: `${SITE_URL}/team`,
     images: OG_IMAGES,
   },
+  // Without an explicit twitter block this page would inherit the root
+  // layout's homepage twitter:title/description.
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Team | Vetted 3D & Technical Design Experts | virtuality.fashion",
+    description: "Browse virtuality.fashion's curated team of vetted 3D designers and technical developers.",
+    images: [OG_IMAGES[0].url],
+  },
   alternates: {
-    canonical: "https://virtuality.fashion/team"
+    canonical: `${SITE_URL}/team`
   }
 };
 

@@ -5,8 +5,7 @@
 // profiles, founding year, services) should be edited here, not duplicated
 // in each layout.
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://virtuality.fashion';
+import { SITE_URL } from '../site';
 
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
@@ -43,7 +42,7 @@ export function organizationNode(): Record<string, unknown> {
     image: `${SITE_URL}/images/og-image.jpg`,
     description:
       'Curated marketplace connecting fashion brands with vetted 3D designers and technical developers. Virtual sampling, tech pack creation, CLO3D and Browzwear expertise.',
-    foundingDate: '2015',
+    foundingDate: '2016',
     sameAs: [
       'https://www.instagram.com/virtuality.fashion/',
       'https://www.linkedin.com/company/virtuality-fashion/',
