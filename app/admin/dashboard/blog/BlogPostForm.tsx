@@ -39,6 +39,9 @@ interface FormState {
   meta_title: string;
   meta_description: string;
   og_image: string;
+  // Empty string = no team member selected → byline falls back to the
+  // company name (virtuality.fashion).
+  author_id: string;
 }
 
 const emptyState: FormState = {
@@ -52,6 +55,7 @@ const emptyState: FormState = {
   meta_title: '',
   meta_description: '',
   og_image: '',
+  author_id: '',
 };
 
 export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
@@ -69,9 +73,15 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           meta_title: initialPost.meta_title || '',
           meta_description: initialPost.meta_description || '',
           og_image: initialPost.og_image || '',
+          author_id: initialPost.author_id || '',
         }
       : emptyState
   );
+
+  // All active team members, used to populate the Author dropdown.
+  const [teamMembers, setTeamMembers] = useState<
+    Pick<TeamMember, 'id' | 'name' | 'role'>[]
+  >([]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
@@ -92,13 +102,6 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
   const [rejectMessage, setRejectMessage] = useState('');
   const [isReviewing, setIsReviewing] = useState(false);
 
-  // When creating a brand-new post, if the current admin is also linked to a
-  // team_members row, default the new post's author_id to theirs. That way
-  // admin-authored posts still get a proper byline on the public blog.
-  const [currentAdminTeamMemberId, setCurrentAdminTeamMemberId] = useState<
-    string | null
-  >(null);
-
   const coverInputRef = useRef<HTMLInputElement>(null);
   const ogInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,7 +120,25 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
     loadAuthor();
   }, [initialPost?.author_id]);
 
-  // Resolve the current admin's linked team_members row (if any) for create mode
+  // Load all active team members for the Author dropdown.
+  useEffect(() => {
+    const loadTeamMembers = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('team_members')
+        .select('id, name, role')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      if (data) {
+        setTeamMembers(data as Pick<TeamMember, 'id' | 'name' | 'role'>[]);
+      }
+    };
+    loadTeamMembers();
+  }, []);
+
+  // Resolve the current admin's linked team_members row (if any) for create
+  // mode, and use it as the default author selection so an admin who is also a
+  // team member is credited by default. The admin can override via the dropdown.
   useEffect(() => {
     if (mode !== 'create') return;
     const loadAdminTeamMember = async () => {
@@ -131,7 +152,11 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
-      if (data) setCurrentAdminTeamMemberId(data.id);
+      if (data) {
+        setFormData((prev) =>
+          prev.author_id ? prev : { ...prev, author_id: data.id }
+        );
+      }
     };
     loadAdminTeamMember();
   }, [mode]);
@@ -243,6 +268,9 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
         meta_title: formData.meta_title.trim() || null,
         meta_description: formData.meta_description.trim() || null,
         og_image: formData.og_image || null,
+        // Author byline is chosen explicitly via the Author dropdown. Empty
+        // selection → null → public page falls back to the company name.
+        author_id: formData.author_id || null,
         review_status: newReviewStatus,
         rejection_reason: null,
       };
@@ -254,16 +282,9 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           .eq('id', initialPost.id);
         if (updateError) throw updateError;
       } else {
-        // On create, attach the admin's team_members row as author_id when
-        // available. Posts created by admins who aren't team members keep
-        // author_id = null and fall back to the site-wide byline.
-        const insertPayload: Record<string, unknown> = { ...payload };
-        if (currentAdminTeamMemberId) {
-          insertPayload.author_id = currentAdminTeamMemberId;
-        }
         const { error: insertError } = await supabase
           .from('blog_posts')
-          .insert([insertPayload]);
+          .insert([payload]);
         if (insertError) throw insertError;
       }
 
@@ -543,6 +564,34 @@ export default function BlogPostForm({ mode, initialPost }: BlogPostFormProps) {
           />
           <p className="text-xs text-gray-500 mt-1">
             {formData.excerpt.length} / 280 characters
+          </p>
+        </div>
+
+        {/* Author */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Author
+          </label>
+          <select
+            value={formData.author_id}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, author_id: e.target.value }))
+            }
+            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-black"
+          >
+            <option value="">virtuality.fashion (company)</option>
+            {teamMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+                {member.role ? ` — ${member.role}` : ''}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Choose the team member to credit as the author. Their name, photo,
+            and role appear on the published post. Leave as{' '}
+            <span className="font-medium">virtuality.fashion</span> to publish
+            under the company name.
           </p>
         </div>
 
