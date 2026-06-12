@@ -96,13 +96,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = post.meta_title || post.title;
+  // Authors sometimes save meta titles that already end with the brand;
+  // strip it so the suffixes appended below don't repeat it.
+  const title = (post.meta_title || post.title).replace(
+    /\s*\|\s*virtuality\.fashion\s*$/i,
+    ''
+  );
   const description = post.meta_description || post.excerpt || '';
   const image = post.og_image || post.cover_image || DEFAULT_OG_IMAGE;
   const url = `${SITE_URL}/blog/${post.slug}`;
 
   return {
-    title: `${title} | ${SITE_NAME} Blog`,
+    // `absolute` bypasses the root layout's "%s | virtuality.fashion"
+    // template, which would otherwise double the brand suffix.
+    title: { absolute: `${title} | ${SITE_NAME} Blog` },
     description,
     alternates: {
       canonical: url,

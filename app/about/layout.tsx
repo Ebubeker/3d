@@ -3,8 +3,8 @@ import { OG_IMAGES } from "@/lib/seo/schema";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "About Us | Digital Fashion Pioneers Since 2015",
-  description: "virtuality.fashion was founded in 2015 by fashion tech veterans. We pioneered 3D as a Service (3DaaS), helping brands adopt virtual sampling without building in-house operations. Thousands of digitized garments, hundreds of global projects.",
+  title: "About Us | Digital Fashion Pioneers Since 2016",
+  description: "virtuality.fashion was founded in 2016 by fashion tech veterans. We pioneered 3D as a Service (3DaaS), helping brands adopt virtual sampling without building in-house operations. Thousands of digitized garments, hundreds of global projects.",
   keywords: [
     "about virtuality.fashion",
     "3D fashion company",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     "digital garment experts"
   ],
   openGraph: {
-    title: "About Us | Digital Fashion Pioneers Since 2015",
-    description: "virtuality.fashion was founded in 2015 by fashion tech veterans. Pioneers in 3D as a Service (3DaaS).",
+    title: "About Us | Digital Fashion Pioneers Since 2016",
+    description: "virtuality.fashion was founded in 2016 by fashion tech veterans. Pioneers in 3D as a Service (3DaaS).",
     url: `${SITE_URL}/about`,
     images: OG_IMAGES,
   },

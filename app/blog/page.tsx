@@ -14,7 +14,9 @@ const PAGE_DESCRIPTION =
   'Practical insights on fashion product development, tech packs, virtual sampling, and working with on-demand teams.';
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  // `absolute` bypasses the root layout's "%s | virtuality.fashion" template,
+  // which would otherwise double the brand suffix.
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}/blog`,

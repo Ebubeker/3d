@@ -9,14 +9,9 @@ import { Target, Users, Award, Leaf } from 'lucide-react';
 export default function AboutPage() {
   const milestones = [
     {
-      year: '2015',
-      title: 'Founded',
-      description: 'virtuality.fashion was founded by fashion tech veterans with one clear goal: make digital fashion practical, scalable, and usable in real product development.'
-    },
-    {
       year: '2016',
-      title: '3D as a Service Pioneer',
-      description: 'Among the first teams to offer 3DaaS (3D as a Service), enabling brands to adopt 3D sampling without building in-house operations.'
+      title: 'Founded',
+      description: 'virtuality.fashion was founded by fashion tech veterans with one clear goal: make digital fashion practical, scalable, and usable in real product development. Among the first teams to offer 3DaaS (3D as a Service), enabling brands to adopt 3D sampling without building in-house operations.'
     },
     {
       year: '2018',
@@ -64,7 +59,7 @@ export default function AboutPage() {
   ];
 
   const stats = [
-    { number: '2015', label: 'Founded' },
+    { number: '2016', label: 'Founded' },
     { number: '1000+', label: 'Digitized Garments' },
     { number: '100+', label: 'Global Projects' },
     { number: '50+', label: 'Brand Partners' }
@@ -129,7 +124,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl leading-relaxed"
           >
-            Making digital fashion practical, scalable, and usable in real product development since 2015.
+            Making digital fashion practical, scalable, and usable in real product development since 2016.
           </motion.p>
         </div>
       </div>
@@ -165,7 +160,7 @@ export default function AboutPage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-6 sm:mb-8 md:mb-10">Our Story</h2>
             <div className="space-y-4 sm:space-y-6 md:space-y-8 text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed">
               <motion.p {...fadeInUp}>
-                virtuality.fashion was founded in 2015 by fashion tech veterans, with one clear goal: make digital fashion practical, scalable, and usable in real product development. We were among the early teams to offer 3D as a Service (3DaaS), so brands could adopt 3D sampling without building an in-house operation or forcing a full workflow reset.
+                virtuality.fashion was founded in 2016 by fashion tech veterans, with one clear goal: make digital fashion practical, scalable, and usable in real product development. We were among the early teams to offer 3D as a Service (3DaaS), so brands could adopt 3D sampling without building an in-house operation or forcing a full workflow reset.
               </motion.p>
               <motion.p {...fadeInUp} transition={{ delay: 0.1 }}>
                 Since day one we have built a home for fashion technical designers and 3D specialists who deliver to strict industry standards. Over the years we have led complex global projects and productions across multiple time zones, producing virtual collections at scale with hundreds of SKUs, hard deadlines, and production-level expectations.
