@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkSpam, extractContentForSpamCheck } from '@/lib/spam-detection';
+import { recordBlockedSubmission } from '@/lib/spam-quarantine';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -58,24 +59,10 @@ export async function POST(request: NextRequest) {
       formType,
     } = body;
 
-    // Spam detection: check before sending
+    // Spam detection: scored up front, applied after the email content is
+    // built so flagged submissions can be quarantined instead of dropped.
     const contentForCheck = extractContentForSpamCheck(body as unknown as Record<string, unknown>);
     const spamResult = checkSpam({ email, content: contentForCheck, name });
-
-    if (spamResult.isSpam) {
-      console.log('[SPAM BLOCKED]', {
-        email,
-        formType,
-        scores: {
-          email: spamResult.emailScore,
-          content: spamResult.contentScore,
-          combined: spamResult.combinedScore,
-        },
-        reason: spamResult.reason,
-      });
-      // Return fake success — spammer sees "success" but no email is sent
-      return NextResponse.json({ success: true, data: { id: 'filtered' } });
-    }
 
     // Build email content based on form type
     let emailSubject = subject || 'New Contact Form Submission - virtuality.fashion';
@@ -135,6 +122,52 @@ export async function POST(request: NextRequest) {
         ${timeline ? `<p><strong>Timeline:</strong> ${timeline}</p>` : ''}
         ${notes ? `<h3>Additional Notes:</h3><p>${notes.replace(/\n/g, '<br>')}</p>` : ''}
       `;
+    }
+
+    if (spamResult.isSpam) {
+      console.log('[SPAM BLOCKED]', {
+        email,
+        formType,
+        scores: {
+          email: spamResult.emailScore,
+          content: spamResult.contentScore,
+          combined: spamResult.combinedScore,
+        },
+        reason: spamResult.reason,
+      });
+
+      // Quarantine instead of silent drop: persist the full submission and
+      // forward it with a warning banner so a false positive is always
+      // recoverable. No designer BCC on flagged sends.
+      await recordBlockedSubmission({
+        source: 'send-email',
+        formType,
+        email,
+        name,
+        payload: body as unknown as Record<string, unknown>,
+        result: spamResult,
+      });
+
+      try {
+        await resend.emails.send({
+          from: 'virtuality.fashion <amnon@virtuality.fashion>',
+          to: 'info@virtuality.fashion',
+          replyTo: email,
+          subject: `[Suspected spam] ${emailSubject}`,
+          html: `
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #92400e;">
+              The spam filter flagged this submission (score ${spamResult.combinedScore}/100 — ${spamResult.reason}).
+              It was quarantined, not dropped: review it in case it is a real lead.
+            </div>
+            ${htmlContent}
+          `,
+        });
+      } catch (err) {
+        console.error('[SPAM BLOCKED] quarantine email failed', err);
+      }
+
+      // Fake success — a real spammer must not learn they were filtered.
+      return NextResponse.json({ success: true, data: { id: 'filtered' } });
     }
 
     // Send to info@ and BCC the freelancer/designer if available

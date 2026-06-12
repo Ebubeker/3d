@@ -137,14 +137,19 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     reasons.push('Very short content');
   }
 
-  // Spam keywords (max +25)
+  // Spam keywords. 5+ distinct keywords is never legitimate — escalate to
+  // an instant-block score; the old +25 cap let classic keyword-stuffed
+  // pitches through.
   let keywordHits = 0;
   for (const keyword of SPAM_KEYWORDS) {
     if (lower.includes(keyword)) {
       keywordHits++;
     }
   }
-  if (keywordHits > 0) {
+  if (keywordHits >= 5) {
+    score += 50;
+    reasons.push(`Spam keywords detected (${keywordHits})`);
+  } else if (keywordHits > 0) {
     score += Math.min(25, keywordHits * 5);
     reasons.push(`Spam keywords detected (${keywordHits})`);
   }
@@ -169,20 +174,32 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     }
   }
 
+  // URLs are legitimate in this domain (portfolio links, product
+  // references) but look like gibberish to the English Markov model —
+  // a links-heavy application with a short message used to score 90+
+  // and get silently blocked. Strip URLs from the text before any
+  // gibberish/word analysis; their volume is already scored above.
+  const textOnly = trimmed
+    .replace(/(https?:\/\/|www\.)\S+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
   // Gibberish detection using Markov chain analysis (gibberish-detective)
-  const words = trimmed.split(/\s+/).filter(w => w.length > 0);
-  if (trimmed.length >= 6) {
+  const words = textOnly.split(/\s+/).filter(w => w.length > 0);
+  if (textOnly.length >= 6) {
     try {
       // Check the full content string
-      if (gibberish.detect(trimmed)) {
+      if (gibberish.detect(textOnly)) {
         score += 50;
         reasons.push('Gibberish content detected (Markov chain)');
       }
 
       // Check individual words >= 6 chars (the library is unreliable on shorter strings)
-      // If majority of testable words are gibberish, flag it
+      // If majority of testable words are gibberish, flag it. Require at
+      // least 4 testable words — a majority over 1-3 words is noise, and
+      // short legitimate messages were getting blocked on it.
       const testableWords = words.filter(w => w.length >= 6);
-      if (testableWords.length > 0) {
+      if (testableWords.length >= 4) {
         const gibberishWords = testableWords.filter(w => gibberish.detect(w));
         const gibberishRatio = gibberishWords.length / testableWords.length;
         if (gibberishRatio > 0.5) {
@@ -212,8 +229,9 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     }
   }
 
-  // 8+ consecutive consonants in content
-  if (/[bcdfghjklmnpqrstvwxyz]{8,}/i.test(trimmed)) {
+  // 8+ consecutive consonants in content (URL-stripped — paths and
+  // domain names routinely contain long consonant runs)
+  if (/[bcdfghjklmnpqrstvwxyz]{8,}/i.test(textOnly)) {
     score += 20;
     reasons.push('Consonant cluster in content');
   }
@@ -300,10 +318,13 @@ export function checkSpam(input: SpamCheckInput): SpamCheckResult {
 }
 
 export function extractContentForSpamCheck(body: Record<string, unknown>): string {
+  // Name fields are deliberately excluded: non-English names read as
+  // gibberish to the English Markov model and were tipping legitimate
+  // submissions over the block threshold. Names are checked separately
+  // via checkSpam's dedicated `name` parameter.
   const contentFields = [
     'message', 'notes', 'additionalNotes', 'subject',
-    'company', 'productName', 'targetMarket', 'name',
-    'fullName', 'firstName', 'lastName',
+    'company', 'productName', 'targetMarket',
   ];
 
   const parts: string[] = [];
