@@ -7,6 +7,7 @@ import {
   validateAuthorPostPayload,
   resolveSlug,
 } from '@/lib/blog/author-posts';
+import { sendPostSubmittedEmail } from '@/lib/email/post-submitted';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,5 +109,31 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Notify the team inbox when a post is submitted straight for review.
+  // Never blocks the response — the helper swallows and logs its own errors.
+  if (reviewStatus === 'pending_review') {
+    const authorName = await authorNameFor(admin, auth.teamMemberId);
+    await sendPostSubmittedEmail({
+      postId: data.id,
+      title: (body.title || '').trim(),
+      authorName,
+      excerpt: body.excerpt?.toString().trim() || null,
+      category: body.category?.toString().trim() || null,
+    });
+  }
+
   return NextResponse.json({ ok: true, id: data.id });
+}
+
+/** Best-effort display name for the submitting author; falls back gracefully. */
+async function authorNameFor(
+  admin: ReturnType<typeof createAdminClient>,
+  teamMemberId: string
+): Promise<string> {
+  const { data } = await admin
+    .from('team_members')
+    .select('name')
+    .eq('id', teamMemberId)
+    .maybeSingle();
+  return data?.name?.toString().trim() || 'A team member';
 }

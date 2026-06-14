@@ -32,7 +32,7 @@ export default function Footer() {
             <Link href="/">
               <img
                 src="/images/logo.png"
-                alt="Virtuality.Fashion"
+                alt="virtuality.fashion"
                 className="h-10 sm:h-12 md:h-14 w-auto"
               />
             </Link>
