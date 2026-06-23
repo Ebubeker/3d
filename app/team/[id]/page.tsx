@@ -372,45 +372,74 @@ export default function TeamMemberPage() {
                 const mediaUrls = getMediaUrls(image);
                 const firstUrl = mediaUrls[0];
                 const mediaType = firstUrl ? getMediaType(firstUrl) : null;
+                // PDFs open in a new tab instead of the lightbox, because the
+                // lightbox itself only renders images and videos.
+                const isPdf = mediaType === 'pdf';
+
+                const wrapperClass =
+                  'block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid';
+                const wrapperStyle = {
+                  animationDelay: `${index * 50}ms`,
+                  animationFillMode: 'both' as const,
+                };
+
+                const content = !firstUrl ? (
+                  <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
+                ) : isLinkEntry(firstUrl) ? (
+                  <div className="aspect-square">
+                    <LinkThumbnail entry={parseLinkEntry(firstUrl)!} />
+                  </div>
+                ) : isPdf ? (
+                  <div className="aspect-square">
+                    <PdfThumbnail url={firstUrl} />
+                  </div>
+                ) : mediaType === 'video' ? (
+                  <video
+                    src={`${firstUrl}#t=0.1`}
+                    className="w-full h-auto object-contain"
+                    preload="metadata"
+                    playsInline
+                    muted
+                    loop
+                    onMouseEnter={(e) => e.currentTarget.play()}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.pause();
+                      e.currentTarget.currentTime = 0;
+                    }}
+                    onError={(e) => console.error('Video load error:', firstUrl, e)}
+                    onLoadedData={() => console.log('Video loaded:', firstUrl)}
+                  />
+                ) : (
+                  <img
+                    src={firstUrl}
+                    alt="Gallery image"
+                    className="w-full h-auto object-contain"
+                  />
+                );
+
+                if (isPdf && firstUrl) {
+                  return (
+                    <a
+                      key={image.id}
+                      href={firstUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={wrapperClass}
+                      style={wrapperStyle}
+                    >
+                      {content}
+                    </a>
+                  );
+                }
 
                 return (
                   <button
                     key={image.id}
                     onClick={() => firstUrl && !isLinkEntry(firstUrl) && setLightboxImage(firstUrl)}
-                    className="block w-full mb-2 sm:mb-3 md:mb-4 bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden hover:opacity-90 transition-opacity cursor-pointer animate-fade-in-up break-inside-avoid"
-                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+                    className={wrapperClass}
+                    style={wrapperStyle}
                   >
-                    {firstUrl ? (
-                      isLinkEntry(firstUrl) ? (
-                        <div className="aspect-square">
-                          <LinkThumbnail entry={parseLinkEntry(firstUrl)!} />
-                        </div>
-                      ) : mediaType === 'video' ? (
-                        <video
-                          src={`${firstUrl}#t=0.1`}
-                          className="w-full h-auto object-contain"
-                          preload="metadata"
-                          playsInline
-                          muted
-                          loop
-                          onMouseEnter={(e) => e.currentTarget.play()}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.pause();
-                            e.currentTarget.currentTime = 0;
-                          }}
-                          onError={(e) => console.error('Video load error:', firstUrl, e)}
-                          onLoadedData={() => console.log('Video loaded:', firstUrl)}
-                        />
-                      ) : (
-                        <img
-                          src={firstUrl}
-                          alt="Gallery image"
-                          className="w-full h-auto object-contain"
-                        />
-                      )
-                    ) : (
-                      <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300" />
-                    )}
+                    {content}
                   </button>
                 );
               })}
