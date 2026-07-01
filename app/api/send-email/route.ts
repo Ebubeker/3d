@@ -95,6 +95,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Honeypot: a visually hidden "website" field real visitors never see.
+    // A bot that fills it gets the same fake success as flagged spam, and
+    // the attempt is quarantined for review, never silently lost.
+    if (str(body.website)) {
+      console.log('[HONEYPOT]', { email, formType });
+      await recordBlockedSubmission({
+        source: 'honeypot',
+        formType,
+        email,
+        name,
+        payload: body,
+        result: {
+          isSpam: true,
+          emailScore: 0,
+          contentScore: 0,
+          combinedScore: 100,
+          reason: 'Honeypot field filled',
+        },
+      });
+      return NextResponse.json({ success: true, data: { id: 'filtered' } });
+    }
+
     // Spam detection runs on the raw values; escaping happens only at
     // HTML interpolation below.
     const contentForCheck = extractContentForSpamCheck(body);
