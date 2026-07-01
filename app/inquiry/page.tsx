@@ -5,9 +5,6 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-// Web3Forms Access Key - Replace with your actual key from https://web3forms.com
-const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY_HERE';
-
 interface FormData {
   // Step 1: Personal Details
   firstName: string;
@@ -31,7 +28,7 @@ export default function InquiryPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [referenceNumber] = useState(() => `INQ-${Date.now().toString().slice(-6)}`);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -105,95 +102,38 @@ export default function InquiryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateStep(currentStep)) {
+      setIsLoading(true);
       try {
-        // Check for spam before sending to Web3Forms
-        let isSpam = false;
-        try {
-          const spamRes = await fetch('/api/check-spam', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: formData.email,
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              company: formData.company,
-              productName: formData.productName,
-              targetMarket: formData.targetMarket,
-              additionalNotes: formData.additionalNotes,
-            }),
-          });
-          const spamData = await spamRes.json();
-          isSpam = spamData.isSpam === true;
-        } catch {
-          // Spam check failed — let the submission through
-          isSpam = false;
-        }
-
-        if (isSpam) {
-          // Show fake success — spammer thinks it went through
-          setSubmitted(true);
-          setTimeout(() => {
-            setCurrentStep(1);
-            setFormData({
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              company: '',
-              productName: '',
-              productType: 'apparel',
-              quantity: '',
-              targetMarket: '',
-              budgetRange: 'standard',
-              timeline: '3-months',
-              additionalNotes: '',
-              filesUploaded: false,
-            });
-            setSubmitted(false);
-          }, 3000);
-          return;
-        }
-
-        // Prepare the form data for Web3Forms
-        const formPayload = {
-          access_key: WEB3FORMS_ACCESS_KEY,
-          // Step 1: Personal Details
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          company: formData.company,
-          // Step 2: Product Details
-          productName: formData.productName,
-          productType: formData.productType,
-          quantity: formData.quantity,
-          targetMarket: formData.targetMarket,
-          // Step 3: Budget & Timeline
-          budgetRange: formData.budgetRange,
-          timeline: formData.timeline,
-          additionalNotes: formData.additionalNotes,
-          // Email recipients
-          to_email: `inquiry@virtuality.fashion,${formData.email}`,
-          subject: `New Project Inquiry: ${formData.productName} from ${formData.company}`,
-          from_name: `${formData.firstName} ${formData.lastName}`,
-          // Required fields for Web3Forms
-          redirect: '',
-        };
-
-        // Send to Web3Forms
-        const response = await fetch('https://api.web3forms.com/submit', {
+        // Send to our server route (spam checking and notification happen server-side)
+        const response = await fetch('/api/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Accept: 'application/json',
           },
-          body: JSON.stringify(formPayload),
+          body: JSON.stringify({
+            formType: 'inquiry',
+            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            email: formData.email,
+            phone: formData.phone,
+            company: formData.company,
+            productName: formData.productName,
+            projectType: formData.productType,
+            quantity: formData.quantity,
+            targetMarket: formData.targetMarket,
+            budgetRange: formData.budgetRange,
+            timeline: formData.timeline,
+            additionalNotes: formData.additionalNotes,
+          }),
         });
 
         const result = await response.json();
 
         if (result.success) {
           setSubmitted(true);
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({
+            event: 'lead_form_submit',
+            form_type: 'inquiry',
+          });
           // Reset form after 3 seconds
           setTimeout(() => {
             setCurrentStep(1);
@@ -215,11 +155,14 @@ export default function InquiryPage() {
             setSubmitted(false);
           }, 3000);
         } else {
-          alert('Error submitting form. Please try again.');
+          console.error('Email Error:', result);
+          setErrors({ form: 'Something went wrong. Please try again.' });
         }
       } catch (error) {
-        console.error('Form submission error:', error);
-        alert('Error submitting form. Please try again.');
+        console.error('Email Connection Error:', error);
+        setErrors({ form: 'Connection error. Please try again.' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -256,16 +199,12 @@ export default function InquiryPage() {
                   <span className="text-4xl">✓</span>
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Thank You!</h2>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-8">
                   Your inquiry has been submitted successfully. Our team will review your project requirements and contact you within 24 hours.
                 </p>
-                <div className="space-y-2 text-sm text-gray-600 mb-8">
-                  <p>We&apos;ve sent a confirmation email to <span className="font-semibold text-purple-600">{formData.email}</span></p>
-                  <p>Reference number: <span className="font-semibold text-blue-600">{referenceNumber}</span></p>
-                </div>
-                <Link href="/employees">
+                <Link href="/">
                   <button className="px-8 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                    Back to Projects
+                    Back to Home
                   </button>
                 </Link>
               </div>
@@ -276,7 +215,7 @@ export default function InquiryPage() {
                   {[1, 2, 3, 4].map((step) => (
                     <div key={step} className="flex items-center">
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-full flex items-center justify-center font-bold text-sm sm:text-base transition-all ${
                           step < currentStep
                             ? 'bg-green-500 text-white'
                             : step === currentStep
@@ -288,7 +227,7 @@ export default function InquiryPage() {
                       </div>
                       {step < 4 && (
                         <div
-                          className={`h-1 w-12 md:w-16 mx-2 ${
+                          className={`h-1 w-6 mx-1 sm:w-12 sm:mx-2 md:w-16 ${
                             step < currentStep ? 'bg-green-500' : 'bg-gray-200'
                           }`}
                         ></div>
@@ -610,6 +549,11 @@ export default function InquiryPage() {
                   </div>
                 )}
 
+                {/* Error Message */}
+                {errors.form && (
+                  <p className="text-red-600 text-sm text-center">{errors.form}</p>
+                )}
+
                 {/* Navigation Buttons */}
                 <div className="flex gap-4 pt-8 border-t border-gray-200">
                   {currentStep > 1 && (
@@ -633,9 +577,10 @@ export default function InquiryPage() {
                   {currentStep === 4 && (
                     <button
                       type="submit"
-                      className="flex-1 px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all ml-auto transform hover:scale-105"
+                      disabled={isLoading}
+                      className="flex-1 px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all ml-auto transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Get Quote
+                      {isLoading ? 'Submitting...' : 'Get Quote'}
                     </button>
                   )}
                 </div>

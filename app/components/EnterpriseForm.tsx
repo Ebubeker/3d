@@ -100,6 +100,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
         const result = await response.json();
 
         if (result.success) {
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'enterprise' });
           setSubmitted(true);
           setTimeout(() => {
             setSubmitted(false);

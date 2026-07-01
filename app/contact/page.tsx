@@ -19,16 +19,15 @@ function ContactForm() {
     designer: '',
   });
 
-  const [designers, setDesigners] = useState<Array<{ id: string; name: string; email: string }>>([]);
-  const [designerEmail, setDesignerEmail] = useState<string | null>(null);
+  const [designers, setDesigners] = useState<Array<{ id: string; name: string }>>([]);
 
-  // Fetch all designers
+  // Fetch all designers (id and name only, the server resolves designer emails)
   useEffect(() => {
     const fetchDesigners = async () => {
       const supabase = createClient();
       const { data } = await supabase
         .from('team_members')
-        .select('id, name, email')
+        .select('id, name')
         .eq('is_active', true)
         .order('name');
 
@@ -40,7 +39,6 @@ function ContactForm() {
           const matchedDesigner = data.find(d => d.name === designerName);
           if (matchedDesigner) {
             setFormData(prev => ({ ...prev, designer: matchedDesigner.name }));
-            setDesignerEmail(matchedDesigner.email);
           }
         }
       }
@@ -69,12 +67,6 @@ function ContactForm() {
       ...prev,
       [name]: value,
     }));
-
-    // Update designer email when designer is selected
-    if (name === 'designer') {
-      const selectedDesigner = designers.find(d => d.name === value);
-      setDesignerEmail(selectedDesigner?.email || null);
-    }
 
     if (errors[name]) {
       setErrors((prev) => ({
@@ -118,8 +110,7 @@ function ContactForm() {
             email: formData.email,
             company: formData.company,
             message: formData.message,
-            designer: formData.designer,
-            designerEmail: designerEmail || '',
+            designer: formData.designer === 'no-preference' ? '' : formData.designer,
             projectReference: projectName || '',
             formType: 'contact',
           }),
@@ -128,9 +119,9 @@ function ContactForm() {
         const result = await response.json();
 
         if (result.success) {
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'contact' });
           setSubmitted(true);
           setFormData({ name: '', email: '', company: '', message: '', designer: '' });
-          setDesignerEmail(null);
           setTimeout(() => setSubmitted(false), 5000);
         } else {
           console.error("Email Error:", result);
@@ -242,6 +233,7 @@ function ContactForm() {
                   } outline-none`}
                 >
                   <option value="">Choose a designer...</option>
+                  <option value="no-preference">No preference (we&apos;ll match you)</option>
                   {designers.map((designer) => (
                     <option key={designer.id} value={designer.name}>
                       {designer.name}

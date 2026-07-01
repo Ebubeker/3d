@@ -132,6 +132,26 @@ export default function MarketplacePage() {
     };
 
     localStorage.setItem('marketplaceUser', JSON.stringify(userData));
+
+    // Notify the team about the captured lead (non-blocking, fire and forget)
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        formType: 'general',
+        queryType: 'Marketplace Access Request',
+        name: formData.name,
+        email: formData.email,
+        company: '',
+        message: 'Requested marketplace access via the gate form.',
+      }),
+    }).catch((err) => console.error('marketplace gate notify failed', err));
+
+    (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({
+      event: 'lead_form_submit',
+      form_type: 'marketplace-gate',
+    });
+
     setSubmitted(true);
 
     // Redirect to marketplace after 1.5 seconds

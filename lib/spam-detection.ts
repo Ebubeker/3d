@@ -1,8 +1,9 @@
 // Spam detection utility for form submissions
 // Uses a scoring system combining email address and content signals.
-// Gibberish content (detected via Markov chain analysis) is flagged as spam
-// even with a clean email. For other signals, both email and content
-// must be suspicious.
+// Two decisive content signals flag spam even with a clean email:
+// gibberish content (detected via Markov chain analysis) and heavy
+// spam-keyword stuffing (5+ distinct keywords). All other signals
+// require both email and content to be suspicious.
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const gibberishDetective = require('gibberish-detective');
@@ -125,8 +126,27 @@ function scoreEmail(email: string): { score: number; reasons: string[] } {
   return { score: Math.min(100, score), reasons };
 }
 
-function scoreContent(content: string, name?: string): { score: number; reasons: string[] } {
+// Matches any Unicode letter. Built via RegExp because the ES2017 compile
+// target rejects \p{L} in regex literals; the runtime supports it.
+const ANY_LETTER = new RegExp('\\p{L}', 'gu');
+
+// The Markov gibberish model, no-vowel check, and consonant-cluster check
+// are calibrated for English. On non-Latin scripts (Hebrew, Cyrillic,
+// Arabic) they misfire: such text contains no a-z vowels and reads as one
+// giant no-vowel block. Content where Latin letters are a minority of the
+// alphabetic characters skips those checks.
+function isPredominantlyNonLatin(text: string): boolean {
+  const letters = text.match(ANY_LETTER) || [];
+  if (letters.length === 0) return false;
+  const latinCount = letters.filter(ch => /[a-zA-Z]/.test(ch)).length;
+  return latinCount / letters.length < 0.5;
+}
+
+// `decisive` marks the two signals allowed to flag spam on content alone
+// (Markov gibberish, 5+ spam keywords); soft heuristics never set it.
+function scoreContent(content: string, name?: string): { score: number; reasons: string[]; decisive: boolean } {
   let score = 0;
+  let decisive = false;
   const reasons: string[] = [];
   const trimmed = content.trim();
   const lower = trimmed.toLowerCase();
@@ -137,9 +157,9 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     reasons.push('Very short content');
   }
 
-  // Spam keywords. 5+ distinct keywords is never legitimate — escalate to
-  // an instant-block score; the old +25 cap let classic keyword-stuffed
-  // pitches through.
+  // Spam keywords. 5+ distinct keywords is never legitimate: instant-block
+  // score, decisive regardless of email. This check is substring-based on
+  // the raw text, so it applies to every script.
   let keywordHits = 0;
   for (const keyword of SPAM_KEYWORDS) {
     if (lower.includes(keyword)) {
@@ -148,6 +168,7 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
   }
   if (keywordHits >= 5) {
     score += 50;
+    decisive = true;
     reasons.push(`Spam keywords detected (${keywordHits})`);
   } else if (keywordHits > 0) {
     score += Math.min(25, keywordHits * 5);
@@ -184,19 +205,24 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     .replace(/\s+/g, ' ')
     .trim();
 
+  // English-calibrated checks below are skipped for predominantly
+  // non-Latin content (Hebrew, Cyrillic, Arabic, etc.)
+  const nonLatinContent = isPredominantlyNonLatin(textOnly);
+
   // Gibberish detection using Markov chain analysis (gibberish-detective)
   const words = textOnly.split(/\s+/).filter(w => w.length > 0);
-  if (textOnly.length >= 6) {
+  if (!nonLatinContent && textOnly.length >= 6) {
     try {
       // Check the full content string
       if (gibberish.detect(textOnly)) {
         score += 50;
+        decisive = true;
         reasons.push('Gibberish content detected (Markov chain)');
       }
 
       // Check individual words >= 6 chars (the library is unreliable on shorter strings)
       // If majority of testable words are gibberish, flag it. Require at
-      // least 4 testable words — a majority over 1-3 words is noise, and
+      // least 4 testable words: a majority over 1-3 words is noise, and
       // short legitimate messages were getting blocked on it.
       const testableWords = words.filter(w => w.length >= 6);
       if (testableWords.length >= 4) {
@@ -204,6 +230,7 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
         const gibberishRatio = gibberishWords.length / testableWords.length;
         if (gibberishRatio > 0.5) {
           score += 50;
+          decisive = true;
           reasons.push(`Gibberish words detected (${gibberishWords.length}/${testableWords.length})`);
         }
       }
@@ -212,8 +239,8 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     }
   }
 
-  // Heuristic gibberish fallbacks
-  if (words.length > 0) {
+  // Heuristic gibberish fallbacks (English-calibrated)
+  if (!nonLatinContent && words.length > 0) {
     // Check for words with no vowels (length > 3)
     const noVowelWords = words.filter(w => w.length > 3 && !/[aeiou]/i.test(w));
     if (words.length >= 3 && noVowelWords.length / words.length > 0.5) {
@@ -229,15 +256,16 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     }
   }
 
-  // 8+ consecutive consonants in content (URL-stripped — paths and
+  // 8+ consecutive consonants in content (URL-stripped, since paths and
   // domain names routinely contain long consonant runs)
-  if (/[bcdfghjklmnpqrstvwxyz]{8,}/i.test(textOnly)) {
+  if (!nonLatinContent && /[bcdfghjklmnpqrstvwxyz]{8,}/i.test(textOnly)) {
     score += 20;
     reasons.push('Consonant cluster in content');
   }
 
-  // Repetitive characters (4+ same char)
-  if (/(.)\1{3,}/.test(trimmed)) {
+  // Repetitive characters (4+ same non-whitespace char; runs of spaces
+  // or blank lines are normal in pasted text)
+  if (/(\S)\1{3,}/.test(trimmed)) {
     score += 15;
     reasons.push('Repetitive characters');
   }
@@ -269,13 +297,16 @@ function scoreContent(content: string, name?: string): { score: number; reasons:
     }
   }
 
-  return { score: Math.min(100, score), reasons };
+  return { score: Math.min(100, score), reasons, decisive };
 }
 
-function calculateCombinedScore(emailScore: number, contentScore: number): number {
-  // If content is clearly gibberish (score >= 50), flag as spam regardless of email
-  // This catches nonsensical messages even from legitimate-looking email addresses
-  if (contentScore >= 50) {
+function calculateCombinedScore(emailScore: number, contentScore: number, contentDecisive: boolean): number {
+  // Content alone flags spam only on decisive signals (Markov gibberish,
+  // 5+ spam keywords), which catch nonsense or keyword-stuffed pitches
+  // even from legitimate-looking email addresses. Soft heuristics (URLs,
+  // caps, repetition) can also stack past 50 but must be paired with a
+  // suspicious email via the combined score below.
+  if (contentDecisive && contentScore >= 50) {
     return contentScore;
   }
 
@@ -303,7 +334,7 @@ export function checkSpam(input: SpamCheckInput): SpamCheckResult {
 
   const emailScore = emailResult.score;
   const contentScore = contentResult.score;
-  const combinedScore = calculateCombinedScore(emailScore, contentScore);
+  const combinedScore = calculateCombinedScore(emailScore, contentScore, contentResult.decisive);
 
   const isSpam = combinedScore >= 50;
   const allReasons = [...emailResult.reasons, ...contentResult.reasons];

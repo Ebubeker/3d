@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: "Our Employees",
   description:
     "Meet the in-house specialists behind virtuality.fashion. Vetted 3D designers, technical developers, and patternmakers delivering virtual sampling and tech pack services for leading fashion brands.",
-  alternates: {
-    canonical: `${SITE_URL}/employees`,
-  },
+  // Demo page with placeholder content, kept out of the index until it is
+  // backed by real employee data. No canonical (contradictory on noindex).
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Our Employees | virtuality.fashion",
     description:

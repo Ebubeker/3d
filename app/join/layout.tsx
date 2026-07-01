@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { OG_IMAGES } from "@/lib/seo/schema";
 import { SITE_URL } from "@/lib/site";
 
+// Placeholder page: the form only console.logs and the copy carries
+// unverified brand claims. Kept out of the index until it is real; the
+// live application path is /join-team.
 export const metadata: Metadata = {
   title: "Apply to Join Our Network",
   description:
     "Are you a 3D fashion designer, patternmaker, or technical developer? Apply to join our vetted network and work with leading fashion brands on virtual sampling and tech pack projects.",
-  alternates: {
-    canonical: `${SITE_URL}/join`,
-  },
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Apply to Join | Freelance with virtuality.fashion",
     description:

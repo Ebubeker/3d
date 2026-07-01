@@ -1,21 +1,11 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Copperplate Gothic Light - Self-hosted font */
-/* Note: Add font files to /public/fonts/CopperplateGothicLight.woff2 and .woff */
-@font-face {
-  font-family: 'Copperplate Gothic Light';
-  src: url('/fonts/CopperplateGothicLight.woff2') format('woff2'),
-       url('/fonts/CopperplateGothicLight.woff') format('woff');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-copperplate: 'Copperplate Gothic Light', 'Copperplate', Georgia, serif;
+  /* System Copperplate where available (macOS), Georgia fallback elsewhere */
+  --font-copperplate: 'Copperplate', Georgia, serif;
 }
 
 @theme inline {
@@ -187,7 +177,7 @@ html {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Copperplate Gothic Light utility class */
+/* Copperplate utility class */
 .font-copperplate {
   font-family: var(--font-copperplate);
 }

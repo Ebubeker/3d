@@ -6,7 +6,7 @@ import { SITE_URL } from '../site';
 // the rest of the site points at.
 const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
 const REPLY_TO =
-  process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
+  process.env.ADMIN_EMAIL || 'info@virtuality.fashion';
 
 const LOGIN_URL = `${SITE_URL}/author`;
 
