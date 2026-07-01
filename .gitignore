@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local lead-gen working docs (repo is public; keep these private)
+LEAD_GEN_AUDIT.md
+LEAD_GEN_ROADMAP.md
+CHANGES.md
+indexing/
+feedback-from-amnon.jfif
+.playwright-mcp/
