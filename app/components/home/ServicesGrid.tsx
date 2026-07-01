@@ -149,7 +149,7 @@ export default function ServicesGrid() {
           className="flex justify-center mt-12 sm:mt-16"
         >
           <Link
-            href="/team"
+            href="/join-team"
             className="inline-flex items-center gap-2 px-8 py-4 border-2 border-black text-black font-semibold rounded-full hover:bg-black hover:text-white transition-all duration-300"
           >
             <span>Join the Team</span>
