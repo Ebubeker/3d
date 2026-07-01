@@ -19,6 +19,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -114,6 +115,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
             notes: normalizedLinks.join('\n'),
             message: formData.message,
             formType: 'join-team',
+            website,
           }),
         });
 
@@ -146,6 +148,7 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
       portfolioLinks: [''],
       message: ''
     });
+    setWebsite('');
     onClose();
   };
 
@@ -314,6 +317,21 @@ export default function JoinTeamModal({ isOpen, onClose }: JoinTeamModalProps) {
                 {errors.form && (
                   <p className="text-red-600 text-sm text-center">{errors.form}</p>
                 )}
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
 
                 {/* Submit */}
                 <button

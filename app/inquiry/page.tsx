@@ -29,6 +29,7 @@ export default function InquiryPage() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -123,6 +124,7 @@ export default function InquiryPage() {
             budgetRange: formData.budgetRange,
             timeline: formData.timeline,
             additionalNotes: formData.additionalNotes,
+            website,
           }),
         });
 
@@ -152,6 +154,7 @@ export default function InquiryPage() {
               additionalNotes: '',
               filesUploaded: false,
             });
+            setWebsite('');
             setSubmitted(false);
           }, 3000);
         } else {
@@ -187,6 +190,9 @@ export default function InquiryPage() {
             </h1>
             <p className="text-xl text-gray-600">
               Fill out this form to request a custom 3D fashion project. We&apos;ll get back to you within 24 hours.
+            </p>
+            <p className="text-sm text-gray-500 mt-3">
+              Your designs and project details stay confidential. NDA available on request.
             </p>
           </div>
 
@@ -553,6 +559,21 @@ export default function InquiryPage() {
                 {errors.form && (
                   <p className="text-red-600 text-sm text-center">{errors.form}</p>
                 )}
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
 
                 {/* Navigation Buttons */}
                 <div className="flex gap-4 pt-8 border-t border-gray-200">

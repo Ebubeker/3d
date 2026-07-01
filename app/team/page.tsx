@@ -93,6 +93,7 @@ export default function TeamPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
 
   // Check if user already has access
   useEffect(() => {
@@ -194,6 +195,7 @@ export default function TeamPage() {
             message: messageContent,
             formType: 'general',
             queryType: 'Team Access Request',
+            website,
           }),
         });
 
@@ -428,6 +430,21 @@ export default function TeamPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-50 rounded font-medium resize-none focus:border-black focus:bg-white outline-none transition-colors text-black"
                     placeholder="Tell us more about your project..."
                   />
+                </div>
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
                 </div>
 
                 {/* Submit Button */}

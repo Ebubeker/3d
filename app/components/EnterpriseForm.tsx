@@ -27,6 +27,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -94,6 +95,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
             timeline: formData.timeline,
             notes: formData.notes,
             formType: 'enterprise',
+            website,
           }),
         });
 
@@ -120,6 +122,7 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
               timeline: '',
               notes: ''
             });
+            setWebsite('');
           }, 3000);
         } else {
           console.error("Email Error:", result);
@@ -171,6 +174,9 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
                 </h2>
                 <p className="text-gray-600">
                   We will review your request and curate the right technical team for your project.
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Your designs and project details stay confidential. NDA available on request.
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
                   Subject: Enterprise quote and team build request
@@ -355,6 +361,21 @@ export default function EnterpriseForm({ isOpen, onClose }: EnterpriseFormProps)
                 {errors.form && (
                   <p className="text-red-600 text-sm text-center">{errors.form}</p>
                 )}
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
 
                 {/* Submit */}
                 <button

@@ -60,6 +60,7 @@ function ContactForm() {
 
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -113,6 +114,7 @@ function ContactForm() {
             designer: formData.designer === 'no-preference' ? '' : formData.designer,
             projectReference: projectName || '',
             formType: 'contact',
+            website,
           }),
         });
 
@@ -122,6 +124,7 @@ function ContactForm() {
           (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'contact' });
           setSubmitted(true);
           setFormData({ name: '', email: '', company: '', message: '', designer: '' });
+          setWebsite('');
           setTimeout(() => setSubmitted(false), 5000);
         } else {
           console.error("Email Error:", result);
@@ -263,6 +266,21 @@ function ContactForm() {
               {errors.form && (
                 <p className="text-red-600 text-xs sm:text-sm text-center">{errors.form}</p>
               )}
+
+              {/* Honeypot field: hidden from real visitors, bots fill it */}
+              <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                <label>
+                  Website
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </label>
+              </div>
 
               {/* Submit Button */}
               <button

@@ -29,6 +29,7 @@ export default function MarketplacePage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({ name: '', email: '' });
+  const [website, setWebsite] = useState('');
 
   // Employee showcase data
   const employees: Employee[] = [
@@ -144,6 +145,7 @@ export default function MarketplacePage() {
         email: formData.email,
         company: '',
         message: 'Requested marketplace access via the gate form.',
+        website,
       }),
     }).catch((err) => console.error('marketplace gate notify failed', err));
 
@@ -424,6 +426,21 @@ export default function MarketplacePage() {
                     } text-gray-900 placeholder-gray-400`}
                   />
                   {errors.email && <p className="text-red-600 text-sm mt-2">{errors.email}</p>}
+                </div>
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
                 </div>
 
                 {/* Submit Button */}
