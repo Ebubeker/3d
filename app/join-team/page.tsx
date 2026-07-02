@@ -16,6 +16,7 @@ export default function JoinTeamPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -111,12 +112,14 @@ export default function JoinTeamPage() {
             notes: normalizedLinks.join('\n'),
             message: formData.message,
             formType: 'join-team',
+            website,
           }),
         });
 
         const result = await response.json();
 
         if (result.success) {
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'join-team' });
           setSubmitted(true);
         } else {
           console.error('Email Error:', result);
@@ -142,6 +145,7 @@ export default function JoinTeamPage() {
       portfolioLinks: [''],
       message: ''
     });
+    setWebsite('');
   };
 
   return (
@@ -316,6 +320,21 @@ export default function JoinTeamPage() {
                 {errors.form && (
                   <p className="text-red-600 text-sm text-center">{errors.form}</p>
                 )}
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
 
                 {/* Submit */}
                 <button

@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     "CLO3D project examples",
     "digital fashion portfolio",
   ],
-  alternates: {
-    canonical: `${SITE_URL}/projects`,
-  },
+  // Demo page with placeholder content, kept out of the index until it is
+  // backed by real project records. No canonical (contradictory on noindex).
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Projects & Case Studies | virtuality.fashion",
     description:

@@ -29,6 +29,7 @@ export default function MarketplacePage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({ name: '', email: '' });
+  const [website, setWebsite] = useState('');
 
   // Employee showcase data
   const employees: Employee[] = [
@@ -132,6 +133,27 @@ export default function MarketplacePage() {
     };
 
     localStorage.setItem('marketplaceUser', JSON.stringify(userData));
+
+    // Notify the team about the captured lead (non-blocking, fire and forget)
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        formType: 'general',
+        queryType: 'Marketplace Access Request',
+        name: formData.name,
+        email: formData.email,
+        company: '',
+        message: 'Requested marketplace access via the gate form.',
+        website,
+      }),
+    }).catch((err) => console.error('marketplace gate notify failed', err));
+
+    (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({
+      event: 'lead_form_submit',
+      form_type: 'marketplace-gate',
+    });
+
     setSubmitted(true);
 
     // Redirect to marketplace after 1.5 seconds
@@ -404,6 +426,21 @@ export default function MarketplacePage() {
                     } text-gray-900 placeholder-gray-400`}
                   />
                   {errors.email && <p className="text-red-600 text-sm mt-2">{errors.email}</p>}
+                </div>
+
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
                 </div>
 
                 {/* Submit Button */}

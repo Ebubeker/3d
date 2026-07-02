@@ -95,7 +95,12 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Contact</h3>
             <div className="flex flex-col gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
-              <p>info@virtuality.fashion</p>
+              <a
+                href="mailto:info@virtuality.fashion"
+                className="hover:text-black transition-colors"
+              >
+                info@virtuality.fashion
+              </a>
               <p>Israel</p>
             </div>
           </div>

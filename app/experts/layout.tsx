@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     "Browzwear specialists",
     "freelance fashion designers",
   ],
-  alternates: {
-    canonical: `${SITE_URL}/experts`,
-  },
+  // Demo page with placeholder content, kept out of the index until it is
+  // backed by real expert profiles. No canonical (contradictory on noindex).
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Fashion Experts | 3D Designers, Patternmakers & Tech Pack Specialists",
     description:

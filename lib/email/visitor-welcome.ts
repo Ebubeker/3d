@@ -4,7 +4,7 @@ import { SITE_URL } from '../site';
 // Sender / reply-to mirror the team-welcome template so domain reputation
 // stays consistent and replies land in the same inbox.
 const FROM = 'virtuality.fashion <amnon@virtuality.fashion>';
-const REPLY_TO = process.env.ADMIN_EMAIL || 'hello@virtuality.fashion';
+const REPLY_TO = process.env.ADMIN_EMAIL || 'info@virtuality.fashion';
 
 const TEAM_URL = `${SITE_URL}/team`;
 

@@ -19,7 +19,7 @@ interface Props {
 // spam check. Collapses the previous two-step flow (T&C then newsletter)
 // into one popup with two explicit checkboxes:
 //   1. Terms & Privacy (required, must be ticked to proceed)
-//   2. Newsletter consent (optional, NOT pre-checked — GDPR-safe so we
+//   2. Newsletter consent (optional, NOT pre-checked, GDPR-safe so we
 //      never auto-subscribe an EU visitor by default)
 // Both choices flow through /api/subscribe, which always stores the
 // email plus the user's opt-in decision.
@@ -31,14 +31,15 @@ export default function UnlockGateModal({
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [wantsUpdates, setWantsUpdates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleFinish = async () => {
     if (!termsAccepted) return;
     setIsSaving(true);
-    setError('');
+    // The lead email was already sent before this gate opened, so the
+    // visitor is never blocked here. We attempt the subscription write,
+    // log any failure for the admin to investigate, and always unlock.
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
@@ -51,21 +52,15 @@ export default function UnlockGateModal({
           optedIn: wantsUpdates,
         }),
       });
-      const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(body.error || 'Could not save your preference. Please try again.');
-        return;
+        console.error('[UnlockGateModal] subscribe failed with status', res.status);
       }
-      onComplete();
-    } catch {
-      // Don't block the user from accessing the team just because the
-      // subscription write failed. Surface the error but still let them
-      // through; the admin can investigate from the server logs.
-      console.error('[UnlockGateModal] subscribe failed');
-      onComplete();
+    } catch (err) {
+      console.error('[UnlockGateModal] subscribe request failed', err);
     } finally {
       setIsSaving(false);
     }
+    onComplete();
   };
 
   return (
@@ -152,12 +147,6 @@ export default function UnlockGateModal({
               </span>
             </label>
           </div>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-              {error}
-            </div>
-          )}
 
           <button
             type="button"

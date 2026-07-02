@@ -16,6 +16,8 @@ interface StaticRoute {
 }
 
 // Public, indexable routes. Admin and API routes are intentionally excluded.
+// Demo routes with placeholder content (/projects, /experts, /marketplace, /join)
+// are also excluded (and noindexed) until they carry real data.
 const STATIC_ROUTES: StaticRoute[] = [
   { path: '', changeFrequency: 'weekly', priority: 1.0 },
   { path: '/solutions', changeFrequency: 'monthly', priority: 0.9 },
@@ -23,11 +25,7 @@ const STATIC_ROUTES: StaticRoute[] = [
   { path: '/blog', changeFrequency: 'daily', priority: 0.9 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/contact', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/projects', changeFrequency: 'weekly', priority: 0.7 },
-  { path: '/experts', changeFrequency: 'weekly', priority: 0.7 },
-  { path: '/marketplace', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/join-team', changeFrequency: 'monthly', priority: 0.6 },
-  { path: '/join', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/inquiry', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
   { path: '/terms', changeFrequency: 'yearly', priority: 0.3 },

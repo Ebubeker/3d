@@ -15,7 +15,7 @@ export default function AudienceSegments() {
         "Visual assets for product pages and e-commerce listings"
       ],
       cta: "Get Started",
-      ctaLink: "/team"
+      ctaLink: "/contact"
     },
     {
       id: 2,

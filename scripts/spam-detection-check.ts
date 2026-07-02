@@ -64,6 +64,41 @@ const cases: { label: string; body: Record<string, unknown> }[] = [
     },
   },
   {
+    label: 'LEGIT contact - enthusiastic caps + !!!! + 3 brand links',
+    body: {
+      formType: 'contact', name: 'Jordan Reyes', email: 'jordan@kayaswimwear.com',
+      company: 'Kaya Swimwear',
+      // Stacks three soft signals (3+ URLs, caps, repetition) to 50; must
+      // fall through to the combined score, not the content-only flag
+      message: 'WE LOVE YOUR 3D RENDERS AND WANT TO START RIGHT AWAY FOR OUR RESORT DROP!!!! Links: www.kayaswimwear.com www.instagram.com/kayaswim www.behance.net/kayaswim',
+    },
+  },
+  {
+    label: 'LEGIT contact - pasted with extra whitespace runs',
+    body: {
+      formType: 'contact', name: 'Emma Larsen', email: 'emma@nordicknit.dk',
+      company: 'Nordic Knitwear',
+      // Runs of 4+ spaces and blank lines must not count as repetition
+      message: 'Hi,     we are a knitwear label from Copenhagen.\n\n\n\nWe need 3D samples for 8 styles.    Can you share your process and pricing?',
+    },
+  },
+  {
+    label: 'LEGIT contact - Hebrew message, script guard (no no-vowel penalty)',
+    body: {
+      formType: 'general', name: 'Noa Barak', email: 'noa@studio-noa.co.il',
+      company: 'Studio Noa',
+      message: 'היי, ראינו את העבודות שלכם ואנחנו מעוניינים בהדמיות תלת ממד לקולקציית הקיץ שלנו. אשמח לקבל הצעת מחיר ולוחות זמנים',
+    },
+  },
+  {
+    label: 'LEGIT contact - Russian message, script guard',
+    body: {
+      formType: 'contact', name: 'Olga Petrova', email: 'olga.petrova@lamoda-brands.ru',
+      company: 'Lamoda Brands',
+      message: 'Здравствуйте! Мы бренд женской одежды из Москвы. Ищем студию для 3D визуализации новой коллекции, около 20 моделей. Пришлите, пожалуйста, цены и сроки.',
+    },
+  },
+  {
     label: 'SPAM control — classic pitch (was PASSING)',
     body: {
       formType: 'contact', name: 'John Winner', email: 'xkjq83hd2k9s@offers.xyz',
@@ -87,15 +122,37 @@ const cases: { label: string; body: Record<string, unknown> }[] = [
       message: 'jqkwzx vbnqpl https://spam-site.xyz zxqjwk mnbvqp wkjqzx',
     },
   },
+  {
+    label: 'SPAM control - Cyrillic casino pitch, EN keyword stuffing',
+    body: {
+      formType: 'contact', name: 'Dmitry', email: 'promo9182736450@bk.ru',
+      company: 'Mega Bonus',
+      // Non-Latin content skips the English heuristics, but the keyword
+      // rule (5+ hits) must still block regardless of script
+      message: 'Лучшие бонусы для вас! casino viagra crypto bitcoin lottery - огромный prize ждет! click here: http://mega-bonus-kazino.icu',
+    },
+  },
 ];
 
+// Expected verdict is encoded in the label prefix: LEGIT must pass,
+// SPAM must be blocked. Any mismatch fails the run.
+let failures = 0;
 for (const c of cases) {
   const content = extractContentForSpamCheck(c.body);
   const name =
     [c.body.firstName, c.body.lastName].filter(Boolean).join(' ') ||
     (c.body.name as string) || undefined;
   const r = checkSpam({ email: c.body.email as string, content, name });
+  const expectSpam = c.label.startsWith('SPAM');
+  const wrong = r.isSpam !== expectSpam;
+  if (wrong) failures++;
   const verdict = r.isSpam ? 'BLOCKED ❌' : 'passes  ✓';
-  console.log(`${verdict}  [e:${r.emailScore} c:${r.contentScore} → ${r.combinedScore}] ${c.label}`);
+  console.log(`${wrong ? 'WRONG VERDICT → ' : ''}${verdict}  [e:${r.emailScore} c:${r.contentScore} → ${r.combinedScore}] ${c.label}`);
   if (r.isSpam) console.log(`           reason: ${r.reason}`);
 }
+
+if (failures > 0) {
+  console.log(`\n${failures} case(s) produced the wrong verdict`);
+  process.exit(1);
+}
+console.log(`\nAll ${cases.length} cases produced the expected verdict`);

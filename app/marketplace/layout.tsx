@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     "CLO3D freelancer",
     "Browzwear freelancer",
   ],
-  alternates: {
-    canonical: `${SITE_URL}/marketplace`,
-  },
+  // Demo page with placeholder content, kept out of the index until it is
+  // backed by real marketplace data. No canonical (contradictory on noindex).
+  robots: { index: false, follow: false },
   openGraph: {
     title: "Marketplace | Hire Vetted 3D Fashion Designers & Tech Pack Pros",
     description:

@@ -92,6 +92,8 @@ export default function TeamPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [website, setWebsite] = useState('');
 
   // Check if user already has access
   useEffect(() => {
@@ -167,6 +169,7 @@ export default function TeamPage() {
     if (!formData.projectType) newErrors.projectType = 'Please select a project type';
 
     if (Object.keys(newErrors).length === 0) {
+      setIsLoading(true);
       try {
         // Build message with only filled fields
         let messageContent = `Project Type: ${formData.projectType}`;
@@ -192,15 +195,17 @@ export default function TeamPage() {
             message: messageContent,
             formType: 'general',
             queryType: 'Team Access Request',
+            website,
           }),
         });
 
         const result = await response.json();
 
         if (result.success) {
-          // Don't unlock yet — show the two-step T&C + email opt-in gate
-          // first. The gate decides when to flip hasAccess via the
-          // onComplete callback, after the subscription row is written.
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'team-unlock' });
+          // Don't unlock yet, show the T&C + email opt-in gate first.
+          // The gate flips hasAccess via the onComplete callback once the
+          // visitor confirms (the lead email is already captured here).
           localStorage.setItem('clientData', JSON.stringify(formData));
           setShowGate(true);
         } else {
@@ -210,6 +215,8 @@ export default function TeamPage() {
       } catch (error) {
         console.error("Email Connection Error:", error);
         setErrors({ form: 'Connection error. Please try again.' });
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setErrors(newErrors);
@@ -292,6 +299,15 @@ export default function TeamPage() {
                 <a href="#unlock-form" className="px-6 sm:px-8 py-3 sm:py-4 bg-black text-white rounded font-medium hover:bg-gray-900 transition-colors inline-block text-sm sm:text-base">
                   Unlock Access
                 </a>
+                <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6 mb-2 sm:mb-3">
+                  Need a curated team for a larger project? No unlock required.
+                </p>
+                <button
+                  onClick={() => setShowEnterpriseForm(true)}
+                  className="w-full px-6 sm:px-8 py-3 sm:py-4 border-2 border-black text-black rounded font-medium hover:bg-black hover:text-white transition-colors text-sm sm:text-base"
+                >
+                  Build My Enterprise Team
+                </button>
               </div>
             </div>
           </div>
@@ -416,12 +432,28 @@ export default function TeamPage() {
                   />
                 </div>
 
+                {/* Honeypot field: hidden from real visitors, bots fill it */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
+
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full px-8 py-4 bg-black text-white rounded font-semibold hover:bg-gray-900 transition-colors"
+                  disabled={isLoading}
+                  className="w-full px-8 py-4 bg-black text-white rounded font-semibold hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Unlock Team Access
+                  {isLoading ? 'Submitting...' : 'Unlock Team Access'}
                 </button>
               </form>
             </div>

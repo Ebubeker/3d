@@ -19,16 +19,15 @@ function ContactForm() {
     designer: '',
   });
 
-  const [designers, setDesigners] = useState<Array<{ id: string; name: string; email: string }>>([]);
-  const [designerEmail, setDesignerEmail] = useState<string | null>(null);
+  const [designers, setDesigners] = useState<Array<{ id: string; name: string }>>([]);
 
-  // Fetch all designers
+  // Fetch all designers (id and name only, the server resolves designer emails)
   useEffect(() => {
     const fetchDesigners = async () => {
       const supabase = createClient();
       const { data } = await supabase
         .from('team_members')
-        .select('id, name, email')
+        .select('id, name')
         .eq('is_active', true)
         .order('name');
 
@@ -40,7 +39,6 @@ function ContactForm() {
           const matchedDesigner = data.find(d => d.name === designerName);
           if (matchedDesigner) {
             setFormData(prev => ({ ...prev, designer: matchedDesigner.name }));
-            setDesignerEmail(matchedDesigner.email);
           }
         }
       }
@@ -62,6 +60,7 @@ function ContactForm() {
 
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -69,12 +68,6 @@ function ContactForm() {
       ...prev,
       [name]: value,
     }));
-
-    // Update designer email when designer is selected
-    if (name === 'designer') {
-      const selectedDesigner = designers.find(d => d.name === value);
-      setDesignerEmail(selectedDesigner?.email || null);
-    }
 
     if (errors[name]) {
       setErrors((prev) => ({
@@ -118,19 +111,20 @@ function ContactForm() {
             email: formData.email,
             company: formData.company,
             message: formData.message,
-            designer: formData.designer,
-            designerEmail: designerEmail || '',
+            designer: formData.designer === 'no-preference' ? '' : formData.designer,
             projectReference: projectName || '',
             formType: 'contact',
+            website,
           }),
         });
 
         const result = await response.json();
 
         if (result.success) {
+          (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.push({ event: 'lead_form_submit', form_type: 'contact' });
           setSubmitted(true);
           setFormData({ name: '', email: '', company: '', message: '', designer: '' });
-          setDesignerEmail(null);
+          setWebsite('');
           setTimeout(() => setSubmitted(false), 5000);
         } else {
           console.error("Email Error:", result);
@@ -242,6 +236,7 @@ function ContactForm() {
                   } outline-none`}
                 >
                   <option value="">Choose a designer...</option>
+                  <option value="no-preference">No preference (we&apos;ll match you)</option>
                   {designers.map((designer) => (
                     <option key={designer.id} value={designer.name}>
                       {designer.name}
@@ -271,6 +266,21 @@ function ContactForm() {
               {errors.form && (
                 <p className="text-red-600 text-xs sm:text-sm text-center">{errors.form}</p>
               )}
+
+              {/* Honeypot field: hidden from real visitors, bots fill it */}
+              <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+                <label>
+                  Website
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </label>
+              </div>
 
               {/* Submit Button */}
               <button
@@ -317,14 +327,22 @@ function ContactForm() {
 }
 
 export default function ContactPage() {
+  // The fallback is what crawlers without JavaScript (including AI
+  // crawlers) receive as the server-rendered page, so it mirrors the
+  // real hero content instead of a skeleton.
   return (
     <Suspense fallback={
       <>
         <Header />
         <div className="bg-white border-b border-gray-200 relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 md:py-28 lg:py-32 pt-24 sm:pt-28 md:pt-32 relative z-10">
-            <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse" />
-            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 font-copperplate">Get in Touch</h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 max-w-2xl leading-relaxed">
+              Have a project in mind? Let&apos;s discuss how we can help bring your vision to life.
+            </p>
+            <p className="text-base sm:text-lg text-gray-600 mt-4">
+              Request a quote with the form on this page, or email us at info@virtuality.fashion. We typically respond within 24 hours during business days.
+            </p>
           </div>
         </div>
         <Footer />

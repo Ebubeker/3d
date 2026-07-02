@@ -2,7 +2,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { SpamCheckResult } from '@/lib/spam-detection';
 
 export interface QuarantineInput {
-  // Which gate blocked it: 'send-email' or 'check-spam'.
+  // Which gate blocked it. Always 'send-email' now; 'check-spam' appears
+  // only on historical rows from the removed /inquiry pre-check endpoint.
   source: string;
   formType?: string;
   email: string;
