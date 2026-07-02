@@ -327,14 +327,22 @@ function ContactForm() {
 }
 
 export default function ContactPage() {
+  // The fallback is what crawlers without JavaScript (including AI
+  // crawlers) receive as the server-rendered page, so it mirrors the
+  // real hero content instead of a skeleton.
   return (
     <Suspense fallback={
       <>
         <Header />
         <div className="bg-white border-b border-gray-200 relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 md:py-28 lg:py-32 pt-24 sm:pt-28 md:pt-32 relative z-10">
-            <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse" />
-            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 sm:mb-6 md:mb-8 font-copperplate">Get in Touch</h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 max-w-2xl leading-relaxed">
+              Have a project in mind? Let&apos;s discuss how we can help bring your vision to life.
+            </p>
+            <p className="text-base sm:text-lg text-gray-600 mt-4">
+              Request a quote with the form on this page, or email us at info@virtuality.fashion. We typically respond within 24 hours during business days.
+            </p>
           </div>
         </div>
         <Footer />
