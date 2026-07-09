@@ -9,6 +9,29 @@ export async function uploadMedia(
   file: File,
   folder: 'portraits' | 'portfolio' | 'blog' | string
 ): Promise<UploadResult | null> {
+  // PDFs are routed through the server upload route so a first-page thumbnail
+  // (<name>_thumb.png, which PdfThumbnail looks for) is generated alongside the
+  // file. MuPDF only runs server-side, so a direct client upload here would
+  // leave the PDF without a thumbnail.
+  if (file.type === 'application/pdf') {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', folder);
+
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) {
+        console.error('PDF upload failed:', await res.text());
+        return null;
+      }
+      const data = await res.json();
+      return { url: data.url, type: 'pdf' };
+    } catch (err) {
+      console.error('PDF upload error:', err);
+      return null;
+    }
+  }
+
   try {
     const isVideo = file.type.startsWith('video/');
     const isPdf = file.type === 'application/pdf';

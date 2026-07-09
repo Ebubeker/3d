@@ -2,7 +2,8 @@
 
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
+import { LinkableImage } from './LinkableImage';
+import { YoutubeEmbed } from './YoutubeEmbed';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useRef, useState } from 'react';
@@ -17,6 +18,7 @@ import {
   Quote,
   Link as LinkIcon,
   Image as ImageIcon,
+  Youtube as YoutubeIcon,
   Undo,
   Redo,
   Code,
@@ -40,12 +42,17 @@ export default function TipTapEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        // StarterKit 3.x bundles its own Link extension. We register a
+        // custom-configured Link below, so disable the bundled one to avoid
+        // a duplicate-extension conflict that breaks link behavior.
+        link: false,
       }),
-      Image.configure({
+      LinkableImage.configure({
         HTMLAttributes: {
           class: 'rounded-lg max-w-full h-auto my-4',
         },
       }),
+      YoutubeEmbed,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -106,14 +113,51 @@ export default function TipTapEditor({
   };
 
   const setLink = () => {
+    // If an image is selected, attach the link to the image itself. TipTap's
+    // text Link mark can't apply to an image node, so this is what makes a
+    // cover/inline image clickable.
+    if (editor.isActive('image')) {
+      const previous = editor.getAttributes('image').href as string | undefined;
+      const url = window.prompt(
+        'Link this image to (URL) — leave empty to remove the link',
+        previous || 'https://'
+      );
+      if (url === null) return;
+      const href = url.trim() ? normalizeUrl(url) : null;
+      editor.chain().focus().updateAttributes('image', { href }).run();
+      return;
+    }
+
     const previousUrl = editor.getAttributes('link').href;
     const url = window.prompt('URL', previousUrl || 'https://');
     if (url === null) return;
-    if (url === '') {
+    if (url.trim() === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
       return;
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: normalizeUrl(url) })
+      .run();
+  };
+
+  const addYoutube = () => {
+    const url = window.prompt(
+      'Paste a YouTube link (normal video or Shorts) to embed it'
+    );
+    if (!url || !url.trim()) return;
+    const inserted = editor
+      .chain()
+      .focus()
+      .setYoutubeEmbed({ src: url.trim() })
+      .run();
+    if (!inserted) {
+      alert(
+        "That doesn't look like a YouTube link. Use a youtube.com, youtu.be, or youtube.com/shorts URL."
+      );
+    }
   };
 
   return (
@@ -122,6 +166,7 @@ export default function TipTapEditor({
         editor={editor}
         onImageClick={() => fileInputRef.current?.click()}
         onLinkClick={setLink}
+        onYoutubeClick={addYoutube}
         isUploading={isUploading}
       />
       <input
@@ -136,14 +181,33 @@ export default function TipTapEditor({
   );
 }
 
+/**
+ * Ensure a user-entered URL has a scheme. Bare domains typed into the link
+ * prompt (e.g. "virtuality.fashion") otherwise get saved verbatim and become
+ * broken/relative links — this prefixes https:// while leaving full URLs,
+ * mailto:, anchors, and root-relative paths untouched.
+ */
+function normalizeUrl(input: string): string {
+  const url = input.trim();
+  if (/^(https?:\/\/|mailto:|\/|#)/i.test(url)) return url;
+  return `https://${url}`;
+}
+
 interface ToolbarProps {
   editor: Editor;
   onImageClick: () => void;
   onLinkClick: () => void;
+  onYoutubeClick: () => void;
   isUploading: boolean;
 }
 
-function Toolbar({ editor, onImageClick, onLinkClick, isUploading }: ToolbarProps) {
+function Toolbar({
+  editor,
+  onImageClick,
+  onLinkClick,
+  onYoutubeClick,
+  isUploading,
+}: ToolbarProps) {
   const btn = (active: boolean) =>
     `p-2 rounded-md transition-colors ${
       active
@@ -223,8 +287,14 @@ function Toolbar({ editor, onImageClick, onLinkClick, isUploading }: ToolbarProp
       <button
         type="button"
         onClick={onLinkClick}
-        className={btn(editor.isActive('link'))}
-        title="Link"
+        className={btn(
+          editor.isActive('link') || !!editor.getAttributes('image').href
+        )}
+        title={
+          editor.isActive('image')
+            ? 'Link this image'
+            : 'Link (select text or an image first)'
+        }
       >
         <LinkIcon className="w-4 h-4" />
       </button>
@@ -236,6 +306,14 @@ function Toolbar({ editor, onImageClick, onLinkClick, isUploading }: ToolbarProp
         title="Insert image"
       >
         <ImageIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onYoutubeClick}
+        className={btn(editor.isActive('youtubeEmbed'))}
+        title="Embed a YouTube video"
+      >
+        <YoutubeIcon className="w-4 h-4" />
       </button>
       <div className="w-px h-6 bg-gray-200 mx-1" />
       <button

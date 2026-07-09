@@ -209,3 +209,37 @@ html {
 .blog-content blockquote {
   border-left: 4px solid #E8700A;
 }
+
+/* ---------------------------------------------------------------------------
+   YouTube embeds
+   Used both in the Tiptap editor (.ProseMirror) and in published posts
+   (.blog-content). The wrapper holds a responsive 16:9 box; the iframe fills
+   it. Inside the editor the iframe is made non-interactive so a click selects
+   the embed for deletion instead of being swallowed by the YouTube player.
+   --------------------------------------------------------------------------- */
+.youtube-embed {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #000;
+}
+
+.youtube-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.ProseMirror .youtube-embed iframe {
+  pointer-events: none;
+}
+
+.ProseMirror .youtube-embed.ProseMirror-selectednode {
+  outline: 3px solid #E8700A;
+  outline-offset: 2px;
+}

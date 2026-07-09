@@ -19,16 +19,31 @@ export default function BlogContent({ html }: BlogContentProps) {
       'ul', 'ol', 'li',
       'a', 'img',
       'span', 'div',
+      'iframe',
     ],
     allowedAttributes: {
       a: ['href', 'title', 'target', 'rel', 'class'],
       img: ['src', 'alt', 'title', 'class'],
+      // YouTube embeds only — src is further restricted to YouTube hostnames
+      // via allowedIframeHostnames below, so no arbitrary iframe can slip in.
+      iframe: [
+        'src', 'title', 'class', 'width', 'height',
+        'frameborder', 'allow', 'allowfullscreen',
+      ],
+      div: ['class', 'data-youtube-embed'],
       '*': ['class'],
     },
     allowedSchemes: ['http', 'https', 'mailto'],
     allowedSchemesByTag: {
       img: ['http', 'https', 'data'],
+      iframe: ['https'],
     },
+    allowedIframeHostnames: [
+      'www.youtube.com',
+      'youtube.com',
+      'www.youtube-nocookie.com',
+      'youtube-nocookie.com',
+    ],
     transformTags: {
       a: (tagName, attribs) => ({
         tagName,

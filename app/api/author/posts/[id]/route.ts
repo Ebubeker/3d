@@ -7,6 +7,7 @@ import {
   validateAuthorPostPayload,
   resolveSlug,
 } from '@/lib/blog/author-posts';
+import { sendPostSubmittedEmail } from '@/lib/email/post-submitted';
 
 export const dynamic = 'force-dynamic';
 
@@ -163,6 +164,24 @@ export async function PATCH(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Notify the team inbox when this update is a submit-for-review. Only on the
+  // draft/rejected -> pending_review transition (re-saving an already-pending
+  // post can't reach here — PATCH is blocked for non-draft/rejected states).
+  if (newReviewStatus === 'pending_review') {
+    const { data: member } = await admin
+      .from('team_members')
+      .select('name')
+      .eq('id', auth.teamMemberId)
+      .maybeSingle();
+    await sendPostSubmittedEmail({
+      postId: id,
+      title: (body.title || '').trim(),
+      authorName: member?.name?.toString().trim() || 'A team member',
+      excerpt: body.excerpt?.toString().trim() || null,
+      category: body.category?.toString().trim() || null,
+    });
   }
 
   return NextResponse.json({ ok: true, submitted: newReviewStatus === 'pending_review' });
