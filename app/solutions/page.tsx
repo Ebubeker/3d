@@ -76,36 +76,41 @@ export default function SolutionsPage() {
               { name: 'Browzwear · Official Partner', desc: 'Digital Fashion', detail: 'End-to-end 3D design platform trusted by leading fashion brands worldwide', href: 'https://browzwear.com/', logo: '/images/logos/browzwear-horizontal.svg' },
               { name: 'Marvelous Designer', desc: '3D Clothing', detail: 'Advanced cloth simulation for photorealistic digital garments' },
               { name: 'Adobe Illustrator', desc: 'Technical Design', detail: 'Professional vector graphics for detailed technical flats and specs' }
-            ] as { name: string; desc: string; detail: string; href?: string; logo?: string }[]).map((tool, idx) => (
-              <div
-                key={idx}
-                className="group bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
-              >
-                {tool.logo && (
-                  <img
-                    src={tool.logo}
-                    alt={`${tool.name} logo`}
-                    className="h-5 sm:h-6 w-auto mb-3 sm:mb-4"
-                  />
-                )}
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-black mb-1.5 sm:mb-2 font-copperplate">
-                  {tool.href ? (
-                    <a
-                      href={tool.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline"
-                    >
-                      {tool.name}
-                    </a>
-                  ) : (
-                    tool.name
+            ] as { name: string; desc: string; detail: string; href?: string; logo?: string }[]).map((tool, idx) => {
+              const cardClassName = "group bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all duration-500 hover:-translate-y-2";
+              const cardContent = (
+                <>
+                  {tool.logo && (
+                    <img
+                      src={tool.logo}
+                      alt={`${tool.name} logo`}
+                      className="h-5 sm:h-6 w-auto mb-3 sm:mb-4"
+                    />
                   )}
-                </h3>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-2 sm:mb-4">{tool.desc}</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{tool.detail}</p>
-              </div>
-            ))}
+                  <h3 className={`text-base sm:text-lg md:text-xl font-bold text-black mb-1.5 sm:mb-2 font-copperplate${tool.href ? ' group-hover:underline' : ''}`}>
+                    {tool.name}
+                  </h3>
+                  <p className="text-xs sm:text-sm font-medium text-gray-500 mb-2 sm:mb-4">{tool.desc}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{tool.detail}</p>
+                </>
+              );
+
+              return tool.href ? (
+                <a
+                  key={idx}
+                  href={tool.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${cardClassName} block cursor-pointer`}
+                >
+                  {cardContent}
+                </a>
+              ) : (
+                <div key={idx} className={cardClassName}>
+                  {cardContent}
+                </div>
+              );
+            })}
           </div>
 
           <div className="mt-10 sm:mt-14 md:mt-20 text-center">
