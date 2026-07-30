@@ -71,17 +71,37 @@ export default function SolutionsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {[
+            {([
               { name: 'CLO3D', desc: '3D Garment Design', detail: 'Industry-standard software for realistic garment simulation and pattern development' },
-              { name: 'Browzwear', desc: 'Digital Fashion', detail: 'End-to-end 3D design platform trusted by leading fashion brands worldwide' },
+              { name: 'Browzwear · Official Partner', desc: 'Digital Fashion', detail: 'End-to-end 3D design platform trusted by leading fashion brands worldwide', href: 'https://browzwear.com/', logo: '/images/logos/browzwear-horizontal.svg' },
               { name: 'Marvelous Designer', desc: '3D Clothing', detail: 'Advanced cloth simulation for photorealistic digital garments' },
               { name: 'Adobe Illustrator', desc: 'Technical Design', detail: 'Professional vector graphics for detailed technical flats and specs' }
-            ].map((tool, idx) => (
+            ] as { name: string; desc: string; detail: string; href?: string; logo?: string }[]).map((tool, idx) => (
               <div
                 key={idx}
                 className="group bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
               >
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-black mb-1.5 sm:mb-2 font-copperplate">{tool.name}</h3>
+                {tool.logo && (
+                  <img
+                    src={tool.logo}
+                    alt={`${tool.name} logo`}
+                    className="h-5 sm:h-6 w-auto mb-3 sm:mb-4"
+                  />
+                )}
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-black mb-1.5 sm:mb-2 font-copperplate">
+                  {tool.href ? (
+                    <a
+                      href={tool.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {tool.name}
+                    </a>
+                  ) : (
+                    tool.name
+                  )}
+                </h3>
                 <p className="text-xs sm:text-sm font-medium text-gray-500 mb-2 sm:mb-4">{tool.desc}</p>
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{tool.detail}</p>
               </div>
